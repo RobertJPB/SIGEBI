@@ -1,35 +1,82 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SIGEBI.Domain.Entities
 {
-  public class Usuario
+    public class Usuario
+    {
+        public Guid Id { get; private set; }
+        public string Nombre { get; private set; } = null!;
+        public string Correo { get; private set; } = null!;
+        public string ContrasenaHash { get; private set; } = null!;
+        public Enums.Seguridad.RolUsuario Rol { get; private set; }
+        public Enums.Seguridad.EstadoUsuario Estado { get; private set; }
+
+        private Usuario() { }
+
+        public Usuario(string nombre, string correo, string contrasenaHash, Enums.Seguridad.RolUsuario rol)
         {
-            public Guid Id { get; private set; }
-            public string Nombre { get; private set; } = null!;
-            public string Correo { get; private set; } = null!;
-            public string ContrasenaHash { get; private set; } = null!;
-            public int IdRol { get; private set; }
-            public short Estado { get; private set; }
+            if (string.IsNullOrWhiteSpace(nombre))
+                throw new ArgumentException("El nombre es requerido.", nameof(nombre));
 
-            private Usuario() { } // Para EF
+            if (string.IsNullOrWhiteSpace(correo) || !correo.Contains("@"))
+                throw new ArgumentException("Correo inválido.", nameof(correo));
 
-            public Usuario(string nombre, string correo, string contrasenaHash, int idRol)
-            {
-                if (string.IsNullOrWhiteSpace(nombre)) throw new ArgumentException("El nombre es requerido.");
-                if (!correo.Contains("@")) throw new ArgumentException("Correo inválido.");
+            if (string.IsNullOrWhiteSpace(contrasenaHash))
+                throw new ArgumentException("La contraseña es requerida.", nameof(contrasenaHash));
 
-                Id = Guid.NewGuid();
-                Nombre = nombre;
-                Correo = correo;
-                ContrasenaHash = contrasenaHash;
-                IdRol = idRol;
-                Estado = 1; // Activo por defecto
-            }
-
-            public void BloquearUsuario() => Estado = 3;
+            Id = Guid.NewGuid();
+            Nombre = nombre.Trim();
+            Correo = correo.Trim();
+            ContrasenaHash = contrasenaHash;
+            Rol = rol;
+            Estado = Enums.Seguridad.EstadoUsuario.Activo;
         }
- }
+
+        public void Bloquear()
+        {
+            if (Estado == Enums.Seguridad.EstadoUsuario.Bloqueado)
+                return;
+
+            Estado = Enums.Seguridad.EstadoUsuario.Bloqueado;
+        }
+
+        public void Activar()
+        {
+            Estado = Enums.Seguridad.EstadoUsuario.Activo;
+        }
+
+        public void Desactivar()
+        {
+            Estado = Enums.Seguridad.EstadoUsuario.Inactivo;
+        }
+
+        public void CambiarRol(Enums.Seguridad.RolUsuario nuevoRol)
+        {
+            Rol = nuevoRol;
+        }
+
+        public void CambiarNombre(string nuevoNombre)
+        {
+            if (string.IsNullOrWhiteSpace(nuevoNombre))
+                throw new ArgumentException("El nombre es requerido.", nameof(nuevoNombre));
+
+            Nombre = nuevoNombre.Trim();
+        }
+
+        public void CambiarCorreo(string nuevoCorreo)
+        {
+            if (string.IsNullOrWhiteSpace(nuevoCorreo) || !nuevoCorreo.Contains("@"))
+                throw new ArgumentException("Correo inválido.", nameof(nuevoCorreo));
+
+            Correo = nuevoCorreo.Trim();
+        }
+
+        public void CambiarContrasenaHash(string nuevoContrasenaHash)
+        {
+            if (string.IsNullOrWhiteSpace(nuevoContrasenaHash))
+                throw new ArgumentException("La contraseña es requerida.", nameof(nuevoContrasenaHash));
+
+            ContrasenaHash = nuevoContrasenaHash;
+        }
+    }
+}

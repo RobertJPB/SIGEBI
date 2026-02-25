@@ -1,32 +1,44 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SIGEBI.Domain.Entities
 {
     public class Notificacion
     {
         public Guid Id { get; private set; }
-        public short Tipo { get; private set; } // 1=Recordatorio, 2=Penalización
-        public string Mensaje { get; private set; } = null!;
+        public Enums.Operacion.TipoNotificacion Tipo { get; private set; }
+        public string Mensaje { get; private set; }
         public DateTime Fecha { get; private set; }
-        public short Estado { get; private set; } // 1=No leída, 2=Leída
+        public Enums.Operacion.EstadoNotificacion Estado { get; private set; }
         public Guid UsuarioId { get; private set; }
 
         private Notificacion() { }
 
-        public Notificacion(Guid usuarioId, short tipo, string mensaje)
+        public Notificacion(
+            Guid usuarioId,
+            Enums.Operacion.TipoNotificacion tipo,
+            string mensaje,
+            DateTime fechaUtc)
         {
+            if (usuarioId == Guid.Empty)
+                throw new ArgumentException("Usuario inválido.", nameof(usuarioId));
+
+            if (string.IsNullOrWhiteSpace(mensaje))
+                throw new ArgumentException("El mensaje es obligatorio.", nameof(mensaje));
+
             Id = Guid.NewGuid();
             UsuarioId = usuarioId;
             Tipo = tipo;
-            Mensaje = mensaje;
-            Fecha = DateTime.UtcNow;
-            Estado = 1;
+            Mensaje = mensaje.Trim();
+            Fecha = fechaUtc;
+            Estado = Enums.Operacion.EstadoNotificacion.NoLeida;
         }
 
-        public void MarcarComoLeida() => Estado = 2;
+        public void MarcarComoLeida()
+        {
+            if (Estado == Enums.Operacion.EstadoNotificacion.Leida)
+                return;
+
+            Estado = Enums.Operacion.EstadoNotificacion.Leida;
+        }
     }
 }

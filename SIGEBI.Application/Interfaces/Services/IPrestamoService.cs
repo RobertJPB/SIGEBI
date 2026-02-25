@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SIGEBI.Business.Interfaces
+namespace SIGEBI.Business.Abstractions.Services
 {
     public interface IPrestamoService
     {

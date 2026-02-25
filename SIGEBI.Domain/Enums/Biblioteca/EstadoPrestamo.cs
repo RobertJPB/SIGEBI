@@ -9,8 +9,7 @@ namespace SIGEBI.Domain.Enums.Biblioteca;
 public enum EstadoPrestamo
 {
     Activo = 1,
-    Devuelto = 2,
-    Vencido = 3,
-    Atrasado = 4, 
-    Cancelado = 5
+    Atrasado = 2,
+    Devuelto = 3,
+    Cancelado = 4
 }

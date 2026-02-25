@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SIGEBI.Business.Interfaces.UseCases.Usuarios
+namespace SIGEBI.Business.UseCases.Prestamos
 {
-    class Registro
+    class SolicitarPrestamoUseCase
     {
     }
 }

@@ -1,15 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SIGEBI.Domain.Enums.Operacion;
-
-public enum TipoNotificacion
+namespace SIGEBI.Domain.Enums.Operacion
 {
-    RecordatorioDevolucion = 1,
-    AlertaVencimiento = 2,
-    ConfirmacionPrestamo = 3,
-    AvisoPenalizacion = 4
+    public enum TipoNotificacion
+    {
+        Recordatorio = 1,
+        Penalizacion = 2
+    }
+
+    public enum EstadoNotificacion
+    {
+        NoLeida = 1,
+        Leida = 2
+    }
 }

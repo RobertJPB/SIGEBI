@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SIGEBI.Business.Interfaces.UseCases.Catalogo
+namespace SIGEBI.Domain.DomainServices
 {
-    class ConsultarLibros
+    class PenalizacionCalculator
     {
     }
 }

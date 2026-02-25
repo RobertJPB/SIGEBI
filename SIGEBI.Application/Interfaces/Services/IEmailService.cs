@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace SIGEBI.Business.Interfaces.ExternalServices
+namespace SIGEBI.Business.Abstractions.Services
 {
     public interface IEmailService
     {

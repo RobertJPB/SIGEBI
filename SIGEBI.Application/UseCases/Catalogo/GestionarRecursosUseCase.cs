@@ -4,11 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SIGEBI.Domain.Enums.Biblioteca
+namespace SIGEBI.Business.UseCases.Catalogo
 {
-    public enum EstadoRecurso
+    class GestionarRecursosUseCase
     {
-        Disponible = 1,
-        Inactivo = 2
     }
 }

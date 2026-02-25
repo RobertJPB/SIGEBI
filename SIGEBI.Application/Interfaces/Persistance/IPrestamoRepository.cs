@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SIGEBI.Domain.Entities;
 
-namespace SIGEBI.Domain.Interfaces.Repositories
+namespace SIGEBI.Business.Abstractions.Persistance
 {
     public interface IPrestamoRepository
     {

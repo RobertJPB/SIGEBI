@@ -1,36 +1,47 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SIGEBI.Domain.Entities
 {
     public class Penalizacion
     {
         public Guid Id { get; private set; }
-        public string Motivo { get; private set; } = null!;
+        public Guid UsuarioId { get; private set; }
+        public string Motivo { get; private set; }
         public DateTime FechaInicio { get; private set; }
         public DateTime? FechaFin { get; private set; }
-        public Guid UsuarioId { get; private set; }
-        public short Estado { get; private set; }
+        public Enums.Operacion.EstadoPenalizacion Estado { get; private set; }
 
         private Penalizacion() { }
 
-        public Penalizacion(Guid usuarioId, string motivo, int diasPenalizacion)
+        public Penalizacion(Guid usuarioId, string motivo, int diasPenalizacion, DateTime fechaInicioUtc)
         {
+            if (usuarioId == Guid.Empty)
+                throw new ArgumentException("Usuario inválido.", nameof(usuarioId));
+
+            if (string.IsNullOrWhiteSpace(motivo))
+                throw new ArgumentException("El motivo es obligatorio.", nameof(motivo));
+
+            if (diasPenalizacion <= 0)
+                throw new ArgumentException("Los días de penalización deben ser mayores que 0.", nameof(diasPenalizacion));
+
             Id = Guid.NewGuid();
             UsuarioId = usuarioId;
-            Motivo = motivo;
-            FechaInicio = DateTime.UtcNow;
-            FechaFin = FechaInicio.AddDays(diasPenalizacion);
-            Estado = 1; // Activa
+            Motivo = motivo.Trim();
+            FechaInicio = fechaInicioUtc;
+            FechaFin = fechaInicioUtc.AddDays(diasPenalizacion);
+            Estado = Enums.Operacion.EstadoPenalizacion.Activa;
         }
 
-        public void FinalizarPenalizacion()
+        public void Finalizar(DateTime fechaFinUtc)
         {
-            FechaFin = DateTime.UtcNow;
-            Estado = 2; // Finalizada
+            if (Estado == Enums.Operacion.EstadoPenalizacion.Finalizada)
+                return;
+
+            if (fechaFinUtc < FechaInicio)
+                throw new InvalidOperationException("La fecha de fin no puede ser anterior a la de inicio.");
+
+            FechaFin = fechaFinUtc;
+            Estado = Enums.Operacion.EstadoPenalizacion.Finalizada;
         }
     }
 }

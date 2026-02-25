@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SIGEBI.Business.Interfaces.UseCases.Usuarios
+namespace SIGEBI.Domain.DomainServices
 {
-    class Login
+    class NotificacionFactory
     {
     }
 }
