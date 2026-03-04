@@ -11,6 +11,23 @@ namespace SIGEBI.Domain.Entities
         public int Stock { get; private set; }
         public Enums.Biblioteca.EstadoRecurso Estado { get; private set; }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         private RecursoBibliografico() { }
 
         public RecursoBibliografico(string titulo, string autor, int idCategoria, int stockInicial)
