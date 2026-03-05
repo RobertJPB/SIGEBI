@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SIGEBI.Infrastructure.Persistance
+namespace SIGEBI.Infrastructure.Persistance.Configurations
 {
-    class Configurations
+    class ValoracionConfiguration
     {
     }
 }

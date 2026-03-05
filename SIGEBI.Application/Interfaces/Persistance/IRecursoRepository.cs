@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SIGEBI.Domain.Entities;
+using SIGEBI.Domain.Entities.RecursoBibliografico;
 
 namespace SIGEBI.Business.Abstractions.Persistance
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SIGEBI.Domain.Entities
+namespace SIGEBI.Domain.Entities.RecursoBibliografico
 {
     public class RecursoBibliografico
     {
@@ -51,7 +51,7 @@ namespace SIGEBI.Domain.Entities
             Stock = stockInicial;
             Estado = Enums.Biblioteca.EstadoRecurso.Disponible;
         }
-
+9
         public void DisminuirStock()
         {
             if (Estado != Enums.Biblioteca.EstadoRecurso.Disponible)

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SIGEBI.Infrastructure.Repositories
+namespace SIGEBI.Infrastructure.Persistance.Configurations
 {
-    class RecursoRepository
+    class RolConfiguration
     {
     }
 }

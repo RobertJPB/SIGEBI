@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SIGEBI.Infrastructure.Repositories
+namespace SIGEBI.Infrastructure.Persistance.Repositories
 {
-    class UsuarioRepository
+    class CategoriaRepository
     {
     }
 }
