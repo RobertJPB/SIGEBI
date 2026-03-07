@@ -1,13 +1,28 @@
+﻿using Microsoft.EntityFrameworkCore;
+using SIGEBI.Infrastructure.Persistance;
+using SIGEBI.Infrastructure.IoC;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+// 🔹 Registrar DbContext
+builder.Services.AddDbContext<SIGEBIDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
+// 🔹 Registrar dependencias (Repositories + Services)
+builder.Services.AddInfrastructure();
+
+
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
