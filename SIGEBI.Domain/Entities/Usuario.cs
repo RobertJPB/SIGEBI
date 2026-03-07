@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using SIGEBI.Domain.Enums.Seguridad;
 
 namespace SIGEBI.Domain.Entities
 {
@@ -8,19 +10,24 @@ namespace SIGEBI.Domain.Entities
         public string Nombre { get; private set; } = null!;
         public string Correo { get; private set; } = null!;
         public string ContrasenaHash { get; private set; } = null!;
-        public Enums.Seguridad.RolUsuario Rol { get; private set; }
-        public Enums.Seguridad.EstadoUsuario Estado { get; private set; }
+        public RolUsuario Rol { get; private set; }
+        public EstadoUsuario Estado { get; private set; }
+
+        public ICollection<Prestamo> Prestamos { get; private set; } = new List<Prestamo>();
+        public ICollection<Penalizacion> Penalizaciones { get; private set; } = new List<Penalizacion>();
+        public ICollection<Notificacion> Notificaciones { get; private set; } = new List<Notificacion>();
+        public ICollection<Valoracion> Valoraciones { get; private set; } = new List<Valoracion>();
+        public ICollection<Auditoria> Auditorias { get; private set; } = new List<Auditoria>();
+        public ListaDeseos? ListaDeseos { get; private set; }
 
         private Usuario() { }
 
-        public Usuario(string nombre, string correo, string contrasenaHash, Enums.Seguridad.RolUsuario rol)
+        public Usuario(string nombre, string correo, string contrasenaHash, RolUsuario rol)
         {
             if (string.IsNullOrWhiteSpace(nombre))
                 throw new ArgumentException("El nombre es requerido.", nameof(nombre));
-
             if (string.IsNullOrWhiteSpace(correo) || !correo.Contains("@"))
                 throw new ArgumentException("Correo inválido.", nameof(correo));
-
             if (string.IsNullOrWhiteSpace(contrasenaHash))
                 throw new ArgumentException("La contraseña es requerida.", nameof(contrasenaHash));
 
@@ -29,37 +36,23 @@ namespace SIGEBI.Domain.Entities
             Correo = correo.Trim();
             ContrasenaHash = contrasenaHash;
             Rol = rol;
-            Estado = Enums.Seguridad.EstadoUsuario.Activo;
+            Estado = EstadoUsuario.Activo;
         }
 
         public void Bloquear()
         {
-            if (Estado == Enums.Seguridad.EstadoUsuario.Bloqueado)
-                return;
-
-            Estado = Enums.Seguridad.EstadoUsuario.Bloqueado;
+            if (Estado == EstadoUsuario.Bloqueado) return;
+            Estado = EstadoUsuario.Bloqueado;
         }
 
-        public void Activar()
-        {
-            Estado = Enums.Seguridad.EstadoUsuario.Activo;
-        }
-
-        public void Desactivar()
-        {
-            Estado = Enums.Seguridad.EstadoUsuario.Inactivo;
-        }
-
-        public void CambiarRol(Enums.Seguridad.RolUsuario nuevoRol)
-        {
-            Rol = nuevoRol;
-        }
+        public void Activar() => Estado = EstadoUsuario.Activo;
+        public void Desactivar() => Estado = EstadoUsuario.Inactivo;
+        public void CambiarRol(RolUsuario nuevoRol) => Rol = nuevoRol;
 
         public void CambiarNombre(string nuevoNombre)
         {
             if (string.IsNullOrWhiteSpace(nuevoNombre))
                 throw new ArgumentException("El nombre es requerido.", nameof(nuevoNombre));
-
             Nombre = nuevoNombre.Trim();
         }
 
@@ -67,16 +60,14 @@ namespace SIGEBI.Domain.Entities
         {
             if (string.IsNullOrWhiteSpace(nuevoCorreo) || !nuevoCorreo.Contains("@"))
                 throw new ArgumentException("Correo inválido.", nameof(nuevoCorreo));
-
             Correo = nuevoCorreo.Trim();
         }
 
-        public void CambiarContrasenaHash(string nuevoContrasenaHash)
+        public void CambiarContrasenaHash(string nuevoHash)
         {
-            if (string.IsNullOrWhiteSpace(nuevoContrasenaHash))
-                throw new ArgumentException("La contraseña es requerida.", nameof(nuevoContrasenaHash));
-
-            ContrasenaHash = nuevoContrasenaHash;
+            if (string.IsNullOrWhiteSpace(nuevoHash))
+                throw new ArgumentException("La contraseña es requerida.", nameof(nuevoHash));
+            ContrasenaHash = nuevoHash;
         }
     }
 }

@@ -1,20 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SIGEBI.Domain.Entities.RecursoBibliografico;
+﻿using SIGEBI.Domain.Entities.Recursos;
 
-namespace SIGEBI.Business.Abstractions.Persistance
+namespace SIGEBI.Business.Interfaces.Persistance
 {
     public interface IRecursoRepository
     {
-        Task<RecursoBibliografico?> GetByIdAsync(int id);
         Task<IEnumerable<RecursoBibliografico>> GetAllAsync();
-        Task<IEnumerable<RecursoBibliografico>> GetByCategoriaIdAsync(int categoriaId);
-
-        Task AddAsync(RecursoBibliografico recurso);
-        void Update(RecursoBibliografico recurso);
-        void Remove(RecursoBibliografico recurso);
+        Task<RecursoBibliografico?> GetByIdAsync(Guid id);
+        Task<IEnumerable<RecursoBibliografico>> GetByCategoriaAsync(int categoriaId);
+        Task<IEnumerable<RecursoBibliografico>> GetDisponiblesAsync();
+        Task<IEnumerable<RecursoBibliografico>> BuscarPorTituloAsync(string titulo);
+        Task<IEnumerable<Libro>> GetLibrosAsync();
+        Task<IEnumerable<Revista>> GetRevistasAsync();
+        Task<IEnumerable<Documento>> GetDocumentosAsync();
+        Task AddAsync(RecursoBibliografico entity);
+        void Update(RecursoBibliografico entity);
+        void Delete(RecursoBibliografico entity);
+        Task<bool> ExistsAsync(Guid id);
     }
 }

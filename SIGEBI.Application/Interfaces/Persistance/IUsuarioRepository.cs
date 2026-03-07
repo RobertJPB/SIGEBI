@@ -1,20 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SIGEBI.Domain.Entities;
+﻿using SIGEBI.Domain.Entities;
+using SIGEBI.Domain.Enums.Seguridad;
 
-namespace SIGEBI.Business.Abstractions.Persistance
+namespace SIGEBI.Business.Interfaces.Persistance
 {
     public interface IUsuarioRepository
     {
-        Task<Usuario?> GetByIdAsync(int id);
-        Task<Usuario?> GetByCorreoAsync(string correo);
         Task<IEnumerable<Usuario>> GetAllAsync();
-
-        Task AddAsync(Usuario usuario);
-        void Update(Usuario usuario);
-        void Remove(Usuario usuario);
+        Task<Usuario?> GetByIdAsync(Guid id);
+        Task<Usuario?> GetByCorreoAsync(string correo);
+        Task<IEnumerable<Usuario>> GetByRolAsync(RolUsuario rol);
+        Task<IEnumerable<Usuario>> GetActivosAsync();
+        Task AddAsync(Usuario entity);
+        void Update(Usuario entity);
+        void Delete(Usuario entity);
+        Task<bool> ExistsAsync(Guid id);
     }
 }

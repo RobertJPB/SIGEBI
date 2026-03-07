@@ -6,13 +6,13 @@ namespace SIGEBI.Domain.Entities
     {
         public int Id { get; private set; }
         public Guid UsuarioId { get; private set; }
-
         public Enums.Auditoria.TipoAccionAuditoria Accion { get; private set; }
-
         public string TablaAfectada { get; private set; } = string.Empty;
         public string Detalle { get; private set; } = string.Empty;
         public DateTime FechaRegistro { get; private set; }
         public string IpAddress { get; private set; } = string.Empty;
+
+        public Usuario Usuario { get; private set; } = null!;
 
         private Auditoria() { }
 
@@ -26,10 +26,8 @@ namespace SIGEBI.Domain.Entities
         {
             if (usuarioId == Guid.Empty)
                 throw new ArgumentException("Usuario inválido.", nameof(usuarioId));
-
             if (string.IsNullOrWhiteSpace(tablaAfectada))
                 throw new ArgumentException("Tabla afectada requerida.", nameof(tablaAfectada));
-
             if (string.IsNullOrWhiteSpace(ipAddress))
                 throw new ArgumentException("IP requerida.", nameof(ipAddress));
 

@@ -1,12 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Infrastructure.Persistance.Configurations
 {
-    class ValoracionConfiguration
+    public class ValoracionConfiguration : IEntityTypeConfiguration<Valoracion>
     {
+        public void Configure(EntityTypeBuilder<Valoracion> builder)
+        {
+            builder.ToTable("Valoraciones");
+
+            builder.HasKey(v => v.Id);
+
+            builder.Property(v => v.Calificacion)
+                .IsRequired();
+
+            builder.Property(v => v.Comentario)
+                .HasMaxLength(500)
+                .IsRequired(false);
+
+            builder.HasOne(v => v.Usuario)
+                .WithMany(u => u.Valoraciones)
+                .HasForeignKey(v => v.UsuarioId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(v => v.Recurso)
+                .WithMany()
+                .HasForeignKey(v => v.RecursoId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
     }
 }

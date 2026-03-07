@@ -1,5 +1,4 @@
 ﻿using System;
-
 namespace SIGEBI.Domain.Entities
 {
     public class Penalizacion
@@ -11,18 +10,15 @@ namespace SIGEBI.Domain.Entities
         public DateTime? FechaFin { get; private set; }
         public Enums.Operacion.EstadoPenalizacion Estado { get; private set; }
 
+        public Usuario Usuario { get; private set; } = null!;
+
         private Penalizacion() { }
 
         public Penalizacion(Guid usuarioId, string motivo, int diasPenalizacion, DateTime fechaInicioUtc)
         {
-            if (usuarioId == Guid.Empty)
-                throw new ArgumentException("Usuario inválido.", nameof(usuarioId));
-
-            if (string.IsNullOrWhiteSpace(motivo))
-                throw new ArgumentException("El motivo es obligatorio.", nameof(motivo));
-
-            if (diasPenalizacion <= 0)
-                throw new ArgumentException("Los días de penalización deben ser mayores que 0.", nameof(diasPenalizacion));
+            if (usuarioId == Guid.Empty) throw new ArgumentException("Usuario inválido.", nameof(usuarioId));
+            if (string.IsNullOrWhiteSpace(motivo)) throw new ArgumentException("El motivo es obligatorio.", nameof(motivo));
+            if (diasPenalizacion <= 0) throw new ArgumentException("Los días deben ser mayores que 0.", nameof(diasPenalizacion));
 
             Id = Guid.NewGuid();
             UsuarioId = usuarioId;
@@ -34,12 +30,9 @@ namespace SIGEBI.Domain.Entities
 
         public void Finalizar(DateTime fechaFinUtc)
         {
-            if (Estado == Enums.Operacion.EstadoPenalizacion.Finalizada)
-                return;
-
+            if (Estado == Enums.Operacion.EstadoPenalizacion.Finalizada) return;
             if (fechaFinUtc < FechaInicio)
                 throw new InvalidOperationException("La fecha de fin no puede ser anterior a la de inicio.");
-
             FechaFin = fechaFinUtc;
             Estado = Enums.Operacion.EstadoPenalizacion.Finalizada;
         }

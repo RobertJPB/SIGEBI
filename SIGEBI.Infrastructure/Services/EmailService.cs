@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SIGEBI.Business.Interfaces.Services;
 
 namespace SIGEBI.Infrastructure.Services
 {
-    class EmailService
+    public class EmailService : IEmailService
     {
+        public async Task EnviarAsync(string destinatario, string asunto, string cuerpo)
+        {
+            // Implementación SMTP ira aqui
+            await Task.CompletedTask;
+        }
     }
 }

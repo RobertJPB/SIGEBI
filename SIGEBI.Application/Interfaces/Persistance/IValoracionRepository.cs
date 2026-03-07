@@ -1,20 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SIGEBI.Domain.Entities;
+﻿using SIGEBI.Domain.Entities;
 
-namespace SIGEBI.Business.Abstractions.Persistance
+namespace SIGEBI.Business.Interfaces.Persistance
 {
     public interface IValoracionRepository
     {
-        Task<Valoracion?> GetByIdAsync(int id);
-        Task<Valoracion?> GetByUsuarioYRecursoAsync(int usuarioId, int recursoId);
-        Task<IEnumerable<Valoracion>> GetByRecursoIdAsync(int recursoId);
-
-        Task AddAsync(Valoracion valoracion);
-        void Update(Valoracion valoracion);
-        void Remove(Valoracion valoracion);
+        Task<IEnumerable<Valoracion>> GetAllAsync();
+        Task<Valoracion?> GetByIdAsync(Guid id);
+        Task<IEnumerable<Valoracion>> GetByRecursoIdAsync(Guid recursoId);
+        Task<IEnumerable<Valoracion>> GetByUsuarioIdAsync(Guid usuarioId);
+        Task<double> GetPromedioCalificacionAsync(Guid recursoId);
+        Task AddAsync(Valoracion entity);
+        void Update(Valoracion entity);
+        void Delete(Valoracion entity);
+        Task<bool> ExistsAsync(Guid id);
     }
 }

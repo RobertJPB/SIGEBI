@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using SIGEBI.Domain.Entities.Recursos;
 
 namespace SIGEBI.Domain.Entities
 {
@@ -8,13 +10,14 @@ namespace SIGEBI.Domain.Entities
         public string Nombre { get; private set; }
         public Enums.Biblioteca.EstadoCategoria Estado { get; private set; }
 
+        public ICollection<RecursoBibliografico> Recursos { get; private set; } = new List<RecursoBibliografico>();
+
         private Categoria() { }
 
         public Categoria(string nombre)
         {
             if (string.IsNullOrWhiteSpace(nombre))
                 throw new ArgumentException("El nombre es obligatorio.", nameof(nombre));
-
             Nombre = nombre.Trim();
             Estado = Enums.Biblioteca.EstadoCategoria.Activa;
         }
@@ -23,18 +26,10 @@ namespace SIGEBI.Domain.Entities
         {
             if (string.IsNullOrWhiteSpace(nuevoNombre))
                 throw new ArgumentException("El nombre es obligatorio.", nameof(nuevoNombre));
-
             Nombre = nuevoNombre.Trim();
         }
 
-        public void Desactivar()
-        {
-            Estado = Enums.Biblioteca.EstadoCategoria.Inactiva;
-        }
-
-        public void Activar()
-        {
-            Estado = Enums.Biblioteca.EstadoCategoria.Activa;
-        }
+        public void Desactivar() => Estado = Enums.Biblioteca.EstadoCategoria.Inactiva;
+        public void Activar() => Estado = Enums.Biblioteca.EstadoCategoria.Activa;
     }
 }

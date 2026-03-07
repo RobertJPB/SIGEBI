@@ -1,10 +1,7 @@
-﻿using System.Threading.Tasks;
-
-namespace SIGEBI.Business.Abstractions.Services
+﻿namespace SIGEBI.Business.Interfaces.Services
 {
     public interface IEmailService
     {
-        Task EnviarNotificacionPrestamoAsync(string emailDestino, string mensaje);
-        Task EnviarAlertaGenericaAsync(string emailDestino, string asunto, string cuerpo);
+        Task EnviarAsync(string destinatario, string asunto, string cuerpo);
     }
 }

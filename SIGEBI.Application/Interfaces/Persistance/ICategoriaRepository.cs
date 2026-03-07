@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SIGEBI.Domain.Entities;
+﻿using SIGEBI.Domain.Entities;
 
-namespace SIGEBI.Business.Abstractions.Persistance
+namespace SIGEBI.Business.Interfaces.Persistance
 {
     public interface ICategoriaRepository
     {
-        Task<Categoria?> GetByIdAsync(int id);
-        Task<Categoria?> GetByNombreAsync(string nombre);
         Task<IEnumerable<Categoria>> GetAllAsync();
-
-        Task AddAsync(Categoria categoria);
-        void Update(Categoria categoria);
-        void Remove(Categoria categoria);
+        Task<Categoria?> GetByIdAsync(Guid id);
+        Task<Categoria?> GetByNombreAsync(string nombre);
+        Task<IEnumerable<Categoria>> GetActivasAsync();
+        Task AddAsync(Categoria entity);
+        void Update(Categoria entity);
+        void Delete(Categoria entity);
+        Task<bool> ExistsAsync(Guid id);
     }
 }

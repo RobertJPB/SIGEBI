@@ -1,5 +1,4 @@
 ﻿using System;
-
 namespace SIGEBI.Domain.Enums.Seguridad
 {
     public enum RolUsuario

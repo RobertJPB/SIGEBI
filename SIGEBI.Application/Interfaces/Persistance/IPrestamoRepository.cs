@@ -1,24 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SIGEBI.Domain.Entities;
+﻿using SIGEBI.Domain.Entities;
 
-namespace SIGEBI.Business.Abstractions.Persistance
+namespace SIGEBI.Business.Interfaces.Persistance
 {
     public interface IPrestamoRepository
     {
-        Task<Prestamo?> GetByIdAsync(int id);
-
-        Task<IEnumerable<Prestamo>> GetByUsuarioIdAsync(int usuarioId);
-
-        Task<IEnumerable<Prestamo>> GetActivosAsync();
-
-        Task AddAsync(Prestamo prestamo);
-
-        void Update(Prestamo prestamo);
-
-        void Remove(Prestamo prestamo);
+        Task<IEnumerable<Prestamo>> GetAllAsync();
+        Task<Prestamo?> GetByIdAsync(Guid id);
+        Task<IEnumerable<Prestamo>> GetByUsuarioIdAsync(Guid usuarioId);
+        Task<IEnumerable<Prestamo>> GetActivosByUsuarioIdAsync(Guid usuarioId);
+        Task<IEnumerable<Prestamo>> GetAtrasadosAsync();
+        Task AddAsync(Prestamo entity);
+        void Update(Prestamo entity);
+        void Delete(Prestamo entity);
+        Task<bool> ExistsAsync(Guid id);
     }
 }

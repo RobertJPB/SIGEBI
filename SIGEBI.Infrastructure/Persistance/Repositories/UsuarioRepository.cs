@@ -1,12 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
+using SIGEBI.Business.Interfaces.Persistance;
+using SIGEBI.Domain.Entities;
+using SIGEBI.Domain.Enums.Seguridad;
+using SIGEBI.Infrastructure.Persistance.Base;
 
 namespace SIGEBI.Infrastructure.Persistance.Repositories
 {
-    class UsuarioRepository
+    public class UsuarioRepository : BaseRepository<Usuario>, IUsuarioRepository
     {
+        public UsuarioRepository(SIGEBIDbContext context) : base(context) { }
+
+        public async Task<Usuario?> GetByCorreoAsync(string correo)
+            => await _dbSet.FirstOrDefaultAsync(u => u.Correo == correo);
+
+        public async Task<IEnumerable<Usuario>> GetByRolAsync(RolUsuario rol)
+            => await _dbSet.Where(u => u.Rol == rol).ToListAsync();
+
+        public async Task<IEnumerable<Usuario>> GetActivosAsync()
+            => await _dbSet.Where(u => u.Estado == EstadoUsuario.Activo).ToListAsync();
     }
 }

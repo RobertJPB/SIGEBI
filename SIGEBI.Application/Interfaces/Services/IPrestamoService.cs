@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using SIGEBI.Domain.Entities;
 
-namespace SIGEBI.Business.Abstractions.Services
+namespace SIGEBI.Business.Interfaces.Services
 {
     public interface IPrestamoService
     {
-        Task RegistrarPrestamoAsync(int usuarioId, Guid recursoId);
-     
-        Task RegistrarDevolucionAsync(Guid prestamoId);
-        Task<IEnumerable<object>> ObtenerPrestamosActivosPorUsuarioAsync(int usuarioId);
+        Task<Prestamo> SolicitarPrestamoAsync(Guid usuarioId, Guid recursoId);
+        Task DevolverPrestamoAsync(Guid prestamoId);
+        Task<IEnumerable<Prestamo>> GetPrestamosActivosByUsuarioAsync(Guid usuarioId);
     }
 }
