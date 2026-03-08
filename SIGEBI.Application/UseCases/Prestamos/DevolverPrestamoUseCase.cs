@@ -1,4 +1,5 @@
-﻿using SIGEBI.Business.Interfaces.Persistance;
+﻿using SIGEBI.Business.Interfaces;
+using SIGEBI.Business.Interfaces.Persistance;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Entities;
 
@@ -9,15 +10,18 @@ namespace SIGEBI.Business.UseCases.Prestamos
         private readonly IPrestamoRepository _prestamoRepository;
         private readonly IRecursoRepository _recursoRepository;
         private readonly IPenalizacionRepository _penalizacionRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
         public DevolverPrestamoUseCase(
             IPrestamoRepository prestamoRepository,
             IRecursoRepository recursoRepository,
-            IPenalizacionRepository penalizacionRepository)
+            IPenalizacionRepository penalizacionRepository,
+            IUnitOfWork unitOfWork)
         {
             _prestamoRepository = prestamoRepository;
             _recursoRepository = recursoRepository;
             _penalizacionRepository = penalizacionRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task EjecutarAsync(Guid prestamoId)
@@ -44,6 +48,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
 
             _prestamoRepository.Update(prestamo);
             _recursoRepository.Update(recurso);
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }

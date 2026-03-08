@@ -1,4 +1,5 @@
 ﻿using SIGEBI.Business.DTOs;
+using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistance;
 using SIGEBI.Business.Mappers;
 using SIGEBI.Domain.Entities;
@@ -10,15 +11,18 @@ namespace SIGEBI.Business.UseCases.Catalogo
         private readonly IValoracionRepository _valoracionRepository;
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IRecursoRepository _recursoRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
         public ValoracionesUseCase(
             IValoracionRepository valoracionRepository,
             IUsuarioRepository usuarioRepository,
-            IRecursoRepository recursoRepository)
+            IRecursoRepository recursoRepository,
+            IUnitOfWork unitOfWork)
         {
             _valoracionRepository = valoracionRepository;
             _usuarioRepository = usuarioRepository;
             _recursoRepository = recursoRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<ValoracionDTO> AgregarValoracionAsync(Guid usuarioId, Guid recursoId,
@@ -32,6 +36,7 @@ namespace SIGEBI.Business.UseCases.Catalogo
 
             var valoracion = new Valoracion(usuarioId, recursoId, calificacion, comentario);
             await _valoracionRepository.AddAsync(valoracion);
+            await _unitOfWork.SaveChangesAsync();
             return ValoracionMapper.ToDTO(valoracion);
         }
 

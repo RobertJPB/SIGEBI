@@ -34,6 +34,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
             );
 
             await _usuarioRepository.AddAsync(usuario);
+
         }
     }
 }

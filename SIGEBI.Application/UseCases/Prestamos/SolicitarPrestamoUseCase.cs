@@ -1,4 +1,5 @@
 ﻿using SIGEBI.Business.DTOs;
+using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistance;
 using SIGEBI.Business.Mappers;
 using SIGEBI.Domain.DomainServices;
@@ -12,17 +13,20 @@ namespace SIGEBI.Business.UseCases.Prestamos
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IRecursoRepository _recursoRepository;
         private readonly IPenalizacionRepository _penalizacionRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
         public SolicitarPrestamoUseCase(
             IPrestamoRepository prestamoRepository,
             IUsuarioRepository usuarioRepository,
             IRecursoRepository recursoRepository,
-            IPenalizacionRepository penalizacionRepository)
+            IPenalizacionRepository penalizacionRepository,
+            IUnitOfWork unitOfWork)
         {
             _prestamoRepository = prestamoRepository;
             _usuarioRepository = usuarioRepository;
             _recursoRepository = recursoRepository;
             _penalizacionRepository = penalizacionRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<PrestamoResponseDTO> EjecutarAsync(Guid usuarioId, Guid recursoId)
@@ -43,6 +47,8 @@ namespace SIGEBI.Business.UseCases.Prestamos
 
             recurso.DisminuirStock();
             await _prestamoRepository.AddAsync(prestamo);
+            _recursoRepository.Update(recurso);
+            await _unitOfWork.SaveChangesAsync();
 
             return PrestamoMapper.ToDTO(prestamo);
         }

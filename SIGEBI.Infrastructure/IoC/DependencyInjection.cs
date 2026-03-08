@@ -1,8 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistance;
 using SIGEBI.Business.Interfaces.Services;
+using SIGEBI.Infrastructure.Persistance;
 using SIGEBI.Infrastructure.Persistance.Repositories;
 using SIGEBI.Infrastructure.Services;
+
+
 
 namespace SIGEBI.Infrastructure.IoC
 {
@@ -16,6 +20,11 @@ namespace SIGEBI.Infrastructure.IoC
             services.AddScoped<ICategoriaRepository, CategoriaRepository>();
             services.AddScoped<IRecursoRepository, RecursoRepository>();
             services.AddScoped<IValoracionRepository, ValoracionRepository>();
+            services.AddScoped<IPenalizacionRepository, PenalizacionRepository>();
+            services.AddScoped<INotificacionRepository, NotificacionRepository>();
+
+            // Unit of Work
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             // Services
             services.AddScoped<IHashService, HashService>();
