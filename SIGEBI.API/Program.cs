@@ -1,40 +1,54 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using SIGEBI.API.Middleware;
 using SIGEBI.Infrastructure.Persistance;
 using SIGEBI.Infrastructure.IoC;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Servicios base
 builder.Services.AddControllers();
-
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
-// 🔹 Registrar DbContext
+// Registrar DbContext
 builder.Services.AddDbContext<SIGEBIDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
-// 🔹 Registrar dependencias (Repositories + Services)
+// Registrar dependencias (Repositorios + Servicios + Casos de uso)
 builder.Services.AddInfrastructure();
 
+// Configurar autenticacion con JWT
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,           // Validar quien emite el token
+            ValidateAudience = true,         // Validar para quien es el token
+            ValidateLifetime = true,         // Validar que el token no haya expirado
+            ValidateIssuerSigningKey = true, // Validar la firma del token
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+        };
+    });
 
 var app = builder.Build();
 
-
-// Configure the HTTP request pipeline.
+// Configurar el pipeline HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ExceptionHandlingMiddleware>(); // Manejo global de excepciones
 app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
+app.UseAuthentication(); // Primero autenticacion
+app.UseAuthorization();  // Luego autorizacion
 app.MapControllers();
-
 app.Run();

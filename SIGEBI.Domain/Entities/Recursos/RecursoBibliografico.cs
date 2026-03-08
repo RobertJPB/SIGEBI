@@ -1,11 +1,12 @@
 ﻿using System;
+
 namespace SIGEBI.Domain.Entities.Recursos
 {
     public class RecursoBibliografico
     {
         public Guid Id { get; private set; }
-        public string Titulo { get; private set; }
-        public string Autor { get; private set; }
+        public string Titulo { get; private set; } = null!;
+        public string Autor { get; private set; } = null!;
         public int IdCategoria { get; private set; }
         public int Stock { get; private set; }
         public Enums.Biblioteca.EstadoRecurso Estado { get; private set; }
@@ -40,19 +41,10 @@ namespace SIGEBI.Domain.Entities.Recursos
             Stock--;
         }
 
-        public void AumentarStock()
-        {
-            Stock++;
-        }
+        public void AumentarStock() => Stock++;
 
-        public void Desactivar()
-        {
-            Estado = Enums.Biblioteca.EstadoRecurso.Inactivo;
-        }
+        public void Desactivar() => Estado = Enums.Biblioteca.EstadoRecurso.Inactivo;
 
-        public void Activar()
-        {
-            Estado = Enums.Biblioteca.EstadoRecurso.Disponible;
-        }
+        public void Activar() => Estado = Enums.Biblioteca.EstadoRecurso.Disponible;
     }
 }

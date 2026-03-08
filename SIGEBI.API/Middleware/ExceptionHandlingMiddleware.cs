@@ -1,0 +1,49 @@
+﻿using System.Text.Json;
+
+namespace SIGEBI.API.Middleware
+{
+    public class ExceptionHandlingMiddleware
+    {
+        private readonly RequestDelegate _next;
+
+        public ExceptionHandlingMiddleware(RequestDelegate next)
+        {
+            _next = next;
+        }
+
+        public async Task InvokeAsync(HttpContext context)
+        {
+            try
+            {
+                await _next(context);
+            }
+            catch (Exception ex)
+            {
+                await ManejarExcepcionAsync(context, ex);
+            }
+        }
+
+        private static Task ManejarExcepcionAsync(HttpContext context, Exception ex)
+        {
+            var statusCode = ex switch
+            {
+                KeyNotFoundException => StatusCodes.Status404NotFound,
+                UnauthorizedAccessException => StatusCodes.Status403Forbidden,
+                ArgumentException => StatusCodes.Status400BadRequest,
+                InvalidOperationException => StatusCodes.Status422UnprocessableEntity,
+                _ => StatusCodes.Status500InternalServerError
+            };
+
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = statusCode;
+
+            var respuesta = new
+            {
+                status = statusCode,
+                mensaje = ex.Message
+            };
+
+            return context.Response.WriteAsJsonAsync(respuesta);
+        }
+    }
+}

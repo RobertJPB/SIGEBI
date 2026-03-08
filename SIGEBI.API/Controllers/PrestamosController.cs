@@ -18,9 +18,8 @@ namespace SIGEBI.API.Controllers
         [HttpPost]
         public async Task<IActionResult> SolicitarPrestamo(PrestamoRequestDTO dto)
         {
-            var id = await _solicitarPrestamo.Ejecutar(dto.UsuarioId, dto.RecursoId);
-
-            return Ok(id);
+            var resultado = await _solicitarPrestamo.EjecutarAsync(dto.UsuarioId, dto.RecursoId);
+            return Ok(resultado);
         }
     }
 }

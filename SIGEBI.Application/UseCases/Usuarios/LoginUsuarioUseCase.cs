@@ -1,7 +1,6 @@
-﻿using SIGEBI.Business.DTOs;
-using SIGEBI.Business.Interfaces.Persistance;
+﻿using SIGEBI.Business.Interfaces.Persistance;
 using SIGEBI.Business.Interfaces.Services;
-using SIGEBI.Business.Mappers;
+using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Business.UseCases.Usuarios
 {
@@ -18,19 +17,17 @@ namespace SIGEBI.Business.UseCases.Usuarios
             _hashService = hashService;
         }
 
-        public async Task<UsuarioDTO?> Ejecutar(string correo, string password)
+        public async Task<Usuario?> EjecutarAsync(string correo, string password)
         {
             var usuario = await _usuarioRepository.GetByCorreoAsync(correo);
-
             if (usuario == null)
                 return null;
 
             var passwordValido = _hashService.Verificar(password, usuario.ContrasenaHash);
-
             if (!passwordValido)
                 return null;
 
-            return UsuarioMapper.ToDTO(usuario);
+            return usuario;
         }
     }
 }
