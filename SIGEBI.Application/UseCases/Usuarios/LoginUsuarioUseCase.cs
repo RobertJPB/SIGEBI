@@ -1,6 +1,5 @@
 ﻿using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces.Persistance;
-using SIGEBI.Business.Interfaces.Persistance;
 using SIGEBI.Business.Interfaces.Services;
 using SIGEBI.Business.Mappers;
 
