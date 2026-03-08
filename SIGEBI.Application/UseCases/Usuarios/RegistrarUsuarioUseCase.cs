@@ -19,10 +19,13 @@ namespace SIGEBI.Business.UseCases.Usuarios
             _hashService = hashService;
         }
 
-        public async Task Ejecutar(UsuarioDTO dto)
+        public async Task EjecutarAsync(UsuarioDTO dto)
         {
-            var hash = _hashService.Hash(dto.Contrasena);
+            var existente = await _usuarioRepository.GetByCorreoAsync(dto.Correo);
+            if (existente != null)
+                throw new InvalidOperationException("Ya existe un usuario con ese correo.");
 
+            var hash = _hashService.Hash(dto.Contrasena);
             var usuario = new Usuario(
                 dto.Nombre,
                 dto.Correo,

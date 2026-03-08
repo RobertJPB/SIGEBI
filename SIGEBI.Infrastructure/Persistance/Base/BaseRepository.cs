@@ -5,10 +5,10 @@ namespace SIGEBI.Infrastructure.Persistance.Base
 {
     public class BaseRepository<T> where T : class
     {
-        protected readonly DbContext _context;
+        protected readonly SIGEBIDbContext _context;
         protected readonly DbSet<T> _dbSet;
 
-        public BaseRepository(DbContext context)
+        public BaseRepository(SIGEBIDbContext context)
         {
             _context = context;
             _dbSet = context.Set<T>();
