@@ -1,12 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SIGEBI.Business.DTOs
 {
-    class UsuarioDTO
+    public class UsuarioDTO
     {
+        public Guid Id { get; set; }
+
+        public string Nombre { get; set; } = string.Empty;
+
+        public string Correo { get; set; } = string.Empty;
+
+        public string Contrasena { get; set; } = string.Empty;
+
+        public int IdRol { get; set; }
+
+        public short Estado { get; set; }
     }
 }

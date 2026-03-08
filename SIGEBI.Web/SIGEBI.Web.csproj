@@ -14,10 +14,10 @@
     <Folder Include="Pages\Auth\" />
     <Folder Include="Pages\Catalogo\" />
     <Folder Include="Pages\ListaDeseos\" />
-    <Folder Include="Pages\Notificaciones\" />
-    <Folder Include="Pages\Perfil\" />
     <Folder Include="Pages\Valoraciones\" />
     <Folder Include="Pages\Prestamos\" />
+    <Folder Include="Pages\Perfil\" />
+    <Folder Include="Pages\Notificaciones\" />
   </ItemGroup>
 
 </Project>

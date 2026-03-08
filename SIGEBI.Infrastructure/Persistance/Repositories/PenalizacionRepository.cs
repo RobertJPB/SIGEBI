@@ -1,0 +1,19 @@
+﻿using Microsoft.EntityFrameworkCore;
+using SIGEBI.Business.Interfaces.Persistance;
+using SIGEBI.Domain.Entities;
+using SIGEBI.Domain.Enums.Operacion;
+using SIGEBI.Infrastructure.Persistance.Base;
+
+namespace SIGEBI.Infrastructure.Persistance.Repositories
+{
+    public class PenalizacionRepository : BaseRepository<Penalizacion>, IPenalizacionRepository
+    {
+        public PenalizacionRepository(SIGEBIDbContext context) : base(context) { }
+
+        public async Task<IEnumerable<Penalizacion>> GetByUsuarioIdAsync(Guid usuarioId)
+            => await _dbSet.Where(p => p.UsuarioId == usuarioId).ToListAsync();
+
+        public async Task<IEnumerable<Penalizacion>> GetActivasAsync()
+            => await _dbSet.Where(p => p.Estado == EstadoPenalizacion.Activa).ToListAsync();
+    }
+}
