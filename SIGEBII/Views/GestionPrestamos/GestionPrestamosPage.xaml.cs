@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace SIGEBI.Views.GestionPrestamos
 {
     /// <summary>
-    /// Lógica de interacción para GestionPrestamos.xaml
+    /// Lógica de interacción para GestionPrestamosPage.xaml
     /// </summary>
-    public partial class GestionPrestamos : Page
+    public partial class GestionPrestamosPage : Page
     {
-        public GestionPrestamos()
+        public GestionPrestamosPage()
         {
             InitializeComponent();
         }

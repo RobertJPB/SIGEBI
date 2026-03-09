@@ -14,14 +14,14 @@ namespace SIGEBI
         public MainWindow()
         {
             InitializeComponent();
-            Navegar(new GestionBibliografica(), "Gestión Bibliográfica", BtnBibliografica);
+            Navegar(new GestionBibliograficaPage(), "Gestión Bibliográfica", BtnBibliografica);
         }
 
         private void BtnBibliografica_Click(object sender, RoutedEventArgs e)
-            => Navegar(new GestionBibliografica(), "Gestión Bibliográfica", BtnBibliografica);
+            => Navegar(new GestionBibliograficaPage(), "Gestión Bibliográfica", BtnBibliografica);
 
         private void BtnPrestamos_Click(object sender, RoutedEventArgs e)
-            => Navegar(new GestionPrestamos(), "Gestión de Préstamos", BtnPrestamos);
+            => Navegar(new GestionPrestamosPage(), "Gestión de Préstamos", BtnPrestamos);
 
         private void BtnUsuarios_Click(object sender, RoutedEventArgs e)
             => Navegar(new GestionUsuariosPage(), "Usuarios", BtnUsuarios);

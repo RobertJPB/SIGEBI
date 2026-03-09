@@ -25,5 +25,22 @@ namespace SIGEBI.Domain.Entities.Recursos
             Institucion = institucion.Trim();
             Anio = anio;
         }
+
+        public void Actualizar(string titulo, string autor, int idCategoria, int stock,
+                               string formato, string institucion, int anio)
+        {
+            ActualizarDatosBase(titulo, autor, idCategoria, stock);
+
+            if (string.IsNullOrWhiteSpace(formato))
+                throw new ArgumentException("El formato es obligatorio.", nameof(formato));
+            if (string.IsNullOrWhiteSpace(institucion))
+                throw new ArgumentException("La institución es obligatoria.", nameof(institucion));
+            if (anio <= 0)
+                throw new ArgumentException("El año es inválido.", nameof(anio));
+
+            Formato = formato.Trim();
+            Institucion = institucion.Trim();
+            Anio = anio;
+        }
     }
 }

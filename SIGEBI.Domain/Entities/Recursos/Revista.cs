@@ -23,5 +23,20 @@ namespace SIGEBI.Domain.Entities.Recursos
             ISSN = issn.Trim();
             FechaPublicacion = fechaPublicacion;
         }
+
+        public void Actualizar(string titulo, string autor, int idCategoria, int stock,
+                               int numeroEdicion, string issn, DateTime fechaPublicacion)
+        {
+            ActualizarDatosBase(titulo, autor, idCategoria, stock);
+
+            if (numeroEdicion <= 0)
+                throw new ArgumentException("El número de edición es inválido.", nameof(numeroEdicion));
+            if (string.IsNullOrWhiteSpace(issn))
+                throw new ArgumentException("El ISSN es obligatorio.", nameof(issn));
+
+            NumeroEdicion = numeroEdicion;
+            ISSN = issn.Trim();
+            FechaPublicacion = fechaPublicacion;
+        }
     }
 }

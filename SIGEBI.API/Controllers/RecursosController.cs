@@ -12,13 +12,16 @@ namespace SIGEBI.API.Controllers
     {
         private readonly ConsultarLibrosUseCase _consultarUseCase;
         private readonly GestionarRecursosUseCase _gestionarUseCase;
+        private readonly IWebHostEnvironment _env;
 
         public RecursosController(
             ConsultarLibrosUseCase consultarUseCase,
-            GestionarRecursosUseCase gestionarUseCase)
+            GestionarRecursosUseCase gestionarUseCase,
+            IWebHostEnvironment env)
         {
             _consultarUseCase = consultarUseCase;
             _gestionarUseCase = gestionarUseCase;
+            _env = env;
         }
 
         [HttpGet]
@@ -42,41 +45,111 @@ namespace SIGEBI.API.Controllers
             return Ok(recursos);
         }
 
+        // ── POST ──
+
         [HttpPost("libro")]
-        public async Task<IActionResult> AgregarLibro([FromBody] AgregarLibroRequest request)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> AgregarLibro([FromForm] AgregarLibroRequest request)
         {
             if (request == null) return BadRequest("Datos inválidos.");
+            var imagenUrl = await GuardarImagenAsync(request.Imagen);
             var resultado = await _gestionarUseCase.AgregarLibroAsync(
                 request.Titulo, request.Autor, request.CategoriaId, request.Stock,
-                request.ISBN, request.Editorial, request.Anio);
+                request.ISBN, request.Editorial, request.Anio, imagenUrl, request.Genero);
             return Ok(resultado);
         }
 
         [HttpPost("revista")]
-        public async Task<IActionResult> AgregarRevista([FromBody] AgregarRevistaRequest request)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> AgregarRevista([FromForm] AgregarRevistaRequest request)
         {
             if (request == null) return BadRequest("Datos inválidos.");
+            var imagenUrl = await GuardarImagenAsync(request.Imagen);
             var resultado = await _gestionarUseCase.AgregarRevistaAsync(
                 request.Titulo, request.Autor, request.CategoriaId, request.Stock,
-                request.NumeroEdicion, request.ISSN, request.FechaPublicacion);
+                request.NumeroEdicion, request.ISSN, request.FechaPublicacion, imagenUrl);
             return Ok(resultado);
         }
 
         [HttpPost("documento")]
-        public async Task<IActionResult> AgregarDocumento([FromBody] AgregarDocumentoRequest request)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> AgregarDocumento([FromForm] AgregarDocumentoRequest request)
         {
             if (request == null) return BadRequest("Datos inválidos.");
+            var imagenUrl = await GuardarImagenAsync(request.Imagen);
             var resultado = await _gestionarUseCase.AgregarDocumentoAsync(
                 request.Titulo, request.Autor, request.CategoriaId, request.Stock,
-                request.Formato, request.Institucion, request.Anio);
+                request.Formato, request.Institucion, request.Anio, imagenUrl);
             return Ok(resultado);
         }
+
+        // ── PUT ──
+
+        [HttpPut("libro/{id}")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> EditarLibro(Guid id, [FromForm] AgregarLibroRequest request)
+        {
+            if (request == null) return BadRequest("Datos inválidos.");
+            var imagenUrl = await GuardarImagenAsync(request.Imagen);
+            var resultado = await _gestionarUseCase.EditarLibroAsync(
+                id, request.Titulo, request.Autor, request.CategoriaId, request.Stock,
+                request.ISBN, request.Editorial, request.Anio, imagenUrl, request.Genero);
+            return Ok(resultado);
+        }
+
+        [HttpPut("revista/{id}")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> EditarRevista(Guid id, [FromForm] AgregarRevistaRequest request)
+        {
+            if (request == null) return BadRequest("Datos inválidos.");
+            var imagenUrl = await GuardarImagenAsync(request.Imagen);
+            var resultado = await _gestionarUseCase.EditarRevistaAsync(
+                id, request.Titulo, request.Autor, request.CategoriaId, request.Stock,
+                request.NumeroEdicion, request.ISSN, request.FechaPublicacion, imagenUrl);
+            return Ok(resultado);
+        }
+
+        [HttpPut("documento/{id}")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> EditarDocumento(Guid id, [FromForm] AgregarDocumentoRequest request)
+        {
+            if (request == null) return BadRequest("Datos inválidos.");
+            var imagenUrl = await GuardarImagenAsync(request.Imagen);
+            var resultado = await _gestionarUseCase.EditarDocumentoAsync(
+                id, request.Titulo, request.Autor, request.CategoriaId, request.Stock,
+                request.Formato, request.Institucion, request.Anio, imagenUrl);
+            return Ok(resultado);
+        }
+
+        // ── DELETE ──
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Eliminar(Guid id)
         {
             await _gestionarUseCase.EliminarRecursoAsync(id);
             return Ok("Recurso eliminado correctamente.");
+        }
+
+        // ── Helper ──
+        private async Task<string?> GuardarImagenAsync(IFormFile? imagen)
+        {
+            if (imagen == null || imagen.Length == 0) return null;
+
+            var extensionesPermitidas = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            var extension = Path.GetExtension(imagen.FileName).ToLowerInvariant();
+            if (!extensionesPermitidas.Contains(extension)) return null;
+            if (imagen.Length > 5 * 1024 * 1024) return null;
+
+            var carpeta = Path.Combine(_env.WebRootPath ?? _env.ContentRootPath, "imagenes", "recursos");
+            Directory.CreateDirectory(carpeta);
+
+            var nombreArchivo = $"{Guid.NewGuid()}{extension}";
+            var rutaCompleta = Path.Combine(carpeta, nombreArchivo);
+
+            using var stream = new FileStream(rutaCompleta, FileMode.Create);
+            await imagen.CopyToAsync(stream);
+
+            return $"/imagenes/recursos/{nombreArchivo}";
         }
     }
 
@@ -89,6 +162,8 @@ namespace SIGEBI.API.Controllers
         public string ISBN { get; set; } = string.Empty;
         public string Editorial { get; set; } = string.Empty;
         public int Anio { get; set; }
+        public string? Genero { get; set; }
+        public IFormFile? Imagen { get; set; }
     }
 
     public class AgregarRevistaRequest
@@ -100,6 +175,7 @@ namespace SIGEBI.API.Controllers
         public int NumeroEdicion { get; set; }
         public string ISSN { get; set; } = string.Empty;
         public DateTime FechaPublicacion { get; set; }
+        public IFormFile? Imagen { get; set; }
     }
 
     public class AgregarDocumentoRequest
@@ -111,5 +187,6 @@ namespace SIGEBI.API.Controllers
         public string Formato { get; set; } = string.Empty;
         public string Institucion { get; set; } = string.Empty;
         public int Anio { get; set; }
+        public IFormFile? Imagen { get; set; }
     }
 }

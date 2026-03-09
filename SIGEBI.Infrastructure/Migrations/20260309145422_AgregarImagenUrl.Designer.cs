@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SIGEBI.Infrastructure.Persistance;
 
@@ -11,9 +12,11 @@ using SIGEBI.Infrastructure.Persistance;
 namespace SIGEBI.Infrastructure.Migrations
 {
     [DbContext(typeof(SIGEBIDbContext))]
-    partial class SIGEBIDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260309145422_AgregarImagenUrl")]
+    partial class AgregarImagenUrl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -359,9 +362,6 @@ namespace SIGEBI.Infrastructure.Migrations
                 {
                     b.HasBaseType("SIGEBI.Domain.Entities.Recursos.RecursoBibliografico");
 
-                    b.Property<string>("Genero")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasDiscriminator().HasValue("Libro");
                 });
 
@@ -452,13 +452,11 @@ namespace SIGEBI.Infrastructure.Migrations
 
             modelBuilder.Entity("SIGEBI.Domain.Entities.Recursos.RecursoBibliografico", b =>
                 {
-                    b.HasOne("SIGEBI.Domain.Entities.Categoria", "Categoria")
+                    b.HasOne("SIGEBI.Domain.Entities.Categoria", null)
                         .WithMany("Recursos")
                         .HasForeignKey("IdCategoria")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Categoria");
                 });
 
             modelBuilder.Entity("SIGEBI.Domain.Entities.Valoracion", b =>

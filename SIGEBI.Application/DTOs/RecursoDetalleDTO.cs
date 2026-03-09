@@ -8,15 +8,17 @@ namespace SIGEBI.Business.DTOs
         public string Titulo { get; set; } = string.Empty;
         public string Autor { get; set; } = string.Empty;
         public int CategoriaId { get; set; }
-        public string Categoria { get; set; } = string.Empty;
+        public string CategoriaNombre { get; set; } = string.Empty;
         public string Estado { get; set; } = string.Empty;
         public int Stock { get; set; }
         public string TipoRecurso { get; set; } = string.Empty;
+        public string? ImagenUrl { get; set; }
         public double PromedioValoraciones { get; set; }
         // Libro
         public string? ISBN { get; set; }
         public string? Editorial { get; set; }
         public int? Anio { get; set; }
+        public string? Genero { get; set; }
         // Revista
         public string? ISSN { get; set; }
         public int? NumeroEdicion { get; set; }

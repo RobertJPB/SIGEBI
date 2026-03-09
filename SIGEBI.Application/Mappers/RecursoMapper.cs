@@ -14,7 +14,10 @@ namespace SIGEBI.Business.Mappers
                 Autor = recurso.Autor,
                 Estado = recurso.Estado.ToString(),
                 Stock = recurso.Stock,
-                TipoRecurso = recurso.GetType().Name
+                TipoRecurso = recurso.GetType().Name,
+                CategoriaId = recurso.IdCategoria,
+                CategoriaNombre = recurso.Categoria?.Nombre ?? string.Empty,
+                ImagenUrl = recurso.ImagenUrl
             };
 
             if (recurso is Libro libro)
@@ -22,6 +25,7 @@ namespace SIGEBI.Business.Mappers
                 dto.ISBN = libro.ISBN;
                 dto.Editorial = libro.Editorial;
                 dto.Anio = libro.Anio;
+                dto.Genero = libro.Genero;
             }
             else if (recurso is Revista revista)
             {

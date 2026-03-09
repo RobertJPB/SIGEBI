@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "Nuevo perfil",
+    "Projects": [
+      {
+        "Path": "SIGEBI.API\\SIGEBI.API.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "SIGEBII\\SIGEBI.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
