@@ -9,6 +9,10 @@
       {
         "Path": "SIGEBII\\SIGEBI.csproj",
         "Action": "Start"
+      },
+      {
+        "Path": "SIGEBI.Web\\SIGEBI.Web.csproj",
+        "Action": "Start"
       }
     ]
   }

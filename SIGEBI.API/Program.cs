@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using SIGEBI.API.Middleware;
 using SIGEBI.Business.Interfaces.Services;
@@ -10,11 +11,9 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Servicios base
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        // Evita el error 500 por referencias circulares (Categoria -> Recursos -> Categoria...)
         options.JsonSerializerOptions.ReferenceHandler =
             System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
@@ -47,18 +46,13 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Registrar DbContext
 builder.Services.AddDbContext<SIGEBIDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Registrar dependencias de infraestructura
 builder.Services.AddInfrastructure();
-
-// Registrar servicio JWT
 builder.Services.AddScoped<IJwtService, JwtService>();
 
-// Configurar autenticación con JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -75,8 +69,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Autorización
 builder.Services.AddAuthorization();
+
+// ── CORS ──
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("WebPolicy", policy =>
+    {
+        policy.WithOrigins(
+                builder.Configuration["AllowedOrigins:Web"]!)
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
 
@@ -88,7 +93,20 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+
+// ── CORS antes de archivos estáticos ──
+app.UseCors("WebPolicy");
+
+// ── Servir imágenes desde ContentRootPath/imagenes ──
+var imagenesPath = Path.Combine(builder.Environment.ContentRootPath, "imagenes");
+Directory.CreateDirectory(imagenesPath);
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(imagenesPath),
+    RequestPath = "/imagenes"
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

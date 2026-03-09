@@ -9,29 +9,30 @@ namespace SIGEBI.Web.Pages.Catalogo
     public class IndexModel : PageModel
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _configuration;
 
         public List<RecursoViewModel> Recursos { get; set; } = new();
         public string Busqueda { get; set; } = string.Empty;
+        public string ApiBaseUrl { get; set; } = string.Empty;
 
-        public IndexModel(IHttpClientFactory httpClientFactory)
+        public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
+            _configuration = configuration;
         }
 
         public async Task<IActionResult> OnGetAsync(string? busqueda)
         {
             Busqueda = busqueda ?? string.Empty;
+            ApiBaseUrl = _configuration["ApiSettings:BaseUrl"]!;
 
             try
             {
                 var client = _httpClientFactory.CreateClient("SIGEBIAPI");
-
                 var token = HttpContext.Session.GetString("JwtToken");
 
                 if (string.IsNullOrWhiteSpace(token))
-                {
                     return RedirectToPage("/Auth/Login");
-                }
 
                 client.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", token);
@@ -49,13 +50,10 @@ namespace SIGEBI.Web.Pages.Catalogo
                 }
 
                 var json = await response.Content.ReadAsStringAsync();
-
                 Recursos = JsonSerializer.Deserialize<List<RecursoViewModel>>(
                     json,
-                    new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    }) ?? new List<RecursoViewModel>();
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+                    ?? new List<RecursoViewModel>();
 
                 return Page();
             }

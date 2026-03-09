@@ -9,5 +9,6 @@
         public int Stock { get; set; }
         public string Estado { get; set; } = string.Empty;
         public string TipoRecurso { get; set; } = string.Empty;
+        public string? ImagenUrl { get; set; }
     }
 }
