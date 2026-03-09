@@ -15,5 +15,11 @@ namespace SIGEBI.Infrastructure.Persistance.Repositories
 
         public async Task<IEnumerable<Penalizacion>> GetActivasAsync()
             => await _dbSet.Where(p => p.Estado == EstadoPenalizacion.Activa).ToListAsync();
+
+        public new async Task<Penalizacion?> GetByIdAsync(Guid id)
+            => await _dbSet.FirstOrDefaultAsync(p => p.Id == id);
+
+        public new async Task<bool> ExistsAsync(Guid id)
+            => await _dbSet.AnyAsync(p => p.Id == id);
     }
 }

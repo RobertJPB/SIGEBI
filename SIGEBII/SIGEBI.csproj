@@ -9,12 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Views\Auditoria\" />
-    <Folder Include="Views\Auth\" />
-    <Folder Include="Views\GestionBibliografica\" />
-    <Folder Include="Views\GestionPrestamos\" />
-    <Folder Include="Views\Penalizaciones\" />
-    <Folder Include="Views\Notificaciones\" />
+    <Folder Include="ViewModels\Base\" />
+    <Folder Include="ViewModels\Auth\" />
   </ItemGroup>
 
 </Project>

@@ -2,8 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SIGEBI.API.Middleware;
+using SIGEBI.Business.Interfaces.Services;
 using SIGEBI.Infrastructure.Persistance;
 using SIGEBI.Infrastructure.IoC;
+using SIGEBI.Infrastructure.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,21 +17,25 @@ builder.Services.AddSwaggerGen();
 
 // Registrar DbContext
 builder.Services.AddDbContext<SIGEBIDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Registrar dependencias (Repositorios + Servicios + Casos de uso)
+// Registrar dependencias de infraestructura
 builder.Services.AddInfrastructure();
 
-// Configurar autenticacion con JWT
+// Registrar servicio JWT
+builder.Services.AddScoped<IJwtService, JwtService>();
+
+// Configurar autenticación con JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,           // Validar quien emite el token
-            ValidateAudience = true,         // Validar para quien es el token
-            ValidateLifetime = true,         // Validar que el token no haya expirado
-            ValidateIssuerSigningKey = true, // Validar la firma del token
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
@@ -37,18 +43,26 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+// Autorización
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
-// Configurar el pipeline HTTP
+// Configuración del pipeline HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseMiddleware<ExceptionHandlingMiddleware>(); // Manejo global de excepciones
+// Middleware de manejo global de errores
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 app.UseHttpsRedirection();
-app.UseAuthentication(); // Primero autenticacion
-app.UseAuthorization();  // Luego autorizacion
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
+
 app.Run();

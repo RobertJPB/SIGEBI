@@ -44,7 +44,7 @@ namespace SIGEBI.Domain.Entities
             FechaDevolucionReal = fechaDevolucionUtc;
             EstadoActual = EstadoPrestamo.Devuelto;
         }
-
+        
         public void MarcarAtrasadoSiAplica(DateTime hoyUtc)
         {
             if (EstadoActual == EstadoPrestamo.Devuelto) return;

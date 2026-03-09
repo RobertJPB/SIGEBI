@@ -1,10 +1,11 @@
 ﻿using System;
+
 namespace SIGEBI.Domain.Entities.Recursos
 {
     public class Documento : RecursoBibliografico
     {
-        public string Formato { get; private set; }
-        public string Institucion { get; private set; }
+        public string Formato { get; private set; } = null!;
+        public string Institucion { get; private set; } = null!;
         public int Anio { get; private set; }
 
         private Documento() { }

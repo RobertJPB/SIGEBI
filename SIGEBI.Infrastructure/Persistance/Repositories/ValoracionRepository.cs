@@ -16,7 +16,10 @@ namespace SIGEBI.Infrastructure.Persistance.Repositories
             => await _dbSet.Where(v => v.UsuarioId == usuarioId).ToListAsync();
 
         public async Task<double> GetPromedioCalificacionAsync(Guid recursoId)
-            => await _dbSet.Where(v => v.RecursoId == recursoId)
-                .AverageAsync(v => (double)v.Calificacion);
+        {
+            var valoraciones = await _dbSet.Where(v => v.RecursoId == recursoId).ToListAsync();
+            if (!valoraciones.Any()) return 0;
+            return valoraciones.Average(v => (double)v.Calificacion);
+        }
     }
 }

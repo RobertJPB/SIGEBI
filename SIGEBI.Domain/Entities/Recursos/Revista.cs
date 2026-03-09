@@ -1,10 +1,11 @@
 ﻿using System;
+
 namespace SIGEBI.Domain.Entities.Recursos
 {
     public class Revista : RecursoBibliografico
     {
         public int NumeroEdicion { get; private set; }
-        public string ISSN { get; private set; }
+        public string ISSN { get; private set; } = null!;
         public DateTime FechaPublicacion { get; private set; }
 
         private Revista() { }

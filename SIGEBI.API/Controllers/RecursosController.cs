@@ -1,93 +1,115 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.UseCases.Catalogo;
-using SIGEBI.Business.Validators;
 
 namespace SIGEBI.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class RecursosController : ControllerBase
     {
-        private readonly ConsultarLibrosUseCase _consultarLibros;
-        private readonly GestionarRecursosUseCase _gestionarRecursos;
-        private readonly AgregarRecursoValidator _validator;
+        private readonly ConsultarLibrosUseCase _consultarUseCase;
+        private readonly GestionarRecursosUseCase _gestionarUseCase;
 
         public RecursosController(
-            ConsultarLibrosUseCase consultarLibros,
-            GestionarRecursosUseCase gestionarRecursos,
-            AgregarRecursoValidator validator)
+            ConsultarLibrosUseCase consultarUseCase,
+            GestionarRecursosUseCase gestionarUseCase)
         {
-            _consultarLibros = consultarLibros;
-            _gestionarRecursos = gestionarRecursos;
-            _validator = validator;
+            _consultarUseCase = consultarUseCase;
+            _gestionarUseCase = gestionarUseCase;
         }
 
         [HttpGet]
-        public async Task<IActionResult> ObtenerTodos()
+        public async Task<IActionResult> GetAll()
         {
-            var recursos = await _consultarLibros.EjecutarAsync();
+            var recursos = await _consultarUseCase.EjecutarAsync();
             return Ok(recursos);
         }
 
         [HttpGet("buscar")]
         public async Task<IActionResult> BuscarPorTitulo([FromQuery] string titulo)
         {
-            var recursos = await _consultarLibros.BuscarPorTituloAsync(titulo);
+            var recursos = await _consultarUseCase.BuscarPorTituloAsync(titulo);
             return Ok(recursos);
         }
 
         [HttpGet("categoria/{categoriaId}")]
-        public async Task<IActionResult> BuscarPorCategoria(int categoriaId)
+        public async Task<IActionResult> GetPorCategoria(int categoriaId)
         {
-            var recursos = await _consultarLibros.BuscarPorCategoriaAsync(categoriaId);
+            var recursos = await _consultarUseCase.BuscarPorCategoriaAsync(categoriaId);
             return Ok(recursos);
         }
 
         [HttpPost("libro")]
-        public async Task<IActionResult> AgregarLibro(RecursoDetalleDTO dto)
+        public async Task<IActionResult> AgregarLibro([FromBody] AgregarLibroRequest request)
         {
-            var errores = _validator.Validar(dto);
-            if (errores.Any())
-                return BadRequest(errores);
-
-            var resultado = await _gestionarRecursos.AgregarLibroAsync(
-                dto.Titulo, dto.Autor, dto.CategoriaId, dto.Stock,
-                dto.ISBN!, dto.Editorial!, dto.Anio!.Value);
+            if (request == null) return BadRequest("Datos inválidos.");
+            var resultado = await _gestionarUseCase.AgregarLibroAsync(
+                request.Titulo, request.Autor, request.CategoriaId, request.Stock,
+                request.ISBN, request.Editorial, request.Anio);
             return Ok(resultado);
         }
 
         [HttpPost("revista")]
-        public async Task<IActionResult> AgregarRevista(RecursoDetalleDTO dto)
+        public async Task<IActionResult> AgregarRevista([FromBody] AgregarRevistaRequest request)
         {
-            var errores = _validator.Validar(dto);
-            if (errores.Any())
-                return BadRequest(errores);
-
-            var resultado = await _gestionarRecursos.AgregarRevistaAsync(
-                dto.Titulo, dto.Autor, dto.CategoriaId, dto.Stock,
-                dto.NumeroEdicion!.Value, dto.ISSN!, dto.FechaPublicacion!.Value);
+            if (request == null) return BadRequest("Datos inválidos.");
+            var resultado = await _gestionarUseCase.AgregarRevistaAsync(
+                request.Titulo, request.Autor, request.CategoriaId, request.Stock,
+                request.NumeroEdicion, request.ISSN, request.FechaPublicacion);
             return Ok(resultado);
         }
 
         [HttpPost("documento")]
-        public async Task<IActionResult> AgregarDocumento(RecursoDetalleDTO dto)
+        public async Task<IActionResult> AgregarDocumento([FromBody] AgregarDocumentoRequest request)
         {
-            var errores = _validator.Validar(dto);
-            if (errores.Any())
-                return BadRequest(errores);
-
-            var resultado = await _gestionarRecursos.AgregarDocumentoAsync(
-                dto.Titulo, dto.Autor, dto.CategoriaId, dto.Stock,
-                dto.Formato!, dto.Institucion!, dto.Anio!.Value);
+            if (request == null) return BadRequest("Datos inválidos.");
+            var resultado = await _gestionarUseCase.AgregarDocumentoAsync(
+                request.Titulo, request.Autor, request.CategoriaId, request.Stock,
+                request.Formato, request.Institucion, request.Anio);
             return Ok(resultado);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Eliminar(Guid id)
         {
-            await _gestionarRecursos.EliminarRecursoAsync(id);
-            return NoContent();
+            await _gestionarUseCase.EliminarRecursoAsync(id);
+            return Ok("Recurso eliminado correctamente.");
         }
+    }
+
+    public class AgregarLibroRequest
+    {
+        public string Titulo { get; set; } = string.Empty;
+        public string Autor { get; set; } = string.Empty;
+        public int CategoriaId { get; set; }
+        public int Stock { get; set; }
+        public string ISBN { get; set; } = string.Empty;
+        public string Editorial { get; set; } = string.Empty;
+        public int Anio { get; set; }
+    }
+
+    public class AgregarRevistaRequest
+    {
+        public string Titulo { get; set; } = string.Empty;
+        public string Autor { get; set; } = string.Empty;
+        public int CategoriaId { get; set; }
+        public int Stock { get; set; }
+        public int NumeroEdicion { get; set; }
+        public string ISSN { get; set; } = string.Empty;
+        public DateTime FechaPublicacion { get; set; }
+    }
+
+    public class AgregarDocumentoRequest
+    {
+        public string Titulo { get; set; } = string.Empty;
+        public string Autor { get; set; } = string.Empty;
+        public int CategoriaId { get; set; }
+        public int Stock { get; set; }
+        public string Formato { get; set; } = string.Empty;
+        public string Institucion { get; set; } = string.Empty;
+        public int Anio { get; set; }
     }
 }
