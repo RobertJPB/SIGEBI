@@ -71,7 +71,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-// ── CORS ──
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("WebPolicy", policy =>
@@ -94,10 +93,10 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
 
-// ── CORS antes de archivos estáticos ──
+
 app.UseCors("WebPolicy");
 
-// ── Servir imágenes desde ContentRootPath/imagenes ──
+
 var imagenesPath = Path.Combine(builder.Environment.ContentRootPath, "imagenes");
 Directory.CreateDirectory(imagenesPath);
 

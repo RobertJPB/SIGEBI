@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configurar Razor Pages
+
 builder.Services.AddRazorPages();
 
 // HttpClient para consumir la API
@@ -19,7 +19,7 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// Autenticación por cookies para la aplicación web
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
