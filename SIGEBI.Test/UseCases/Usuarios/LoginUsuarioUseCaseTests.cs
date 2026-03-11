@@ -90,7 +90,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
             // Act
             await _useCase.EjecutarAsync("juan@test.com", "password123");
 
-            // Assert — verifica que se llamó al hash service exactamente una vez
+            // Assert 
             _hashService.Verify(h => h.Verificar("password123", "hash123"), Times.Once);
         }
     }

@@ -90,7 +90,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
             // Act
             await _useCase.EjecutarAsync(dto);
 
-            // Assert — verifica que se hasheó la contraseña exactamente una vez
+            // Assert 
             _hashService.Verify(h => h.Hash(dto.Contrasena), Times.Once);
         }
 
@@ -106,7 +106,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
             // Act
             try { await _useCase.EjecutarAsync(dto); } catch { }
 
-            // Assert — nunca se llamó AddAsync
+            
             _usuarioRepo.Verify(r => r.AddAsync(It.IsAny<Usuario>()), Times.Never);
         }
     }
