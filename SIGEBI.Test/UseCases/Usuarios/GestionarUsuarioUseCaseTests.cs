@@ -142,7 +142,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
             usuario.Estado.Should().Be(EstadoUsuario.Bloqueado);
         }
 
-        // ── CAMBIAR ROL ──
+        // CAMBIAR ROL 
 
         [Fact]
         public async Task CambiarRol_UsuarioExistente_ActualizaRol()
