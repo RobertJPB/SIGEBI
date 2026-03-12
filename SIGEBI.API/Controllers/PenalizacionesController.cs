@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.UseCases.Usuarios;
+using SIGEBI.Domain.DomainServices;
+using SIGEBI.Domain.Enums.Seguridad;
 
 namespace SIGEBI.API.Controllers
 {
@@ -16,19 +19,35 @@ namespace SIGEBI.API.Controllers
             _penalizacionesUseCase = penalizacionesUseCase;
         }
 
-        // Obtener penalizaciones de un usuario
+        // ── HELPER ──
+        private RolUsuario ObtenerRolActual()
+        {
+            var rolClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (Enum.TryParse<RolUsuario>(rolClaim, out var rol))
+                return rol;
+            throw new UnauthorizedAccessException("Rol no identificado en el token.");
+        }
+
+        // ── GET ──
+
         [HttpGet("usuario/{usuarioId}")]
         public async Task<IActionResult> ObtenerPorUsuario(Guid usuarioId)
         {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPenalizaciones(rol), "ver penalizaciones");
+
             var penalizaciones = await _penalizacionesUseCase.ObtenerPenalizacionesPorUsuarioAsync(usuarioId);
             return Ok(penalizaciones);
         }
 
-        // Aplicar penalizaciones a prestamos atrasados (solo administrador y bibliotecario)
+        // ── POST ──
+
         [HttpPost("aplicar")]
-        [Authorize(Roles = "Administrador,Bibliotecario")]
         public async Task<IActionResult> AplicarPenalizaciones()
         {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPenalizaciones(rol), "aplicar penalizaciones");
+
             await _penalizacionesUseCase.AplicarPenalizacionesAsync();
             return Ok("Penalizaciones aplicadas correctamente.");
         }

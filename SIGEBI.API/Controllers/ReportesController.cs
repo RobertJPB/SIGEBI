@@ -1,36 +1,54 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SIGEBI.Business.UseCases.Usuarios;
+using SIGEBI.Business.Services;
+using SIGEBI.Domain.DomainServices;
+using SIGEBI.Domain.Enums.Seguridad;
 
 namespace SIGEBI.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Administrador,Bibliotecario")]
+    [Authorize]
     public class ReportesController : ControllerBase
     {
-        private readonly GenerarReportesUseCase _reportesUseCase;
+        private readonly GenerarReportesService _reportesService;
 
-        public ReportesController(GenerarReportesUseCase reportesUseCase)
+        public ReportesController(GenerarReportesService reportesService)
         {
-            _reportesUseCase = reportesUseCase;
+            _reportesService = reportesService;
         }
 
-        // Obtener reporte general del sistema
+        // ── HELPER ──
+        private RolUsuario ObtenerRolActual()
+        {
+            var rolClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (Enum.TryParse<RolUsuario>(rolClaim, out var rol))
+                return rol;
+            throw new UnauthorizedAccessException("Rol no identificado en el token.");
+        }
+
+        // ── GET ──
+
         [HttpGet("general")]
         public async Task<IActionResult> ObtenerReporteGeneral()
         {
-            var reporte = await _reportesUseCase.GenerarReporteGeneralAsync();
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGenerarReportes(rol), "generar reporte general");
+
+            var reporte = await _reportesService.GenerarReporteGeneralAsync();
             return Ok(reporte);
         }
 
-        // Obtener prestamos por periodo
         [HttpGet("prestamos")]
         public async Task<IActionResult> ObtenerPrestamosPorPeriodo(
             [FromQuery] DateTime fechaInicio,
             [FromQuery] DateTime fechaFin)
         {
-            var prestamos = await _reportesUseCase.ObtenerPrestamosPorPeriodoAsync(fechaInicio, fechaFin);
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGenerarReportes(rol), "generar reporte de préstamos");
+
+            var prestamos = await _reportesService.ObtenerPrestamosPorPeriodoAsync(fechaInicio, fechaFin);
             return Ok(prestamos);
         }
     }

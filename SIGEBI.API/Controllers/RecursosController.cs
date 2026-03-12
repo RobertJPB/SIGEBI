@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.UseCases.Catalogo;
+using SIGEBI.Domain.DomainServices;
+using SIGEBI.Domain.Enums.Seguridad;
 
 namespace SIGEBI.API.Controllers
 {
@@ -24,9 +27,23 @@ namespace SIGEBI.API.Controllers
             _env = env;
         }
 
+        // ── HELPER — extrae el rol del token JWT ──
+        private RolUsuario ObtenerRolActual()
+        {
+            var rolClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (Enum.TryParse<RolUsuario>(rolClaim, out var rol))
+                return rol;
+            throw new UnauthorizedAccessException("Rol no identificado en el token.");
+        }
+
+        // ── GET ──
+
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver catálogo");
+
             var recursos = await _consultarUseCase.EjecutarAsync();
             return Ok(recursos);
         }
@@ -34,6 +51,9 @@ namespace SIGEBI.API.Controllers
         [HttpGet("buscar")]
         public async Task<IActionResult> BuscarPorTitulo([FromQuery] string titulo)
         {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "buscar recursos");
+
             var recursos = await _consultarUseCase.BuscarPorTituloAsync(titulo);
             return Ok(recursos);
         }
@@ -41,6 +61,9 @@ namespace SIGEBI.API.Controllers
         [HttpGet("categoria/{categoriaId}")]
         public async Task<IActionResult> GetPorCategoria(int categoriaId)
         {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver por categoría");
+
             var recursos = await _consultarUseCase.BuscarPorCategoriaAsync(categoriaId);
             return Ok(recursos);
         }
@@ -51,6 +74,9 @@ namespace SIGEBI.API.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> AgregarLibro([FromForm] AgregarLibroRequest request)
         {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "agregar libro");
+
             if (request == null) return BadRequest("Datos inválidos.");
             var imagenUrl = await GuardarImagenAsync(request.Imagen);
             var resultado = await _gestionarUseCase.AgregarLibroAsync(
@@ -63,6 +89,9 @@ namespace SIGEBI.API.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> AgregarRevista([FromForm] AgregarRevistaRequest request)
         {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "agregar revista");
+
             if (request == null) return BadRequest("Datos inválidos.");
             var imagenUrl = await GuardarImagenAsync(request.Imagen);
             var resultado = await _gestionarUseCase.AgregarRevistaAsync(
@@ -75,6 +104,9 @@ namespace SIGEBI.API.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> AgregarDocumento([FromForm] AgregarDocumentoRequest request)
         {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "agregar documento");
+
             if (request == null) return BadRequest("Datos inválidos.");
             var imagenUrl = await GuardarImagenAsync(request.Imagen);
             var resultado = await _gestionarUseCase.AgregarDocumentoAsync(
@@ -89,6 +121,9 @@ namespace SIGEBI.API.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> EditarLibro(Guid id, [FromForm] AgregarLibroRequest request)
         {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "editar libro");
+
             if (request == null) return BadRequest("Datos inválidos.");
             var imagenUrl = await GuardarImagenAsync(request.Imagen);
             var resultado = await _gestionarUseCase.EditarLibroAsync(
@@ -101,6 +136,9 @@ namespace SIGEBI.API.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> EditarRevista(Guid id, [FromForm] AgregarRevistaRequest request)
         {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "editar revista");
+
             if (request == null) return BadRequest("Datos inválidos.");
             var imagenUrl = await GuardarImagenAsync(request.Imagen);
             var resultado = await _gestionarUseCase.EditarRevistaAsync(
@@ -113,6 +151,9 @@ namespace SIGEBI.API.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> EditarDocumento(Guid id, [FromForm] AgregarDocumentoRequest request)
         {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "editar documento");
+
             if (request == null) return BadRequest("Datos inválidos.");
             var imagenUrl = await GuardarImagenAsync(request.Imagen);
             var resultado = await _gestionarUseCase.EditarDocumentoAsync(
@@ -126,11 +167,14 @@ namespace SIGEBI.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Eliminar(Guid id)
         {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "eliminar recurso");
+
             await _gestionarUseCase.EliminarRecursoAsync(id);
             return Ok("Recurso eliminado correctamente.");
         }
 
-        // ── Helper ──
+        // ── Helper — guarda imagen en disco ──
         private async Task<string?> GuardarImagenAsync(IFormFile? imagen)
         {
             if (imagen == null || imagen.Length == 0) return null;

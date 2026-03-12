@@ -2,6 +2,7 @@
 using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistance;
 using SIGEBI.Business.Interfaces.Services;
+using SIGEBI.Business.Services;
 using SIGEBI.Business.UseCases.Catalogo;
 using SIGEBI.Business.UseCases.Prestamos;
 using SIGEBI.Business.UseCases.Usuarios;
@@ -30,9 +31,9 @@ namespace SIGEBI.Infrastructure.IoC
             // Unidad de trabajo
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-            // Servicios
+            // Servicios de infraestructura
             services.AddScoped<IHashService, HashService>();
-            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IEmailAdapter, EmailAdapter>();
             services.AddScoped<IJwtService, JwtService>();
 
             // Casos de uso - Usuarios
@@ -55,6 +56,10 @@ namespace SIGEBI.Infrastructure.IoC
             services.AddScoped<SolicitarPrestamoUseCase>();
             services.AddScoped<DevolverPrestamoUseCase>();
             services.AddScoped<ConsultarPrestamoUseCase>();
+
+            // Servicios de aplicación
+            services.AddScoped<RegistrarPrestamoService>();
+            services.AddScoped<GenerarReportesService>();
 
             // Validadores
             services.AddScoped<RegistrarUsuarioValidator>();
