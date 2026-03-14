@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.UseCases.Usuarios;
@@ -44,6 +44,7 @@ namespace SIGEBI.API.Controllers
             var rol = ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "marcar notificación como leída");
 
+            // TODO: Podriamos devolver la notificacion actualizada en vez de un simple string
             await _notificacionesUseCase.MarcarComoLeidaAsync(notificacionId);
             return Ok("Notificación marcada como leída.");
         }

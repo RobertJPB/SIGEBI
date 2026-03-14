@@ -1,4 +1,4 @@
-﻿using SIGEBI.Business.DTOs;
+using SIGEBI.Business.DTOs;
 using SIGEBI.Business.UseCases.Prestamos;
 
 namespace SIGEBI.Business.Services
@@ -19,6 +19,7 @@ namespace SIGEBI.Business.Services
             _consultarUseCase = consultarUseCase;
         }
 
+        // Usando un Facade para no inyectar tantos UseCases en el Controller (visto en clase)
         public async Task<PrestamoResponseDTO> SolicitarPrestamoAsync(Guid usuarioId, Guid recursoId)
             => await _solicitarUseCase.EjecutarAsync(usuarioId, recursoId);
 

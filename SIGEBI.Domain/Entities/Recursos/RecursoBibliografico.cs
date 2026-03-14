@@ -1,8 +1,10 @@
-﻿using System;
+using System;
 using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Domain.Entities.Recursos
-{
+    // Principio SOLID (OCP - Abierto/Cerrado): 
+    // Esta clase esta abierta a la extension (podemos crear nuevos tipos de recursos heredando de aca)
+    // pero cerrada a la modificacion (no hace falta tocar esta clase para agregar un nuevo tipo).
     public class RecursoBibliografico
     {
         public Guid Id { get; private set; }
@@ -58,8 +60,11 @@ namespace SIGEBI.Domain.Entities.Recursos
         {
             if (Estado != Enums.Biblioteca.EstadoRecurso.Disponible)
                 throw new InvalidOperationException("El recurso no está disponible.");
+            
+            // Si nos quedamos sin copias, tiramos error en vez de dejar stock negativo
             if (Stock <= 0)
                 throw new InvalidOperationException("No hay stock disponible.");
+            
             Stock--;
         }
 

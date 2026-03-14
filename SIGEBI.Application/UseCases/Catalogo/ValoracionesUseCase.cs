@@ -28,15 +28,19 @@ namespace SIGEBI.Business.UseCases.Catalogo
         public async Task<ValoracionDTO> AgregarValoracionAsync(Guid usuarioId, Guid recursoId,
             int calificacion, string? comentario)
         {
+            // Validaciones iniciales
             var usuario = await _usuarioRepository.GetByIdAsync(usuarioId)
                 ?? throw new InvalidOperationException("Usuario no encontrado.");
 
             var recurso = await _recursoRepository.GetByIdAsync(recursoId)
                 ?? throw new InvalidOperationException("Recurso no encontrado.");
 
+            // Guardamos la calificacion (estrellas) que puso el usuario
             var valoracion = new Valoracion(usuarioId, recursoId, calificacion, comentario);
+            
             await _valoracionRepository.AddAsync(valoracion);
             await _unitOfWork.SaveChangesAsync();
+            
             return ValoracionMapper.ToDTO(valoracion);
         }
 

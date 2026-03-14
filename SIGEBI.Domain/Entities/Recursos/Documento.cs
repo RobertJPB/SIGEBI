@@ -1,7 +1,9 @@
-﻿using System;
+using System;
 
 namespace SIGEBI.Domain.Entities.Recursos
 {
+    // Principio SOLID (OCP y LSP):
+    // El documento hereda la logica base pero tiene sus propios datos especificos (Institucion).
     public class Documento : RecursoBibliografico
     {
         public string Formato { get; private set; } = null!;
@@ -14,6 +16,7 @@ namespace SIGEBI.Domain.Entities.Recursos
                          string formato, string institucion, int anio)
             : base(titulo, autor, idCategoria, stockInicial)
         {
+            // Validaciones para documentos (como tesis y manuales)
             if (string.IsNullOrWhiteSpace(formato))
                 throw new ArgumentException("El formato es obligatorio.", nameof(formato));
             if (string.IsNullOrWhiteSpace(institucion))

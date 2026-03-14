@@ -1,11 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SIGEBI.Business.Interfaces.Persistance;
 using SIGEBI.Domain.Entities.Recursos;
 using SIGEBI.Domain.Enums.Biblioteca;
 using SIGEBI.Infrastructure.Persistance.Base;
 
 namespace SIGEBI.Infrastructure.Persistance.Repositories
-{
+    // Principio SOLID (LSP - Sustitución de Liskov):
+    // El repo devuelve IEnumerable<RecursoBibliografico>, pero por detras Entity Framework nos puede 
+    // devolver Libros, Revistas o Documentos mezclados, y el sistema sigue funcionando igual.
     public class RecursoRepository : BaseRepository<RecursoBibliografico>, IRecursoRepository
     {
         public RecursoRepository(SIGEBIDbContext context) : base(context) { }
@@ -17,10 +19,13 @@ namespace SIGEBI.Infrastructure.Persistance.Repositories
                 .ToListAsync();
 
         public async Task<IEnumerable<RecursoBibliografico>> GetDisponiblesAsync()
-            => await _dbSet
+        {
+            // Solo trae los recursos que todavia tienen stock y no estan inactivos
+            return await _dbSet
                 .Include(r => r.Categoria)
                 .Where(r => r.Estado == EstadoRecurso.Disponible)
                 .ToListAsync();
+        }
 
         public async Task<IEnumerable<RecursoBibliografico>> BuscarPorTituloAsync(string titulo)
             => await _dbSet

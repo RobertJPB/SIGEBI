@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.DTOs;
@@ -53,6 +53,7 @@ namespace SIGEBI.API.Controllers
         public async Task<IActionResult> Agregar([FromBody] ValoracionDTO dto)
         {
             var rol = ObtenerRolActual();
+            // TODO: Cambiar esto. Alguien copypasteo PuedeSolicitarPrestamo en vez de usar algo para valoraciones jaja
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeSolicitarPrestamo(rol), "agregar valoración");
 
             var valoracion = await _valoracionesUseCase.AgregarValoracionAsync(

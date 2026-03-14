@@ -28,6 +28,7 @@ namespace SIGEBI.Business.UseCases.Catalogo
             int categoriaId, int stock, string isbn, string editorial, int anio,
             string? imagenUrl = null, string? genero = null)
         {
+            // Ojo: validar que la categoria exista primero
             var categoria = await _categoriaRepository.GetByIdAsync(categoriaId)
                 ?? throw new InvalidOperationException("Categoría no encontrada.");
             var libro = new Libro(titulo, autor, categoriaId, stock, isbn, editorial, anio, genero);

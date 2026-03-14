@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.UseCases.Usuarios;
@@ -36,6 +36,7 @@ namespace SIGEBI.API.Controllers
             var rol = ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerAuditoria(rol), "ver auditoría");
 
+            // Solo el admin deberia poder ver esto (ya esta validado arriba)
             var auditorias = await _auditoriaUseCase.ObtenerTodasAsync();
             return Ok(auditorias);
         }

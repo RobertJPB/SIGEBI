@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace SIGEBI.Domain.Entities
 {
@@ -24,6 +24,7 @@ namespace SIGEBI.Domain.Entities
             string ipAddress,
             DateTime fechaRegistroUtc)
         {
+            // Validamos que no nos pasen cosas vacias para la auditoria
             if (usuarioId == Guid.Empty)
                 throw new ArgumentException("Usuario inválido.", nameof(usuarioId));
             if (string.IsNullOrWhiteSpace(tablaAfectada))

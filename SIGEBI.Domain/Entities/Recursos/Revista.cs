@@ -1,7 +1,9 @@
-﻿using System;
+using System;
 
 namespace SIGEBI.Domain.Entities.Recursos
 {
+    // Principio SOLID (OCP y LSP):
+    // Una revista es un tipo de recurso mas. Cumple el contrato base de RecursoBibliografico.
     public class Revista : RecursoBibliografico
     {
         public int NumeroEdicion { get; private set; }
@@ -14,6 +16,7 @@ namespace SIGEBI.Domain.Entities.Recursos
                        int numeroEdicion, string issn, DateTime fechaPublicacion)
             : base(titulo, autor, idCategoria, stockInicial)
         {
+            // Validaciones especificas de la revista
             if (numeroEdicion <= 0)
                 throw new ArgumentException("El número de edición es inválido.", nameof(numeroEdicion));
             if (string.IsNullOrWhiteSpace(issn))

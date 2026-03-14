@@ -1,7 +1,10 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 
 namespace SIGEBI.API.Middleware
 {
+    // Principio SOLID (SRP - Responsabilidad Única):
+    // Su única responsabilidad es atrapar excepciones (try/catch global) y formatearlas como JSON.
+    // Le quita esta responsabilidad a los Controladores para que ellos solo manejen flujo HTTP.
     public class ExceptionHandlingMiddleware
     {
         private readonly RequestDelegate _next;
@@ -19,6 +22,7 @@ namespace SIGEBI.API.Middleware
             }
             catch (Exception ex)
             {
+                // Si explota algo en cualquier lado, cae aca y le armamos un JSON bonito
                 await ManejarExcepcionAsync(context, ex);
             }
         }

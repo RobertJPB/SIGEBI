@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.UseCases.Catalogo;
@@ -52,6 +52,7 @@ namespace SIGEBI.API.Controllers
         public async Task<IActionResult> Crear([FromBody] string nombre)
         {
             var rol = ObtenerRolActual();
+            // TODO: Mover la creacion de categorias solo a Administradores?
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "crear categoría");
 
             var categoria = await _categoriasUseCase.CrearAsync(nombre);

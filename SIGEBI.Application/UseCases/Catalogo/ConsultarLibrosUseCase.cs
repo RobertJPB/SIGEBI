@@ -1,4 +1,4 @@
-﻿using SIGEBI.Business.DTOs;
+using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces.Persistance;
 using SIGEBI.Business.Mappers;
 
@@ -19,6 +19,7 @@ namespace SIGEBI.Business.UseCases.Catalogo
 
         public async Task<IEnumerable<RecursoDetalleDTO>> EjecutarAsync()
         {
+            // Solo traemos los que estan disponibles para mostrar en la vista
             var recursos = await _recursoRepository.GetDisponiblesAsync();
             var dtos = new List<RecursoDetalleDTO>();
 

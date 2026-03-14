@@ -1,4 +1,4 @@
-﻿using SIGEBI.Business.DTOs;
+using SIGEBI.Business.DTOs;
 using SIGEBI.Business.UseCases.Usuarios;
 
 namespace SIGEBI.Business.Services
@@ -12,6 +12,7 @@ namespace SIGEBI.Business.Services
             _generarReportesUseCase = generarReportesUseCase;
         }
 
+        // Este service es mas que nada un wrapper para agrupar los reportes
         public async Task<ReporteDTO> GenerarReporteGeneralAsync()
             => await _generarReportesUseCase.GenerarReporteGeneralAsync();
 

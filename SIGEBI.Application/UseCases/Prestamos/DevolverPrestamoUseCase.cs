@@ -5,6 +5,9 @@ using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Business.UseCases.Prestamos
 {
+    // Principio SOLID (SRP y DIP):
+    // SRP: Solo maneja el flujo de devolver un libro.
+    // DIP: Depende de interfaces de repositorios para no acoplarse a la base de datos.
     public class DevolverPrestamoUseCase
     {
         private readonly IPrestamoRepository _prestamoRepository;
@@ -33,15 +36,18 @@ namespace SIGEBI.Business.UseCases.Prestamos
                 ?? throw new InvalidOperationException("Recurso no encontrado.");
 
             prestamo.Devolver(DateTime.UtcNow);
-            recurso.AumentarStock();
+            recurso.AumentarStock(); // el libro vuelve a estar disponible
 
+            // Verificamos si lo entrego tarde para clavarle una multa
             if (PenalizacionCalculator.TienePenalizacion(prestamo.FechaDevolucionEstimada, DateTime.UtcNow))
             {
                 int diasAtraso = (int)(DateTime.UtcNow - prestamo.FechaDevolucionEstimada).TotalDays;
                 int diasPenalizacion = PenalizacionCalculator.CalcularDiasPenalizacion(
                     prestamo.FechaDevolucionEstimada, DateTime.UtcNow);
+                
                 string motivo = PenalizacionCalculator.ObtenerMotivo(diasAtraso);
 
+                // TODO: ¿Deberíamos notificar por correo aquí también?
                 var penalizacion = new Penalizacion(prestamo.UsuarioId, motivo, diasPenalizacion, DateTime.UtcNow);
                 await _penalizacionRepository.AddAsync(penalizacion);
             }

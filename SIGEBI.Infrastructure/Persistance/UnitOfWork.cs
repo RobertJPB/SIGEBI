@@ -6,6 +6,9 @@ using SIGEBI.Infrastructure.Persistance.Repositories;
 
 namespace SIGEBI.Infrastructure.Persistance
 {
+    // Principio SOLID (SRP - Responsabilidad Única):
+    // Esta clase implementa el patron UnitOfWork. Su unica responsabilidad es coordinar
+    // que todos los repositorios compartan el mismo contexto y guardar los cambios en una sola transaccion.
     public class UnitOfWork : IUnitOfWork
     {
         private readonly SIGEBIDbContext _context;
@@ -25,6 +28,7 @@ namespace SIGEBI.Infrastructure.Persistance
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
+        // Usamos Lazy loading para los repos (este patron me lo enseño el profe)
         public IUsuarioRepository Usuarios => _usuarios ??= new UsuarioRepository(_context);
         public IPrestamoRepository Prestamos => _prestamos ??= new PrestamoRepository(_context);
         public IRecursoRepository Recursos => _recursos ??= new RecursoRepository(_context);

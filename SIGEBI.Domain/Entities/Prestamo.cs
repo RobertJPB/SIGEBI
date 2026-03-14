@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using SIGEBI.Domain.Entities.Recursos;
 using SIGEBI.Domain.Enums.Biblioteca;
 
@@ -47,7 +47,9 @@ namespace SIGEBI.Domain.Entities
         
         public void MarcarAtrasadoSiAplica(DateTime hoyUtc)
         {
+            // Ojo: no marcar como atrasado si ya lo devolvio!
             if (EstadoActual == EstadoPrestamo.Devuelto) return;
+            
             if (EstadoActual == EstadoPrestamo.Activo && hoyUtc > FechaDevolucionEstimada)
                 EstadoActual = EstadoPrestamo.Atrasado;
         }

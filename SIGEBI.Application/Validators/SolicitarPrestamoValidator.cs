@@ -1,13 +1,16 @@
-﻿using SIGEBI.Business.DTOs;
+using SIGEBI.Business.DTOs;
 
 namespace SIGEBI.Business.Validators
 {
+    // Principio SOLID (SRP - Responsabilidad Única):
+    // Valida que el pedido de prestamo tenga los campos obligatorios completos.
     public class SolicitarPrestamoValidator
     {
         public List<string> Validar(PrestamoRequestDTO dto)
         {
             var errores = new List<string>();
 
+            // Verificamos que no manden Guids en blanco por error
             if (dto.UsuarioId == Guid.Empty)
                 errores.Add("El UsuarioId es obligatorio.");
 

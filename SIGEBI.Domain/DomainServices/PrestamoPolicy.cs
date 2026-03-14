@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SIGEBI.Domain.Entities;
@@ -53,12 +53,15 @@ namespace SIGEBI.Domain.DomainServices
         public static void ValidarPrestamo(Usuario usuario, RecursoBibliografico recurso,
             IEnumerable<Prestamo> prestamosActivos, IEnumerable<Penalizacion> penalizaciones)
         {
+            // Primero verificamos si el usuario no esta castigado
             if (TienePenalizacionActiva(penalizaciones))
                 throw new InvalidOperationException("El usuario tiene una penalización activa y no puede realizar préstamos.");
 
+            // Luego vemos si no excedio su limite (3 para estudiantes, 5 para bibliotecarios)
             if (!PuedeRealizarPrestamo(usuario, prestamosActivos))
                 throw new InvalidOperationException("El usuario ha alcanzado el límite de préstamos permitidos.");
 
+            // TODO: Revisar si el estado Disponible es suficiente o si hay que chequear algo mas
             if (recurso.Estado != EstadoRecurso.Disponible)
                 throw new InvalidOperationException("El recurso no está disponible para préstamo.");
 

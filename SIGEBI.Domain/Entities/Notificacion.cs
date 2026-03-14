@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace SIGEBI.Domain.Entities
 {
@@ -24,6 +24,8 @@ namespace SIGEBI.Domain.Entities
             Tipo = tipo;
             Mensaje = mensaje.Trim();
             Fecha = fechaUtc;
+            
+            // Por defecto nacen sin leerse
             Estado = Enums.Operacion.EstadoNotificacion.NoLeida;
         }
 

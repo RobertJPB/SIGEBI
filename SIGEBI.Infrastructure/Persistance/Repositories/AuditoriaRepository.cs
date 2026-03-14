@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SIGEBI.Business.Interfaces.Persistance;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Infrastructure.Persistance.Base;
@@ -16,10 +16,13 @@ namespace SIGEBI.Infrastructure.Persistance.Repositories
             => await _dbSet.AnyAsync(a => a.Id == id);
 
         public async Task<IEnumerable<Auditoria>> GetByUsuarioIdAsync(Guid usuarioId)
-            => await _dbSet
+        {
+            // Traemos todo el historial de un usuario ordenado por fecha de lo más nuevo a lo viejo
+            return await _dbSet
                 .Include(a => a.Usuario)
                 .Where(a => a.UsuarioId == usuarioId)
                 .OrderByDescending(a => a.FechaRegistro)
                 .ToListAsync();
+        }
     }
 }

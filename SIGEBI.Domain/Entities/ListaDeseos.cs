@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SIGEBI.Domain.Entities.Recursos;
@@ -29,7 +29,10 @@ namespace SIGEBI.Domain.Entities
         public void AgregarRecurso(RecursoBibliografico recurso)
         {
             if (recurso is null) throw new ArgumentNullException(nameof(recurso));
+            
+            // Si ya lo tenia en favoritos no hacemos nada
             if (_recursos.Any(r => r.Id == recurso.Id)) return;
+            
             _recursos.Add(recurso);
         }
 

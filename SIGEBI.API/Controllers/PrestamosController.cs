@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.DTOs;
@@ -11,6 +11,8 @@ namespace SIGEBI.API.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
+    // Principio SOLID (SRP - Responsabilidad Única):
+    // El controlador solo orquesta la peticion HTTP. No tiene reglas de negocio.
     public class PrestamosController : ControllerBase
     {
         private readonly SolicitarPrestamoUseCase _solicitarUseCase;
@@ -86,6 +88,7 @@ namespace SIGEBI.API.Controllers
             var rol = ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeSolicitarPrestamo(rol), "solicitar préstamo");
 
+            // Aca toda la logica pesada de validacion la hace el UseCase
             var resultado = await _solicitarUseCase.EjecutarAsync(dto.UsuarioId, dto.RecursoId);
             return Ok(resultado);
         }

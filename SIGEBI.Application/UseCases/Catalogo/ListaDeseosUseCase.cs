@@ -26,12 +26,15 @@ namespace SIGEBI.Business.UseCases.Catalogo
         public async Task<ListaDeseosDTO> ObtenerPorUsuarioAsync(Guid usuarioId)
         {
             var lista = await _listaDeseosRepository.GetByUsuarioIdAsync(usuarioId);
+            
+            // Si el usuario no tiene lista, le creamos una en blanco por defecto
             if (lista == null)
             {
                 lista = new ListaDeseos(usuarioId, DateTime.UtcNow);
                 await _listaDeseosRepository.AddAsync(lista);
                 await _unitOfWork.SaveChangesAsync();
             }
+            
             return ListaDeseosMapper.ToDTO(lista);
         }
 

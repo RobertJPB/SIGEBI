@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces.Services;
 using SIGEBI.Business.UseCases.Usuarios;
@@ -7,7 +7,9 @@ using SIGEBI.Business.Validators;
 namespace SIGEBI.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    // Principio SOLID (SRP - Responsabilidad Única):
+    // El controlador solo se encarga de recibir la peticion web (HTTP) y devolver un 200 OK o 400 BadRequest.
+    // La validadcion se delega al Validator, y la logica a los UseCases.
     public class AuthController : ControllerBase
     {
         private readonly LoginUsuarioUseCase _loginUseCase;
@@ -35,6 +37,7 @@ namespace SIGEBI.API.Controllers
 
             var usuario = await _loginUseCase.EjecutarAsync(dto.Correo, dto.Contrasena);
 
+            // Si falla el login no damos muchos detalles por seguridad
             if (usuario == null)
                 return Unauthorized("Correo o contraseña incorrectos.");
 

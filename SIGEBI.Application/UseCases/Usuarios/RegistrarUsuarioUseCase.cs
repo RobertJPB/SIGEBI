@@ -25,10 +25,12 @@ namespace SIGEBI.Business.UseCases.Usuarios
 
         public async Task EjecutarAsync(UsuarioDTO dto)
         {
+            // Ojo: validar que el correo no este repetido
             var existente = await _usuarioRepository.GetByCorreoAsync(dto.Correo);
             if (existente != null)
                 throw new InvalidOperationException("Ya existe un usuario con ese correo.");
 
+            // encriptamos la clave antes de guardarla
             var hash = _hashService.Hash(dto.Contrasena);
 
             var usuario = new Usuario(
@@ -39,7 +41,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
             );
 
             await _usuarioRepository.AddAsync(usuario);
-            await _unitOfWork.SaveChangesAsync(); // ← Este era el problema
+            await _unitOfWork.SaveChangesAsync(); // ← Este era el problema (ya arreglado)
         }
     }
 }

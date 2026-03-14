@@ -51,8 +51,10 @@ namespace SIGEBI.Business.UseCases.Usuarios
 
         public async Task BloquearAsync(Guid id)
         {
+            // TODO: Agregar motivo de bloqueo despues?
             var usuario = await _usuarioRepository.GetByIdAsync(id)
                 ?? throw new InvalidOperationException("Usuario no encontrado.");
+            
             usuario.Bloquear();
             _usuarioRepository.Update(usuario);
             await _unitOfWork.SaveChangesAsync();

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace SIGEBI.Domain.Entities
 {
@@ -24,7 +24,10 @@ namespace SIGEBI.Domain.Entities
             UsuarioId = usuarioId;
             Motivo = motivo.Trim();
             FechaInicio = fechaInicioUtc;
+            
+            // Le sumamos los dias de castigo a la fecha actual
             FechaFin = fechaInicioUtc.AddDays(diasPenalizacion);
+            
             Estado = Enums.Operacion.EstadoPenalizacion.Activa;
         }
 

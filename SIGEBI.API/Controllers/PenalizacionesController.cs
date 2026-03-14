@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.UseCases.Usuarios;
@@ -48,6 +48,7 @@ namespace SIGEBI.API.Controllers
             var rol = ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPenalizaciones(rol), "aplicar penalizaciones");
 
+            // Llama al caso de uso que procesa a todos los morosos de una
             await _penalizacionesUseCase.AplicarPenalizacionesAsync();
             return Ok("Penalizaciones aplicadas correctamente.");
         }

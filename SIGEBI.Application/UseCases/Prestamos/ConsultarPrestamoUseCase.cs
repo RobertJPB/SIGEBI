@@ -1,4 +1,4 @@
-﻿using SIGEBI.Business.DTOs;
+using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces.Persistance;
 using SIGEBI.Business.Mappers;
 
@@ -25,6 +25,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
 
         public async Task<IEnumerable<PrestamoResponseDTO>> ObtenerPorUsuarioAsync(Guid usuarioId)
         {
+            // Verificamos que el id sea de alguien real
             var usuario = await _usuarioRepository.GetByIdAsync(usuarioId)
                 ?? throw new InvalidOperationException("Usuario no encontrado.");
 

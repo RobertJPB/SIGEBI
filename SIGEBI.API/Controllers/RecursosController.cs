@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.DTOs;
@@ -11,6 +11,8 @@ namespace SIGEBI.API.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
+    // Principio SOLID (SRP - Responsabilidad Única):
+    // Maneja la entrada y salida de datos del catalogo. No sabe nada de SQL ni de validaciones complejas.
     public class RecursosController : ControllerBase
     {
         private readonly ConsultarLibrosUseCase _consultarUseCase;
@@ -177,6 +179,7 @@ namespace SIGEBI.API.Controllers
         // ── Helper — guarda imagen en disco ──
         private async Task<string?> GuardarImagenAsync(IFormFile? imagen)
         {
+            // Ojo: Si no mandan imagen no pasa nada, devolvemos null y ya
             if (imagen == null || imagen.Length == 0) return null;
 
             var extensionesPermitidas = new[] { ".jpg", ".jpeg", ".png", ".webp" };

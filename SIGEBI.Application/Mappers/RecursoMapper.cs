@@ -1,8 +1,10 @@
-﻿using SIGEBI.Business.DTOs;
+using SIGEBI.Business.DTOs;
 using SIGEBI.Domain.Entities.Recursos;
 
 namespace SIGEBI.Business.Mappers
 {
+    // Principio SOLID (SRP - Responsabilidad Única):
+    // Su trabajo es mapear los Recursos (que pueden ser Libros, Revistas o Documentos) a DTO.
     public static class RecursoMapper
     {
         public static RecursoDetalleDTO ToDTO(RecursoBibliografico recurso)

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SIGEBI.Business.Interfaces.Persistance;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Infrastructure.Persistance.Base;
@@ -18,7 +18,10 @@ namespace SIGEBI.Infrastructure.Persistance.Repositories
         public async Task<double> GetPromedioCalificacionAsync(Guid recursoId)
         {
             var valoraciones = await _dbSet.Where(v => v.RecursoId == recursoId).ToListAsync();
+            
+            // Si nadie lo valoro todavia, devolvemos 0 para que no pinche al promediar
             if (!valoraciones.Any()) return 0;
+            
             return valoraciones.Average(v => (double)v.Calificacion);
         }
     }

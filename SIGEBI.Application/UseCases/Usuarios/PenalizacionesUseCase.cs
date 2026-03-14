@@ -28,11 +28,14 @@ namespace SIGEBI.Business.UseCases.Usuarios
 
         public async Task AplicarPenalizacionesAsync()
         {
+            // Este metodo deberia correrse todos los dias con un cronjob o algo asi
             var prestamosAtrasados = await _prestamoRepository.GetAtrasadosAsync();
 
             foreach (var prestamo in prestamosAtrasados)
             {
                 int diasAtraso = (int)(DateTime.UtcNow - prestamo.FechaDevolucionEstimada).TotalDays;
+                
+                // calculamos cuantos dias le tocan de castigo
                 int diasPenalizacion = PenalizacionCalculator.CalcularDiasPenalizacion(
                     prestamo.FechaDevolucionEstimada, DateTime.UtcNow);
                 string motivo = PenalizacionCalculator.ObtenerMotivo(diasAtraso);
@@ -41,6 +44,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
                 await _penalizacionRepository.AddAsync(penalizacion);
             }
 
+            // guardamos todas las multas de una
             await _unitOfWork.SaveChangesAsync();
         }
 

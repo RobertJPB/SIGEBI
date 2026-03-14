@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SIGEBI.Infrastructure.Persistance;
 
 namespace SIGEBI.Infrastructure.Persistance.Base
-{
+    // Principio SOLID (OCP - Abierto/Cerrado):
+    // Esta clase base tiene todo el CRUD basico. Esta cerrada a modificaciones (no hace falta tocarla)
+    // pero abierta a extension (creamos un UsuarioRepository que hereda de aca y le suma metodos extra).
     public class BaseRepository<T> where T : class
     {
         protected readonly SIGEBIDbContext _context;
@@ -15,7 +17,10 @@ namespace SIGEBI.Infrastructure.Persistance.Base
         }
 
         public async Task<IEnumerable<T>> GetAllAsync()
-            => await _dbSet.ToListAsync();
+        {
+            // Trae todo de la tabla, ojo con tablas gigantes!
+            return await _dbSet.ToListAsync();
+        }
 
         public async Task<T?> GetByIdAsync(Guid id)
             => await _dbSet.FindAsync(id);

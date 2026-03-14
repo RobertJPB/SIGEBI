@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SIGEBI.Business.Interfaces.Persistance;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Enums.Biblioteca;
@@ -21,6 +21,9 @@ namespace SIGEBI.Infrastructure.Persistance.Repositories
             => await _dbSet.FirstOrDefaultAsync(c => c.Nombre == nombre);
 
         public async Task<IEnumerable<Categoria>> GetActivasAsync()
-            => await _dbSet.Where(c => c.Estado == EstadoCategoria.Activa).ToListAsync();
+        {
+            // Ojo: Solo listamos las categorias que esten activas para que no salgan cosas borradas
+            return await _dbSet.Where(c => c.Estado == EstadoCategoria.Activa).ToListAsync();
+        }
     }
 }

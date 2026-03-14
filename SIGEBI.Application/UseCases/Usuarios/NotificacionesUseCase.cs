@@ -36,7 +36,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
             var notificacion = await _notificacionRepository.GetByIdAsync(notificacionId)
                 ?? throw new InvalidOperationException("Notificación no encontrada.");
 
-            notificacion.MarcarComoLeida();
+            notificacion.MarcarComoLeida(); // cambiamos el estado
             _notificacionRepository.Update(notificacion);
             await _unitOfWork.SaveChangesAsync();
         }

@@ -1,9 +1,12 @@
-﻿using SIGEBI.Business.DTOs;
+using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces.Persistance;
 using SIGEBI.Business.Mappers;
 
 namespace SIGEBI.Business.UseCases.Usuarios
 {
+    // Principio SOLID (ISP - Segregación de Interfaces):
+    // Solo dependemos de las interfaces estrictamente necesarias para los reportes 
+    // (IPrestamoRepository, IUsuarioRepository, etc.) en lugar de un "IGestorCentral" gigante.
     public class GenerarReportesUseCase
     {
         private readonly IPrestamoRepository _prestamoRepository;
@@ -25,6 +28,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
 
         public async Task<ReporteDTO> GenerarReporteGeneralAsync()
         {
+            // Contamos los totales para el dashboard del admin
             var prestamos = await _prestamoRepository.GetAllAsync();
             var usuarios = await _usuarioRepository.GetAllAsync();
             var recursos = await _recursoRepository.GetAllAsync();

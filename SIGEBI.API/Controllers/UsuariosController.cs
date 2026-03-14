@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.DTOs;
@@ -65,6 +65,7 @@ namespace SIGEBI.API.Controllers
             var rol = ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarUsuarios(rol), "registrar usuario");
 
+            // El UseCase ya se encarga de todo el hash de la contraseña y demas
             await _registrarUsuario.EjecutarAsync(dto);
             return Ok("Usuario registrado correctamente.");
         }

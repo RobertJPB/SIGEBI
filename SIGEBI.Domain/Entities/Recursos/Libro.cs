@@ -1,7 +1,9 @@
-﻿using System;
+using System;
 
 namespace SIGEBI.Domain.Entities.Recursos
 {
+    // Principio SOLID (OCP y LSP):
+    // Extiende de RecursoBibliografico (OCP) y puede usarse donde se espere la base (LSP).
     public class Libro : RecursoBibliografico
     {
         public string ISBN { get; private set; } = null!;
@@ -15,6 +17,7 @@ namespace SIGEBI.Domain.Entities.Recursos
                      string isbn, string editorial, int anio, string? genero = null)
             : base(titulo, autor, idCategoria, stockInicial)
         {
+            // Validaciones especificas del libro (adicionales a las del recurso base)
             if (string.IsNullOrWhiteSpace(isbn))
                 throw new ArgumentException("El ISBN es obligatorio.", nameof(isbn));
             if (string.IsNullOrWhiteSpace(editorial))

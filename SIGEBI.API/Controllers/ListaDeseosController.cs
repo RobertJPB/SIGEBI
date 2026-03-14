@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.UseCases.Catalogo;
@@ -44,6 +44,7 @@ namespace SIGEBI.API.Controllers
             var rol = ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "agregar a lista de deseos");
 
+            // TODO: Asegurarnos de que el usuario logueado coincida con usuarioId para que no metan cosas en listas ajenas
             await _listaDeseosUseCase.AgregarRecursoAsync(usuarioId, recursoId);
             return Ok("Recurso agregado a la lista de deseos.");
         }

@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.Services;
@@ -36,6 +36,7 @@ namespace SIGEBI.API.Controllers
             var rol = ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGenerarReportes(rol), "generar reporte general");
 
+            // TODO: Agregar filtros por fecha de ser necesario mas adelante
             var reporte = await _reportesService.GenerarReporteGeneralAsync();
             return Ok(reporte);
         }

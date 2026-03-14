@@ -3,7 +3,10 @@ using System.Threading.Tasks;
 using SIGEBI.Business.Interfaces.Persistance;
 
 namespace SIGEBI.Application.Interfaces
-{
+    // PATRON DE DISEÑO: Unit of Work (Unidad de Trabajo)
+    // Su trabajo es englobar todos los repositorios para que compartan la misma conexion/contexto de base de datos.
+    // Garantiza que cuando hacemos SaveChangesAsync(), todos los cambios de todos los repositorios se guarden como
+    // una única transacción atómica (o se guarda todo, o no se guarda nada si hay error).
     public interface IUnitOfWork : IDisposable
     {
         IUsuarioRepository Usuarios { get; }
