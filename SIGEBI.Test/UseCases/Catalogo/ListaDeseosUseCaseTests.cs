@@ -1,0 +1,190 @@
+using FluentAssertions;
+using Moq;
+using SIGEBI.Application.Interfaces;
+using SIGEBI.Business.Interfaces.Persistance;
+using SIGEBI.Business.UseCases.Catalogo;
+using SIGEBI.Domain.Entities;
+using SIGEBI.Domain.Entities.Recursos;
+using Xunit;
+
+namespace SIGEBI.Test.UseCases.Catalogo
+{
+    public class ListaDeseosUseCaseTests
+    {
+        private readonly Mock<IListaDeseosRepository> _listaRepo;
+        private readonly Mock<IRecursoRepository> _recursoRepo;
+        private readonly Mock<IUnitOfWork> _unitOfWork;
+        private readonly ListaDeseosUseCase _useCase;
+
+        public ListaDeseosUseCaseTests()
+        {
+            _listaRepo = new Mock<IListaDeseosRepository>();
+            _recursoRepo = new Mock<IRecursoRepository>();
+            _unitOfWork = new Mock<IUnitOfWork>();
+
+            _useCase = new ListaDeseosUseCase(
+                _listaRepo.Object,
+                _recursoRepo.Object,
+                _unitOfWork.Object);
+        }
+
+        // ── OBTENER POR USUARIO ──
+
+        [Fact]
+        public async Task ObtenerPorUsuario_ListaExistente_DevuelveDTO()
+        {
+            // Arrange
+            var usuarioId = Guid.NewGuid();
+            var lista = new ListaDeseos(usuarioId, DateTime.UtcNow);
+
+            _listaRepo
+                .Setup(r => r.GetByUsuarioIdAsync(usuarioId))
+                .ReturnsAsync(lista);
+
+            // Act
+            var resultado = await _useCase.ObtenerPorUsuarioAsync(usuarioId);
+
+            // Assert
+            resultado.Should().NotBeNull();
+            resultado.UsuarioId.Should().Be(usuarioId);
+        }
+
+        [Fact]
+        public async Task ObtenerPorUsuario_ListaNoExiste_CreaYDevuelveDTO()
+        {
+            // Arrange
+            var usuarioId = Guid.NewGuid();
+
+            _listaRepo
+                .Setup(r => r.GetByUsuarioIdAsync(usuarioId))
+                .ReturnsAsync((ListaDeseos?)null);
+
+            _listaRepo
+                .Setup(r => r.AddAsync(It.IsAny<ListaDeseos>()))
+                .Returns(Task.CompletedTask);
+
+            _unitOfWork
+                .Setup(u => u.SaveChangesAsync())
+                .ReturnsAsync(1);
+
+            // Act
+            var resultado = await _useCase.ObtenerPorUsuarioAsync(usuarioId);
+
+            // Assert
+            resultado.Should().NotBeNull();
+            _listaRepo.Verify(r => r.AddAsync(It.IsAny<ListaDeseos>()), Times.Once);
+        }
+
+        // ── AGREGAR RECURSO ──
+
+        [Fact]
+        public async Task AgregarRecurso_RecursoExistente_AgregaALista()
+        {
+            // Arrange
+            var usuarioId = Guid.NewGuid();
+            var libro = new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943);
+            var lista = new ListaDeseos(usuarioId, DateTime.UtcNow);
+
+            _recursoRepo
+                .Setup(r => r.GetByIdAsync(libro.Id))
+                .ReturnsAsync(libro);
+
+            _listaRepo
+                .Setup(r => r.GetByUsuarioIdAsync(usuarioId))
+                .ReturnsAsync(lista);
+
+            _unitOfWork
+                .Setup(u => u.SaveChangesAsync())
+                .ReturnsAsync(1);
+
+            // Act
+            await _useCase.AgregarRecursoAsync(usuarioId, libro.Id);
+
+            // Assert
+            lista.Recursos.Should().HaveCount(1);
+            lista.Recursos.First().Id.Should().Be(libro.Id);
+        }
+
+        [Fact]
+        public async Task AgregarRecurso_RecursoNoEncontrado_LanzaExcepcion()
+        {
+            // Arrange
+            _recursoRepo
+                .Setup(r => r.GetByIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync((RecursoBibliografico?)null);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                _useCase.AgregarRecursoAsync(Guid.NewGuid(), Guid.NewGuid()));
+        }
+
+        [Fact]
+        public async Task AgregarRecurso_ListaNoExiste_CreaListaYAgrega()
+        {
+            // Arrange
+            var usuarioId = Guid.NewGuid();
+            var libro = new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943);
+
+            _recursoRepo
+                .Setup(r => r.GetByIdAsync(libro.Id))
+                .ReturnsAsync(libro);
+
+            _listaRepo
+                .Setup(r => r.GetByUsuarioIdAsync(usuarioId))
+                .ReturnsAsync((ListaDeseos?)null);
+
+            _listaRepo
+                .Setup(r => r.AddAsync(It.IsAny<ListaDeseos>()))
+                .Returns(Task.CompletedTask);
+
+            _unitOfWork
+                .Setup(u => u.SaveChangesAsync())
+                .ReturnsAsync(1);
+
+            // Act & Assert — no lanza excepcion
+            await _useCase.Invoking(u => u.AgregarRecursoAsync(usuarioId, libro.Id))
+                          .Should().NotThrowAsync();
+
+            _listaRepo.Verify(r => r.AddAsync(It.IsAny<ListaDeseos>()), Times.Once);
+        }
+
+        // ── REMOVER RECURSO ──
+
+        [Fact]
+        public async Task RemoverRecurso_RecursoEnLista_RemueveCorrecto()
+        {
+            // Arrange
+            var usuarioId = Guid.NewGuid();
+            var libro = new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943);
+            var lista = new ListaDeseos(usuarioId, DateTime.UtcNow);
+            lista.AgregarRecurso(libro);
+
+            _listaRepo
+                .Setup(r => r.GetByUsuarioIdAsync(usuarioId))
+                .ReturnsAsync(lista);
+
+            _unitOfWork
+                .Setup(u => u.SaveChangesAsync())
+                .ReturnsAsync(1);
+
+            // Act
+            await _useCase.RemoverRecursoAsync(usuarioId, libro.Id);
+
+            // Assert
+            lista.Recursos.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task RemoverRecurso_ListaNoEncontrada_LanzaExcepcion()
+        {
+            // Arrange
+            _listaRepo
+                .Setup(r => r.GetByUsuarioIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync((ListaDeseos?)null);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                _useCase.RemoverRecursoAsync(Guid.NewGuid(), Guid.NewGuid()));
+        }
+    }
+}

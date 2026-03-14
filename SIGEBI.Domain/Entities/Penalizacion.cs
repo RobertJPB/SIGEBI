@@ -1,15 +1,15 @@
-﻿using System;
+using System;
+
 namespace SIGEBI.Domain.Entities
 {
     public class Penalizacion
     {
         public Guid Id { get; private set; }
         public Guid UsuarioId { get; private set; }
-        public string Motivo { get; private set; }
+        public string Motivo { get; private set; } = null!;
         public DateTime FechaInicio { get; private set; }
         public DateTime? FechaFin { get; private set; }
         public Enums.Operacion.EstadoPenalizacion Estado { get; private set; }
-
         public Usuario Usuario { get; private set; } = null!;
 
         private Penalizacion() { }
@@ -24,7 +24,10 @@ namespace SIGEBI.Domain.Entities
             UsuarioId = usuarioId;
             Motivo = motivo.Trim();
             FechaInicio = fechaInicioUtc;
+            
+            // Le sumamos los dias de castigo a la fecha actual
             FechaFin = fechaInicioUtc.AddDays(diasPenalizacion);
+            
             Estado = Enums.Operacion.EstadoPenalizacion.Activa;
         }
 
@@ -33,6 +36,7 @@ namespace SIGEBI.Domain.Entities
             if (Estado == Enums.Operacion.EstadoPenalizacion.Finalizada) return;
             if (fechaFinUtc < FechaInicio)
                 throw new InvalidOperationException("La fecha de fin no puede ser anterior a la de inicio.");
+
             FechaFin = fechaFinUtc;
             Estado = Enums.Operacion.EstadoPenalizacion.Finalizada;
         }

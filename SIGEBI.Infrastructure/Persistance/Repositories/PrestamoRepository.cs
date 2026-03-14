@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SIGEBI.Business.Interfaces.Persistance;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Enums.Biblioteca;
@@ -20,7 +20,10 @@ namespace SIGEBI.Infrastructure.Persistance.Repositories
                 .ToListAsync();
 
         public async Task<IEnumerable<Prestamo>> GetAtrasadosAsync()
-            => await _dbSet.Where(p => p.EstadoActual == EstadoPrestamo.Atrasado)
+        {
+            // Trae a todos los morosos
+            return await _dbSet.Where(p => p.EstadoActual == EstadoPrestamo.Atrasado)
                 .ToListAsync();
+        }
     }
 }

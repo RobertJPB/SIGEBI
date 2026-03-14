@@ -1,0 +1,562 @@
+﻿@page
+@model SIGEBI.Web.Pages.Catalogo.IndexModel
+@{
+    ViewData["Title"] = "Catalogo";
+    Layout = null;
+    var apiBase = Model.ApiBaseUrl;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIGEBI - Catálogo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --green-900: #0f3d20;
+            --green-800: #1a5c2e;
+            --green-600: #2e8b4a;
+            --green-400: #4caf7d;
+            --green-100: #e8f5ee;
+            --green-50: #f4faf7;
+            --cream: #faf8f4;
+            --ink: #1a1f1c;
+            --muted: #5a6b60;
+            --border: #dde8e2;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--cream);
+            font-family: 'Outfit', sans-serif;
+            color: var(--ink);
+            min-height: 100vh;
+        }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            background-color: #0d2e18;
+            padding: 0 2.5rem;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.18);
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .brand-text {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 1px;
+        }
+
+        .brand-sub {
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            display: block;
+            line-height: 1;
+            margin-top: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.75);
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 500;
+            padding: 7px 14px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .nav-link:hover {
+                color: white;
+                background: rgba(255,255,255,0.1);
+            }
+
+        .nav-divider {
+            width: 1px;
+            height: 20px;
+            background: rgba(255,255,255,0.15);
+            margin: 0 6px;
+        }
+
+        /* ── HERO ── */
+        .page-header {
+            background: linear-gradient(160deg, rgba(15,61,32,0.92) 0%, rgba(26,92,46,0.88) 60%, rgba(46,139,74,0.85) 100%), url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=1400&q=80');
+            background-size: cover;
+            background-position: center;
+            padding: 3rem 2.5rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-eyebrow {
+            font-size: 0.72rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--green-400);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .header-title {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: white;
+            line-height: 1.2;
+            margin-bottom: 8px;
+        }
+
+        .header-subtitle {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.95rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+        }
+
+        /* ── SEARCH ── */
+        .search-wrapper {
+            display: flex;
+            gap: 10px;
+            max-width: 560px;
+        }
+
+        .search-input-wrap {
+            flex: 1;
+            position: relative;
+        }
+
+            .search-input-wrap i {
+                position: absolute;
+                left: 14px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--muted);
+                font-size: 0.95rem;
+            }
+
+        .search-input {
+            width: 100%;
+            padding: 11px 14px 11px 38px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            background: rgba(255,255,255,0.97);
+            color: var(--ink);
+            outline: none;
+        }
+
+            .search-input:focus {
+                box-shadow: 0 0 0 3px rgba(76,175,125,0.4);
+            }
+
+        .btn-search {
+            background: var(--green-400);
+            color: white;
+            border: none;
+            padding: 11px 22px;
+            border-radius: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .btn-search:hover {
+                background: #3da060;
+            }
+
+        .btn-clear {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.25);
+            padding: 11px 16px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            font-family: 'Outfit', sans-serif;
+        }
+
+            .btn-clear:hover {
+                background: rgba(255,255,255,0.22);
+                color: white;
+            }
+
+        /* ── MAIN ── */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2.5rem 2.5rem 4rem;
+        }
+
+        .results-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .results-count {
+            font-size: 0.85rem;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+            .results-count strong {
+                color: var(--green-800);
+                font-weight: 600;
+            }
+
+        /* ── CARDS ── */
+        .recursos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .recurso-card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: transform 0.25s, box-shadow 0.25s;
+            display: flex;
+            flex-direction: column;
+            animation: fadeUp 0.4s ease both;
+        }
+
+            .recurso-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 12px 32px rgba(15,61,32,0.12);
+            }
+
+        @@keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-cover {
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .card-cover.tipo-libro {
+                background: linear-gradient(135deg, #0f3d20, #2e8b4a);
+            }
+
+            .card-cover.tipo-revista {
+                background: linear-gradient(135deg, #1a3a5c, #2e6b8b);
+            }
+
+            .card-cover.tipo-documento {
+                background: linear-gradient(135deg, #3d2a0f, #8b5e2e);
+            }
+
+        .card-cover-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .card-cover-icon {
+            font-size: 2.8rem;
+            color: rgba(255,255,255,0.2);
+        }
+
+        .card-tipo-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.45);
+            color: white;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 3px 9px;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .card-body {
+            padding: 1.1rem 1.1rem 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--ink);
+            line-height: 1.35;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-autor {
+            font-size: 0.8rem;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .card-categoria {
+            font-size: 0.75rem;
+            color: var(--green-600);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .card-footer {
+            padding: 0.75rem 1.1rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid var(--border);
+            margin-top: auto;
+        }
+
+        .stock-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        .stock-disponible {
+            background: var(--green-100);
+            color: var(--green-800);
+        }
+
+        .stock-agotado {
+            background: #fdecea;
+            color: #c62828;
+        }
+
+        .btn-detalle {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--green-600);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.2s;
+        }
+
+            .btn-detalle:hover {
+                color: var(--green-800);
+            }
+
+        /* ── EMPTY ── */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--muted);
+        }
+
+        .empty-icon {
+            width: 72px;
+            height: 72px;
+            background: var(--green-100);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.2rem;
+            font-size: 1.8rem;
+            color: var(--green-600);
+        }
+
+        .empty-state h4 {
+            font-size: 1.3rem;
+            color: var(--ink);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .empty-state p {
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <a class="navbar-brand" href="/Catalogo/Index">
+            <div>
+                <span class="brand-text">SIGEBI</span>
+                <span class="brand-sub">Biblioteca</span>
+            </div>
+        </a>
+        <div class="nav-links">
+            <a class="nav-link" href="/ListaDeseos/Index"><i class="bi bi-heart"></i> Lista de Deseos</a>
+            <a class="nav-link" href="/Prestamos/Index"><i class="bi bi-book"></i> Mis Préstamos</a>
+            <a class="nav-link" href="/Notificaciones/Index"><i class="bi bi-bell"></i> Notificaciones</a>
+            <div class="nav-divider"></div>
+            <a class="nav-link" href="/Perfil/Index"><i class="bi bi-person-circle"></i> Perfil</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <div class="page-header">
+        <div class="header-content">
+            <p class="header-eyebrow">Explorar colección</p>
+            <h1 class="header-title">Catálogo de Recursos</h1>
+            <p class="header-subtitle">Libros, revistas y documentos disponibles en la biblioteca</p>
+            <form method="get">
+                <div class="search-wrapper">
+                    <div class="search-input-wrap">
+                        <i class="bi bi-search"></i>
+                        <input type="text" name="busqueda" class="search-input"
+                               placeholder="Buscar por título, autor..." value="@Model.Busqueda" />
+                    </div>
+                    <button type="submit" class="btn-search">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                    @if (!string.IsNullOrEmpty(Model.Busqueda))
+                    {
+                        <a href="/Catalogo/Index" class="btn-clear">
+                            <i class="bi bi-x"></i> Limpiar
+                        </a>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="main-content">
+        @if (!Model.Recursos.Any())
+        {
+            <div class="empty-state">
+                <div class="empty-icon"><i class="bi bi-search"></i></div>
+                <h4>No se encontraron recursos</h4>
+                <p>Intenta con otra búsqueda o limpia los filtros.</p>
+            </div>
+        }
+        else
+        {
+            <div class="results-meta">
+                <span class="results-count">
+                    <strong>@Model.Recursos.Count</strong> recursos encontrados
+                    @if (!string.IsNullOrEmpty(Model.Busqueda))
+                    {
+                        <span> para "<em>@Model.Busqueda</em>"</span>
+                    }
+                </span>
+            </div>
+
+            <div class="recursos-grid">
+                @foreach (var recurso in Model.Recursos)
+                {
+                    var tipoClass = recurso.TipoRecurso?.ToLower() == "revista" ? "tipo-revista"
+                    : recurso.TipoRecurso?.ToLower() == "documento" ? "tipo-documento"
+                    : "tipo-libro";
+
+                    var tipoIcon = recurso.TipoRecurso?.ToLower() == "revista" ? "bi-journal-text"
+                    : recurso.TipoRecurso?.ToLower() == "documento" ? "bi-file-earmark-text"
+                    : "bi-book";
+
+                    <div class="recurso-card">
+                        <div class="card-cover @tipoClass">
+                            @if (!string.IsNullOrEmpty(recurso.ImagenUrl))
+                            {
+                                <img class="card-cover-img"
+                                     src="@(apiBase + recurso.ImagenUrl)"
+                                     alt="@recurso.Titulo"
+                                     onerror="this.style.display='none'" />
+                            }
+                            else
+                            {
+                                <i class="bi @tipoIcon card-cover-icon"></i>
+                            }
+                            <span class="card-tipo-badge">@recurso.TipoRecurso</span>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title">@recurso.Titulo</h3>
+                            <p class="card-autor"><i class="bi bi-person"></i> @recurso.Autor</p>
+                            <p class="card-categoria"><i class="bi bi-tag"></i> @recurso.CategoriaNombre</p>
+                        </div>
+                        <div class="card-footer">
+                            <span class="stock-badge @(recurso.Stock == 0 ? "stock-agotado" : "stock-disponible")">
+                                @(recurso.Stock == 0 ? "Agotado" : $"{recurso.Stock} disponibles")
+                            </span>
+                            <a href="/Catalogo/Detalle?id=@recurso.Id" class="btn-detalle">
+                                Ver detalle <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+</body>
+</html>

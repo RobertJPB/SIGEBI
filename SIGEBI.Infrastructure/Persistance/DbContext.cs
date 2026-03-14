@@ -1,12 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using SIGEBI.Domain.Entities;
+using SIGEBI.Domain.Entities.Recursos;
 
 namespace SIGEBI.Infrastructure.Persistance
 {
-    class DbContext
+    public class SIGEBIDbContext : DbContext
     {
+        public SIGEBIDbContext(DbContextOptions<SIGEBIDbContext> options) : base(options) { }
+
+        public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<RecursoBibliografico> RecursosBibliograficos { get; set; }
+        public DbSet<Libro> Libros { get; set; }
+        public DbSet<Revista> Revistas { get; set; }
+        public DbSet<Documento> Documentos { get; set; }
+        public DbSet<Prestamo> Prestamos { get; set; }
+        public DbSet<Categoria> Categorias { get; set; }
+        public DbSet<Penalizacion> Penalizaciones { get; set; }
+        public DbSet<Valoracion> Valoraciones { get; set; }
+        public DbSet<Notificacion> Notificaciones { get; set; }
+        public DbSet<ListaDeseos> ListasDeseos { get; set; }
+        public DbSet<Auditoria> Auditorias { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Principio SOLID (OCP - Abierto/Cerrado):
+            // Si agregamos una nueva tabla, no modificamos este DbContext gigante.
+            // Simplemente creamos su archivo de configuracion (IEntityTypeConfiguration) 
+            // y esta linea lo levanta automaticamente (abierto a extension, cerrado a modificacion).
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(SIGEBIDbContext).Assembly);
+        }
     }
 }
