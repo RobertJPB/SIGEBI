@@ -54,7 +54,7 @@ namespace SIGEBI.API.Controllers
         public async Task<IActionResult> GetPorUsuario(Guid usuarioId)
         {
             var rol = ObtenerRolActual();
-            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPrestamos(rol), "ver préstamos por usuario");
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver préstamos por usuario");
 
             var prestamos = await _consultarUseCase.ObtenerPorUsuarioAsync(usuarioId);
             return Ok(prestamos);
@@ -64,7 +64,7 @@ namespace SIGEBI.API.Controllers
         public async Task<IActionResult> GetActivosPorUsuario(Guid usuarioId)
         {
             var rol = ObtenerRolActual();
-            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPrestamos(rol), "ver préstamos activos");
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver préstamos activos");
 
             var prestamos = await _consultarUseCase.ObtenerActivosPorUsuarioAsync(usuarioId);
             return Ok(prestamos);

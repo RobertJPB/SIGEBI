@@ -2,7 +2,6 @@ using SIGEBI.Business.DTOs;
 
 namespace SIGEBI.Business.Validators
 {
-    // Principio SOLID (SRP - Responsabilidad Única):
     // Valida que el pedido de prestamo tenga los campos obligatorios completos.
     public class SolicitarPrestamoValidator
     {

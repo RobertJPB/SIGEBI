@@ -34,7 +34,7 @@ namespace SIGEBI.API.Controllers
         public async Task<IActionResult> ObtenerPorUsuario(Guid usuarioId)
         {
             var rol = ObtenerRolActual();
-            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPenalizaciones(rol), "ver penalizaciones");
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver penalizaciones");
 
             var penalizaciones = await _penalizacionesUseCase.ObtenerPenalizacionesPorUsuarioAsync(usuarioId);
             return Ok(penalizaciones);

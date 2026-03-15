@@ -53,8 +53,7 @@ namespace SIGEBI.API.Controllers
         public async Task<IActionResult> Agregar([FromBody] ValoracionDTO dto)
         {
             var rol = ObtenerRolActual();
-            // TODO: Cambiar esto. Alguien copypasteo PuedeSolicitarPrestamo en vez de usar algo para valoraciones jaja
-            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeSolicitarPrestamo(rol), "agregar valoración");
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "agregar valoración");
 
             var valoracion = await _valoracionesUseCase.AgregarValoracionAsync(
                 dto.UsuarioId, dto.RecursoId, dto.Calificacion, dto.Comentario);

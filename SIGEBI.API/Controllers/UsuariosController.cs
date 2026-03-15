@@ -49,7 +49,7 @@ namespace SIGEBI.API.Controllers
         public async Task<IActionResult> ObtenerPorId(Guid id)
         {
             var rol = ObtenerRolActual();
-            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerUsuarios(rol), "ver usuario");
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver usuario");
 
             var usuario = await _gestionarUsuario.ObtenerPorIdAsync(id);
             if (usuario == null)
