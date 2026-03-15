@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SIGEBI.Infrastructure.Persistance;
 
 namespace SIGEBI.Infrastructure.Persistance.Base
+{
     // Principio SOLID (OCP - Abierto/Cerrado):
     // Esta clase base tiene todo el CRUD basico. Esta cerrada a modificaciones (no hace falta tocarla)
     // pero abierta a extension (creamos un UsuarioRepository que hereda de aca y le suma metodos extra).

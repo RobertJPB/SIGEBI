@@ -1,6 +1,7 @@
 using SIGEBI.Business.DTOs;
 
 namespace SIGEBI.Business.Validators
+{
     // Principio SOLID (SRP - Responsabilidad Única):
     // Su único trabajo es validar que los datos crudos (strings, numeros) tengan el formato correcto.
     // No guarda en la BD ni procesa reglas de negocio complejas.

@@ -2,6 +2,7 @@ using SIGEBI.Business.DTOs;
 using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Business.Mappers
+{
     // Principio SOLID (SRP - Responsabilidad Única):
     // Esta clase solo tiene una razon para existir: transcribir datos de la Entidad (BD) al DTO (Web).
     public static class UsuarioMapper

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using SIGEBI.Business.Interfaces.Services;
 
 namespace SIGEBI.Infrastructure.Services
+{
     // Principios SOLID (SRP y DIP):
     // SRP: Solo sabe enviar emails con SmtpClient, nada mas.
     // DIP: Implementa IEmailAdapter para que la capa de Negocio dependa de la interfaz y no de esta clase tecnologica puntual.

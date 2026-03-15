@@ -1,30 +1,35 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using SIGEBI.Web.Models;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
-namespace SIGEBI.Web.Pages.Catalogo
+namespace SIGEBI.Web.Controllers
 {
-    public class IndexModel : PageModel
+    public class CatalogoViewModel
+    {
+        public List<RecursoViewModel> Recursos { get; set; } = new();
+        public string Busqueda { get; set; } = string.Empty;
+        public string ApiBaseUrl { get; set; } = string.Empty;
+    }
+
+    public class CatalogoController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
 
-        public List<RecursoViewModel> Recursos { get; set; } = new();
-        public string Busqueda { get; set; } = string.Empty;
-        public string ApiBaseUrl { get; set; } = string.Empty;
-
-        public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public CatalogoController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
             _configuration = configuration;
         }
 
-        public async Task<IActionResult> OnGetAsync(string? busqueda)
+        public async Task<IActionResult> Index(string? busqueda)
         {
-            Busqueda = busqueda ?? string.Empty;
-            ApiBaseUrl = _configuration["ApiSettings:BaseUrl"]!;
+            var model = new CatalogoViewModel
+            {
+                Busqueda = busqueda ?? string.Empty,
+                ApiBaseUrl = _configuration["ApiSettings:BaseUrl"]!
+            };
 
             try
             {
@@ -32,7 +37,7 @@ namespace SIGEBI.Web.Pages.Catalogo
                 var token = HttpContext.Session.GetString("JwtToken");
 
                 if (string.IsNullOrWhiteSpace(token))
-                    return RedirectToPage("/Auth/Login");
+                    return RedirectToAction("Login", "Auth");
 
                 client.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", token);
@@ -45,22 +50,20 @@ namespace SIGEBI.Web.Pages.Catalogo
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    Recursos = new List<RecursoViewModel>();
-                    return Page();
+                    return View(model);
                 }
 
                 var json = await response.Content.ReadAsStringAsync();
-                Recursos = JsonSerializer.Deserialize<List<RecursoViewModel>>(
+                model.Recursos = JsonSerializer.Deserialize<List<RecursoViewModel>>(
                     json,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
                     ?? new List<RecursoViewModel>();
 
-                return Page();
+                return View(model);
             }
             catch
             {
-                Recursos = new List<RecursoViewModel>();
-                return Page();
+                return View(model);
             }
         }
     }

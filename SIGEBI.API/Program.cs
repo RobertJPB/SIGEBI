@@ -11,7 +11,6 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuracion de controladores para que no se cicle el JSON (típico error de EF Core)
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -91,7 +90,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Metemos nuestro middleware global para atrapar errores y no mostrar cosas raras al cliente
+// Metemos nuestro middleware global para atrapar errores y no mostrarles detalles a los clientes
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
 

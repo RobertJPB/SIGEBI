@@ -6,6 +6,7 @@ using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Business.UseCases.Prestamos
+{
     // Principio SOLID (DIP - Inversión de Dependencias):
     // Esta clase NO conoce a SQL Server ni a Entity Framework. 
     // Solo conoce las interfaces (IPrestamoRepository, etc) que le inyectaron por constructor.

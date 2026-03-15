@@ -7,9 +7,7 @@ using SIGEBI.Business.Validators;
 namespace SIGEBI.API.Controllers
 {
     [ApiController]
-    // Principio SOLID (SRP - Responsabilidad Única):
-    // El controlador solo se encarga de recibir la peticion web (HTTP) y devolver un 200 OK o 400 BadRequest.
-    // La validadcion se delega al Validator, y la logica a los UseCases.
+    [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly LoginUsuarioUseCase _loginUseCase;

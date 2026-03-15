@@ -1,0 +1,129 @@
+﻿@model SIGEBI.Web.Controllers.NotificacionesIndexViewModel
+@{
+    ViewData["Title"] = "Notificaciones";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIGEBI - Notificaciones</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --green-900: #0f3d20; --green-800: #1a5c2e; --green-600: #2e8b4a;
+            --green-400: #4caf7d; --green-100: #e8f5ee; --cream: #faf8f4;
+            --ink: #1a1f1c; --muted: #5a6b60; --border: #dde8e2;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: var(--cream); font-family: 'Outfit', sans-serif; color: var(--ink); min-height: 100vh; }
+
+        .navbar { background-color: #0d2e18; padding: 0 2.5rem; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 20px rgba(0,0,0,0.18); }
+        .navbar-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .brand-text { font-size: 1.7rem; font-weight: 700; color: white; letter-spacing: 1px; }
+        .brand-sub { font-size: 0.65rem; color: rgba(255,255,255,0.5); letter-spacing: 2px; text-transform: uppercase; display: block; }
+        .nav-links { display: flex; align-items: center; gap: 4px; }
+        .nav-link { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.82rem; font-weight: 500; padding: 7px 14px; border-radius: 6px; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+        .nav-link:hover, .nav-link.active { color: white; background: rgba(255,255,255,0.1); }
+        .nav-divider { width: 1px; height: 20px; background: rgba(255,255,255,0.15); margin: 0 6px; }
+
+        .page-header { background: linear-gradient(160deg, rgba(15,61,32,0.92) 0%, rgba(26,92,46,0.88) 60%, rgba(46,139,74,0.85) 100%); padding: 3rem 2.5rem 4rem; }
+        .header-content { max-width: 900px; margin: 0 auto; }
+        .header-eyebrow { font-size: 0.72rem; letter-spacing: 3px; text-transform: uppercase; color: var(--green-400); font-weight: 600; margin-bottom: 10px; }
+        .header-title { font-size: 2.2rem; font-weight: 700; color: white; margin-bottom: 6px; }
+        .header-subtitle { color: rgba(255,255,255,0.6); font-size: 0.95rem; font-weight: 300; }
+
+        .main-content { max-width: 900px; margin: 0 auto; padding: 2.5rem 2.5rem 4rem; }
+
+        .notif-list { display: flex; flex-direction: column; gap: 12px; }
+        .notif-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 18px 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            transition: box-shadow 0.2s;
+            animation: fadeUp 0.3s ease both;
+        }
+        .notif-card:hover { box-shadow: 0 4px 16px rgba(15,61,32,0.09); }
+        .notif-card.no-leida { border-left: 4px solid var(--green-400); background: #f7fdf9; }
+        .notif-icon { width: 42px; height: 42px; border-radius: 50%; background: var(--green-100); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--green-600); flex-shrink: 0; }
+        .notif-body { flex: 1; }
+        .notif-mensaje { font-size: 0.92rem; color: var(--ink); font-weight: 500; margin-bottom: 4px; }
+        .notif-fecha { font-size: 0.78rem; color: var(--muted); }
+        .notif-badge-leida { font-size: 0.72rem; color: var(--muted); font-weight: 500; padding: 3px 10px; border-radius: 20px; background: #f0f0f0; }
+        .notif-badge-nueva { font-size: 0.72rem; color: var(--green-800); font-weight: 600; padding: 3px 10px; border-radius: 20px; background: var(--green-100); }
+
+        .empty-state { text-align: center; padding: 80px 20px; color: var(--muted); }
+        .empty-icon { width: 72px; height: 72px; background: var(--green-100); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.2rem; font-size: 1.8rem; color: var(--green-600); }
+        .empty-state h4 { font-size: 1.3rem; color: var(--ink); margin-bottom: 6px; font-weight: 600; }
+
+        @@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a class="navbar-brand" href="/Catalogo/Index">
+            <div>
+                <span class="brand-text">SIGEBI</span>
+                <span class="brand-sub">Biblioteca</span>
+            </div>
+        </a>
+        <div class="nav-links">
+            <a class="nav-link" href="/Catalogo/Index"><i class="bi bi-grid"></i> CatÃ¡logo</a>
+            <a class="nav-link" href="/ListaDeseos/Index"><i class="bi bi-heart"></i> Lista de Deseos</a>
+            <a class="nav-link" href="/Prestamos/Index"><i class="bi bi-book"></i> Mis PrÃ©stamos</a>
+            <a class="nav-link active" href="/Notificaciones/Index"><i class="bi bi-bell"></i> Notificaciones</a>
+            <div class="nav-divider"></div>
+            <a class="nav-link" href="/Perfil/Index"><i class="bi bi-person-circle"></i> Perfil</a>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <div class="header-content">
+            <p class="header-eyebrow">Centro de mensajes</p>
+            <h1 class="header-title">Notificaciones</h1>
+            <p class="header-subtitle">Avisos sobre prÃ©stamos, devoluciones y penalizaciones</p>
+        </div>
+    </div>
+
+    <div class="main-content">
+        @if (!Model.Notificaciones.Any())
+        {
+            <div class="empty-state">
+                <div class="empty-icon"><i class="bi bi-bell-slash"></i></div>
+                <h4>No tenÃ©s notificaciones</h4>
+                <p>Cuando haya novedades sobre tus prÃ©stamos, aparecerÃ¡n aquÃ­.</p>
+            </div>
+        }
+        else
+        {
+            <div class="notif-list">
+                @foreach (var n in Model.Notificaciones)
+                {
+                    <div class="notif-card @(!n.Leida ? "no-leida" : "")">
+                        <div class="notif-icon">
+                            <i class="bi bi-bell"></i>
+                        </div>
+                        <div class="notif-body">
+                            <p class="notif-mensaje">@n.Mensaje</p>
+                            <p class="notif-fecha"><i class="bi bi-clock me-1"></i>@n.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</p>
+                        </div>
+                        <span class="@(n.Leida ? "notif-badge-leida" : "notif-badge-nueva")">
+                            @(n.Leida ? "LeÃ­da" : "Nueva")
+                        </span>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+</body>
+</html>
+

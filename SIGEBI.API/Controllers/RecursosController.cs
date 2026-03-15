@@ -11,8 +11,7 @@ namespace SIGEBI.API.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    // Principio SOLID (SRP - Responsabilidad Única):
-    // Maneja la entrada y salida de datos del catalogo. No sabe nada de SQL ni de validaciones complejas.
+   
     public class RecursosController : ControllerBase
     {
         private readonly ConsultarLibrosUseCase _consultarUseCase;

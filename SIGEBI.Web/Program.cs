@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 var builder = WebApplication.CreateBuilder(args);
 
 
-builder.Services.AddRazorPages();
+builder.Services.AddControllersWithViews();
 
 // HttpClient para consumir la API
 builder.Services.AddHttpClient("SIGEBIAPI", client =>
@@ -45,6 +45,8 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseSession();
 app.UseAuthorization();
-app.MapRazorPages();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Catalogo}/{action=Index}/{id?}");
 
 app.Run();

@@ -1,38 +1,42 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
+using System.IdentityModel.Tokens.Jwt;
 
-namespace SIGEBI.Web.Pages.Auth
+namespace SIGEBI.Web.Controllers
 {
-    public class LoginModel : PageModel
+    public class LoginViewModel
+    {
+        public string Correo { get; set; } = string.Empty;
+        public string Contrasena { get; set; } = string.Empty;
+        public string ErrorMessage { get; set; } = string.Empty;
+    }
+
+    public class AuthController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
 
-        [BindProperty]
-        public string Correo { get; set; } = string.Empty;
-
-        [BindProperty]
-        public string Contrasena { get; set; } = string.Empty;
-
-        public string ErrorMessage { get; set; } = string.Empty;
-
-        public LoginModel(IHttpClientFactory httpClientFactory)
+        public AuthController(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
         }
 
-        public void OnGet() { }
-
-        public async Task<IActionResult> OnPostAsync()
+        [HttpGet]
+        public IActionResult Login()
         {
-            if (string.IsNullOrWhiteSpace(Correo) || string.IsNullOrWhiteSpace(Contrasena))
+            return View(new LoginViewModel());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            if (string.IsNullOrWhiteSpace(model.Correo) || string.IsNullOrWhiteSpace(model.Contrasena))
             {
-                ErrorMessage = "Correo y contraseÒa son obligatorios.";
-                return Page();
+                model.ErrorMessage = "Correo y contrase√±a son obligatorios.";
+                return View(model);
             }
 
             try
@@ -41,8 +45,8 @@ namespace SIGEBI.Web.Pages.Auth
 
                 var payload = new
                 {
-                    correo = Correo,
-                    contrasena = Contrasena
+                    correo = model.Correo,
+                    contrasena = model.Contrasena
                 };
 
                 var json = JsonSerializer.Serialize(payload);
@@ -52,33 +56,43 @@ namespace SIGEBI.Web.Pages.Auth
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    ErrorMessage = $"Credenciales incorrectas. CÛdigo: {(int)response.StatusCode}";
-                    return Page();
+                    model.ErrorMessage = $"Credenciales incorrectas. C√≥digo: {(int)response.StatusCode}";
+                    return View(model);
                 }
 
                 var result = JsonSerializer.Deserialize<JsonElement>(responseBody);
 
                 if (!result.TryGetProperty("token", out var tokenElement))
                 {
-                    ErrorMessage = $"La API no devolviÛ token. Respuesta: {responseBody}";
-                    return Page();
+                    model.ErrorMessage = $"La API no devolvi√≥ token. Respuesta: {responseBody}";
+                    return View(model);
                 }
 
                 var token = tokenElement.GetString();
 
                 if (string.IsNullOrWhiteSpace(token))
                 {
-                    ErrorMessage = "El token llegÛ vacÌo.";
-                    return Page();
+                    model.ErrorMessage = "El token lleg√≥ vac√≠o.";
+                    return View(model);
                 }
 
                 // Guardar token en Session
                 HttpContext.Session.SetString("JwtToken", token);
 
-                // Crear cookie de autenticaciÛn
+                // üî• Extraer el UsuarioId del token JWT y guardarlo en sesi√≥n
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+                var usuarioIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                
+                if (!string.IsNullOrEmpty(usuarioIdClaim))
+                {
+                    HttpContext.Session.SetString("UsuarioId", usuarioIdClaim);
+                }
+
+                // Crear cookie de autenticaci√≥n
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, Correo),
+                    new Claim(ClaimTypes.Name, model.Correo),
                     new Claim("JwtToken", token)
                 };
 
@@ -97,12 +111,12 @@ namespace SIGEBI.Web.Pages.Auth
                     authProperties
                 );
 
-                return RedirectToPage("/Catalogo/Index");
+                return RedirectToAction("Index", "Catalogo");
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"No se pudo conectar con el servidor. Detalle: {ex.Message}";
-                return Page();
+                model.ErrorMessage = $"No se pudo conectar con el servidor. Detalle: {ex.Message}";
+                return View(model);
             }
         }
     }

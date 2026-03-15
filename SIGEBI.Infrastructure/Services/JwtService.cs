@@ -7,6 +7,7 @@ using SIGEBI.Business.Interfaces.Services;
 using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Infrastructure.Services
+{
     // Principio SOLID (SRP - Responsabilidad Única):
     // La única razon de existir de esta clase es generar el Token JWT con los Claims. 
     // No hace login, no busca en la base de datos, solo encripta la pulsera VIP.
