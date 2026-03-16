@@ -11,7 +11,6 @@ namespace SIGEBI.API.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    // Principio SOLID (SRP - Responsabilidad Única):
     // El controlador solo orquesta la peticion HTTP. No tiene reglas de negocio.
     public class PrestamosController : ControllerBase
     {
@@ -106,3 +105,4 @@ namespace SIGEBI.API.Controllers
         }
     }
 }
+

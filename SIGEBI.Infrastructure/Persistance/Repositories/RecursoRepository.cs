@@ -6,7 +6,6 @@ using SIGEBI.Infrastructure.Persistance.Base;
 
 namespace SIGEBI.Infrastructure.Persistance.Repositories
 {
-    // Principio SOLID (LSP - Sustitución de Liskov):
     // El repo devuelve IEnumerable<RecursoBibliografico>, pero por detras Entity Framework nos puede 
     // devolver Libros, Revistas o Documentos mezclados, y el sistema sigue funcionando igual.
     public class RecursoRepository : BaseRepository<RecursoBibliografico>, IRecursoRepository

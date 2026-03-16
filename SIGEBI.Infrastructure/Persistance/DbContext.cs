@@ -24,8 +24,6 @@ namespace SIGEBI.Infrastructure.Persistance
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            // Principio SOLID (OCP - Abierto/Cerrado):
             // Si agregamos una nueva tabla, no modificamos este DbContext gigante.
             // Simplemente creamos su archivo de configuracion (IEntityTypeConfiguration) 
             // y esta linea lo levanta automaticamente (abierto a extension, cerrado a modificacion).

@@ -2,7 +2,6 @@ using System;
 
 namespace SIGEBI.Domain.Entities.Recursos
 {
-    // Principio SOLID (OCP y LSP):
     // El documento hereda la logica base pero tiene sus propios datos especificos (Institucion).
     public class Documento : RecursoBibliografico
     {
@@ -47,3 +46,4 @@ namespace SIGEBI.Domain.Entities.Recursos
         }
     }
 }
+

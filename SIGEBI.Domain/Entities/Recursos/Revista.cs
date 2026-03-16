@@ -2,7 +2,6 @@ using System;
 
 namespace SIGEBI.Domain.Entities.Recursos
 {
-    // Principio SOLID (OCP y LSP):
     // Una revista es un tipo de recurso mas. Cumple el contrato base de RecursoBibliografico.
     public class Revista : RecursoBibliografico
     {
@@ -43,3 +42,4 @@ namespace SIGEBI.Domain.Entities.Recursos
         }
     }
 }
+

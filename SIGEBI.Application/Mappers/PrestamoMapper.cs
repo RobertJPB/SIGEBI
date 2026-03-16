@@ -3,7 +3,6 @@ using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Business.Mappers
 {
-    // Principio SOLID (SRP - Responsabilidad Única):
     // Su unico trabajo es convertir la entidad Prestamo en el objeto de respuesta DTO para el cliente.
     public static class PrestamoMapper
     {

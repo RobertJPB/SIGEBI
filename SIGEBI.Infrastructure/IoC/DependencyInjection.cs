@@ -17,7 +17,6 @@ namespace SIGEBI.Infrastructure.IoC
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
-            // Principio SOLID (DIP - Inversión de Dependencias):
             // Aca le decimos al sistema "cada vez que una clase pida un IUsuarioRepository, pasale una instancia de UsuarioRepository".
             // Así los Casos de Uso dependen de las abstracciones y no de Entity Framework directo.
             
@@ -78,3 +77,4 @@ namespace SIGEBI.Infrastructure.IoC
         }
     }
 }
+

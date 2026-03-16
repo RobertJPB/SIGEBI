@@ -2,7 +2,6 @@ using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Business.Interfaces.Persistance
 {
-    // Principio SOLID (ISP - Segregación de Interfaces):
     // Define operaciones unicas para multas y sanciones del usuario.
     public interface IPenalizacionRepository
     {

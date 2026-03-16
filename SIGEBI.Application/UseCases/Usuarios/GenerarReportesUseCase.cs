@@ -4,7 +4,6 @@ using SIGEBI.Business.Mappers;
 
 namespace SIGEBI.Business.UseCases.Usuarios
 {
-    // Principio SOLID (ISP - Segregación de Interfaces):
     // Solo dependemos de las interfaces estrictamente necesarias para los reportes 
     // (IPrestamoRepository, IUsuarioRepository, etc.) en lugar de un "IGestorCentral" gigante.
     public class GenerarReportesUseCase

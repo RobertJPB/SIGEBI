@@ -2,7 +2,6 @@ using SIGEBI.Business.DTOs;
 
 namespace SIGEBI.Business.Validators
 {
-    // Principio SOLID (SRP - Responsabilidad Única):
     // Solo se encarga de verificar que los datos crudos del usuario sean correctos antes del registro.
     public class RegistrarUsuarioValidator
     {

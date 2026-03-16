@@ -5,7 +5,6 @@ using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Business.UseCases.Prestamos
 {
-    // Principio SOLID (SRP y DIP):
     // SRP: Solo maneja el flujo de devolver un libro.
     // DIP: Depende de interfaces de repositorios para no acoplarse a la base de datos.
     public class DevolverPrestamoUseCase

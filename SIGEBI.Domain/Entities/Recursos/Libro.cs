@@ -2,7 +2,6 @@ using System;
 
 namespace SIGEBI.Domain.Entities.Recursos
 {
-    // Principio SOLID (OCP y LSP):
     // Extiende de RecursoBibliografico (OCP) y puede usarse donde se espere la base (LSP).
     public class Libro : RecursoBibliografico
     {
@@ -52,3 +51,4 @@ namespace SIGEBI.Domain.Entities.Recursos
         public void ActualizarGenero(string? genero) => Genero = genero?.Trim();
     }
 }
+

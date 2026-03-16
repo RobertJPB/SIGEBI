@@ -3,7 +3,6 @@ using SIGEBI.Domain.Entities.Recursos;
 
 namespace SIGEBI.Business.Mappers
 {
-    // Principio SOLID (SRP - Responsabilidad Única):
     // Su trabajo es mapear los Recursos (que pueden ser Libros, Revistas o Documentos) a DTO.
     public static class RecursoMapper
     {
@@ -46,3 +45,4 @@ namespace SIGEBI.Business.Mappers
         }
     }
 }
+

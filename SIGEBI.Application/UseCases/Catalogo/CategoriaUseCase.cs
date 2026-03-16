@@ -6,11 +6,9 @@ using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Business.UseCases.Catalogo
 {
-    // Principio SOLID (SRP y DIP):
     // Controla todo el flujo de gestion de categorias de forma aislada.
     public class CategoriasUseCase
     {
-        // Principio SOLID (ISP - Segregación de Interfaces):
         // Solo inyectamos ICategoriaRepository. No le damos acceso a IUsuarioRepository ni a metodos que no necesita.
         private readonly ICategoriaRepository _categoriaRepository;
         private readonly IUnitOfWork _unitOfWork;

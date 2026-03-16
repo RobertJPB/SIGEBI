@@ -3,7 +3,6 @@ using SIGEBI.Domain.Enums.Seguridad;
 
 namespace SIGEBI.Business.Interfaces.Persistance
 {
-    // Principio SOLID (ISP - Segregación de Interfaces):
     // Definimos un contrato pequeño y especifico para operaciones de Usuario.
     // Esto evita tener una interfaz monstruosa "IGestorDatos" obligando a las clases a implementar metodos que no usan.
     public interface IUsuarioRepository

@@ -6,7 +6,6 @@ using SIGEBI.Infrastructure.Persistance.Repositories;
 
 namespace SIGEBI.Infrastructure.Persistance
 {
-    // Principio SOLID (SRP - Responsabilidad Única):
     // Esta clase implementa el patron UnitOfWork. Su unica responsabilidad es coordinar
     // que todos los repositorios compartan el mismo contexto y guardar los cambios en una sola transaccion.
     public class UnitOfWork : IUnitOfWork
@@ -49,3 +48,4 @@ namespace SIGEBI.Infrastructure.Persistance
         }
     }
 }
+

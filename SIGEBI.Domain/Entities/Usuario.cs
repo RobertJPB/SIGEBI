@@ -4,7 +4,6 @@ using SIGEBI.Domain.Enums.Seguridad;
 
 namespace SIGEBI.Domain.Entities
 {
-    // Principio SOLID (SRP - Responsabilidad Única):
     // La entidad Usuario solo es responsable de gestionar sus propios datos y su estado.
     // No sabe como guardarse en la BD ni como mandarse por mail.
     public class Usuario
