@@ -2,6 +2,7 @@ using FluentAssertions;
 using Moq;
 using SIGEBI.Application.Interfaces;
 using SIGEBI.Business.Interfaces.Persistance;
+using SIGEBI.Business.Interfaces.Services;
 using SIGEBI.Business.UseCases.Prestamos;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Entities.Recursos;
@@ -16,6 +17,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
         private readonly Mock<IUsuarioRepository> _usuarioRepo;
         private readonly Mock<IRecursoRepository> _recursoRepo;
         private readonly Mock<IPenalizacionRepository> _penalizacionRepo;
+        private readonly Mock<IEmailAdapter> _emailAdapter;
         private readonly Mock<IUnitOfWork> _unitOfWork;
         private readonly SolicitarPrestamoUseCase _useCase;
 
@@ -25,6 +27,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
             _usuarioRepo = new Mock<IUsuarioRepository>();
             _recursoRepo = new Mock<IRecursoRepository>();
             _penalizacionRepo = new Mock<IPenalizacionRepository>();
+            _emailAdapter = new Mock<IEmailAdapter>();
             _unitOfWork = new Mock<IUnitOfWork>();
 
             _useCase = new SolicitarPrestamoUseCase(
@@ -32,6 +35,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
                 _usuarioRepo.Object,
                 _recursoRepo.Object,
                 _penalizacionRepo.Object,
+                _emailAdapter.Object,
                 _unitOfWork.Object);
         }
 
