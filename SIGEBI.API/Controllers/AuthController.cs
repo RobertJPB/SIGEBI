@@ -39,6 +39,7 @@ namespace SIGEBI.API.Controllers
             if (usuario == null)
                 return Unauthorized("Correo o contraseña incorrectos.");
 
+            // Generación del token JWT con los claims del usuario (ID, Rol, etc.)
             var token = _jwtService.GenerarToken(usuario);
 
             return Ok(new
