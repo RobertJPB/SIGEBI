@@ -7,12 +7,13 @@ using SIGEBI.Business.UseCases.Prestamos;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
 
+// Este controlador orquesta todas las solicitudes relacionadas con el préstamo y devolución de libros.
+// Actúa como el puente entre las peticiones HTTP y los servicios de lógica de negocio de préstamos.
 namespace SIGEBI.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    // El controlador solo orquesta la peticion HTTP. No tiene reglas de negocio.
     public class PrestamosController : ControllerBase
     {
         private readonly RegistrarPrestamoService _prestamoService;
@@ -22,7 +23,7 @@ namespace SIGEBI.API.Controllers
             _prestamoService = prestamoService;
         }
 
-        // ── HELPER ──
+        // Helper para obtener el nivel de acceso del usuario a partir de sus credenciales JWT.
         private RolUsuario ObtenerRolActual()
         {
             var rolClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
@@ -31,8 +32,7 @@ namespace SIGEBI.API.Controllers
             throw new UnauthorizedAccessException("Rol no identificado en el token.");
         }
 
-        // ── GET ──
-
+        // Recupera el historial completo de préstamos (requiere permisos administrativos).
         [HttpGet]
         public async Task<IActionResult> GetTodos()
         {
@@ -43,6 +43,7 @@ namespace SIGEBI.API.Controllers
             return Ok(prestamos);
         }
 
+        // Lista todos los préstamos vinculados a un usuario específico.
         [HttpGet("usuario/{usuarioId}")]
         public async Task<IActionResult> GetPorUsuario(Guid usuarioId)
         {
@@ -53,6 +54,7 @@ namespace SIGEBI.API.Controllers
             return Ok(prestamos);
         }
 
+        // Consulta únicamente los préstamos que el usuario tiene actualmente en su posesión (sin devolver).
         [HttpGet("activos/{usuarioId}")]
         public async Task<IActionResult> GetActivosPorUsuario(Guid usuarioId)
         {
@@ -63,6 +65,7 @@ namespace SIGEBI.API.Controllers
             return Ok(prestamos);
         }
 
+        // Identifica aquellos préstamos cuya fecha límite de devolución ya ha expirado.
         [HttpGet("atrasados")]
         public async Task<IActionResult> GetAtrasados()
         {
@@ -73,21 +76,19 @@ namespace SIGEBI.API.Controllers
             return Ok(prestamos);
         }
 
-        // ── POST ──
-
+        // Procesa la solicitud de un nuevo préstamo de libro para un usuario.
+        // Valida stock disponible, penalizaciones activas y límites de préstamos.
         [HttpPost]
         public async Task<IActionResult> SolicitarPrestamo([FromBody] PrestamoRequestDTO dto)
         {
             var rol = ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeSolicitarPrestamo(rol), "solicitar préstamo");
 
-            // Aca toda la logica pesada de validacion la hace el UseCase
             var resultado = await _prestamoService.SolicitarPrestamoAsync(dto.UsuarioId, dto.RecursoId);
             return Ok(resultado);
         }
 
-        // ── PUT ──
-
+        // Registra el retorno físico de un libro al sistema, cerrando el ciclo del préstamo.
         [HttpPut("devolver/{prestamoId}")]
         public async Task<IActionResult> DevolverPrestamo(Guid prestamoId)
         {

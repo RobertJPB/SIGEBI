@@ -9,8 +9,10 @@ using SIGEBI.Infrastructure.IoC;
 using SIGEBI.Infrastructure.Services;
 using System.Text;
 
+// ── CONFIGURACIÓN DE LA APLICACIÓN (API) ──
 var builder = WebApplication.CreateBuilder(args);
 
+// Registro de controladores y configuración de JSON para evitar ciclos en las relaciones de las entidades
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -18,9 +20,11 @@ builder.Services.AddControllers()
             System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
 
+// Configuración de Swagger para la documentación de la API y pruebas de endpoints
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+    // Configuración de seguridad Bearer (JWT) en Swagger
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -46,13 +50,16 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// Configuración del Contexto de Base de Datos (Entity Framework Core con SQL Server)
 builder.Services.AddDbContext<SIGEBIDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Inyección de dependencias de las capas de infraestructura y servicios
 builder.Services.AddInfrastructure();
 builder.Services.AddScoped<IJwtService, JwtService>();
 
+// Configuración de Autenticación basada en JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -82,6 +89,7 @@ builder.Services.AddCors(options =>
     });
 });
 
+// ── PIPELINE DE LA PETICIÓN (MIDDLEWARE) ──
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -90,24 +98,24 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Metemos nuestro middleware global para atrapar errores y no mostrarles detalles a los clientes
+// Middleware personalizado para la gestión global de excepciones
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 app.UseHttpsRedirection();
-
-
 app.UseCors("WebPolicy");
 
-
+// Configuración de archivos estáticos para servir imágenes
 var imagenesPath = Path.Combine(builder.Environment.ContentRootPath, "imagenes");
 Directory.CreateDirectory(imagenesPath);
-
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(imagenesPath),
     RequestPath = "/imagenes"
 });
 
+// Autenticación y Autorización en el orden correcto
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 app.Run();

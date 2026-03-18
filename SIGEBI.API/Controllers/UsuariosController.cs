@@ -6,6 +6,8 @@ using SIGEBI.Business.UseCases.Usuarios;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
 
+// Administra el ciclo de vida de los usuarios en el sistema (registro, activación, bloqueo y roles).
+// Permite que el personal administrativo controle quién tiene acceso a la plataforma.
 namespace SIGEBI.API.Controllers
 {
     [ApiController]
@@ -24,7 +26,7 @@ namespace SIGEBI.API.Controllers
             _registrarUsuario = registrarUsuario;
         }
 
-        // ── HELPER ──
+        // Recupera el rol para validar los permisos de gestión de cuentas de usuario.
         private RolUsuario ObtenerRolActual()
         {
             var rolClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
@@ -33,8 +35,7 @@ namespace SIGEBI.API.Controllers
             throw new UnauthorizedAccessException("Rol no identificado en el token.");
         }
 
-        // ── GET ──
-
+        // Lista todos los usuarios registrados en la base de datos para supervisión.
         [HttpGet]
         public async Task<IActionResult> ObtenerTodos()
         {
@@ -45,6 +46,7 @@ namespace SIGEBI.API.Controllers
             return Ok(usuarios);
         }
 
+        // Consulta la ficha detallada de un usuario específico mediante su ID.
         [HttpGet("{id}")]
         public async Task<IActionResult> ObtenerPorId(Guid id)
         {
@@ -57,21 +59,18 @@ namespace SIGEBI.API.Controllers
             return Ok(usuario);
         }
 
-        // ── POST ──
-
+        // Registra manualmente un nuevo usuario, útil para dar de alta personal interno por parte de administradores.
         [HttpPost]
         public async Task<IActionResult> Registrar([FromBody] UsuarioDTO dto)
         {
             var rol = ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarUsuarios(rol), "registrar usuario");
 
-            // El UseCase ya se encarga de todo el hash de la contraseña y demas
             await _registrarUsuario.EjecutarAsync(dto);
             return Ok("Usuario registrado correctamente.");
         }
 
-        // ── PUT ──
-
+        // Restablece el acceso a un usuario que estaba previamente desactivado o bloqueado.
         [HttpPut("{id}/activar")]
         public async Task<IActionResult> Activar(Guid id)
         {
@@ -82,6 +81,7 @@ namespace SIGEBI.API.Controllers
             return NoContent();
         }
 
+        // Suspende temporalmente el acceso de un usuario al sistema.
         [HttpPut("{id}/desactivar")]
         public async Task<IActionResult> Desactivar(Guid id)
         {
@@ -92,6 +92,7 @@ namespace SIGEBI.API.Controllers
             return NoContent();
         }
 
+        // Bloquea definitivamente a un usuario (por ejemplo, por acumulación de multas o infracciones graves).
         [HttpPut("{id}/bloquear")]
         public async Task<IActionResult> Bloquear(Guid id)
         {
@@ -102,6 +103,7 @@ namespace SIGEBI.API.Controllers
             return NoContent();
         }
 
+        // Modifica el nivel de privilegios (rol) asignado a un usuario específico.
         [HttpPut("{id}/rol")]
         public async Task<IActionResult> CambiarRol(Guid id, [FromBody] int nuevoRol)
         {

@@ -10,6 +10,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
 {
     // Esta clase NO conoce a SQL Server ni a Entity Framework. 
     // Solo conoce las interfaces (IPrestamoRepository, etc) que le inyectaron por constructor.
+    // Gestiona la solicitud de nuevos préstamos validando reglas de negocio y enviando notificaciones.
     public class SolicitarPrestamoUseCase
     {
         private readonly IPrestamoRepository _prestamoRepository;
@@ -35,6 +36,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
             _unitOfWork = unitOfWork;
         }
 
+        // Ejecuta el flujo de préstamo: valida usuario/recurso, comprueba disponibilidad y persiste el registro.
         public async Task<PrestamoResponseDTO> EjecutarAsync(Guid usuarioId, Guid recursoId)
         {
             // buscamos el usuario primero

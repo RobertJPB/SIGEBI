@@ -5,6 +5,8 @@ using SIGEBI.Business.UseCases.Catalogo;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
 
+// Gestiona las categorías en las que se clasifican los recursos de la biblioteca.
+// Permite organizar el catálogo por temas para facilitar la búsqueda.
 namespace SIGEBI.API.Controllers
 {
     [ApiController]
@@ -19,7 +21,7 @@ namespace SIGEBI.API.Controllers
             _categoriasUseCase = categoriasUseCase;
         }
 
-        // ── HELPER ──
+        // Obtiene el rol del usuario conectado para validar sus permisos de acceso.
         private RolUsuario ObtenerRolActual()
         {
             var rolClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
@@ -28,6 +30,7 @@ namespace SIGEBI.API.Controllers
             throw new UnauthorizedAccessException("Rol no identificado en el token.");
         }
 
+        // Lista todas las categorías disponibles para mostrar en el catálogo o filtros de búsqueda.
         [HttpGet]
         public async Task<IActionResult> ObtenerTodas()
         {
@@ -38,6 +41,7 @@ namespace SIGEBI.API.Controllers
             return Ok(categorias);
         }
 
+        // Recupera los detalles de una categoría específica mediante su identificador.
         [HttpGet("{id}")]
         public async Task<IActionResult> ObtenerPorId(int id)
         {
@@ -48,11 +52,12 @@ namespace SIGEBI.API.Controllers
             return Ok(categoria);
         }
 
+        // Crea una nueva categoría temática.
+        // Requiere privilegios de gestión de recursos (bibliotecario o administrador).
         [HttpPost]
         public async Task<IActionResult> Crear([FromBody] string nombre)
         {
             var rol = ObtenerRolActual();
-            // TODO: Mover la creacion de categorias solo a Administradores?
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "crear categoría");
 
             var categoria = await _categoriasUseCase.CrearAsync(nombre);

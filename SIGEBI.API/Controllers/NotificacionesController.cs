@@ -5,6 +5,8 @@ using SIGEBI.Business.UseCases.Usuarios;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
 
+// Se encarga del sistema de alertas y avisos para los usuarios.
+// Notifica sobre devoluciones próximas, multas aplicadas u otras novedades.
 namespace SIGEBI.API.Controllers
 {
     [ApiController]
@@ -19,7 +21,7 @@ namespace SIGEBI.API.Controllers
             _notificacionesUseCase = notificacionesUseCase;
         }
 
-        // ── HELPER ──
+        // Valida la identidad y el rol para asegurar que la información sea privada y autorizada.
         private RolUsuario ObtenerRolActual()
         {
             var rolClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
@@ -28,6 +30,7 @@ namespace SIGEBI.API.Controllers
             throw new UnauthorizedAccessException("Rol no identificado en el token.");
         }
 
+        // Recupera todas las notificaciones (leídas y no leídas) de un usuario.
         [HttpGet("usuario/{usuarioId}")]
         public async Task<IActionResult> ObtenerPorUsuario(Guid usuarioId)
         {
@@ -38,13 +41,13 @@ namespace SIGEBI.API.Controllers
             return Ok(notificaciones);
         }
 
+        // Cambia el estado de una notificación para indicar que el usuario ya la ha visto.
         [HttpPut("{notificacionId}/leida")]
         public async Task<IActionResult> MarcarComoLeida(Guid notificacionId)
         {
             var rol = ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "marcar notificación como leída");
 
-            // TODO: Podriamos devolver la notificacion actualizada en vez de un simple string
             await _notificacionesUseCase.MarcarComoLeidaAsync(notificacionId);
             return Ok("Notificación marcada como leída.");
         }

@@ -4,6 +4,7 @@ using SIGEBI.Business.Mappers;
 
 namespace SIGEBI.Business.UseCases.Catalogo
 {
+    // Permite buscar y listar recursos bibliográficos disponibles en el catálogo.
     public class ConsultarLibrosUseCase
     {
         private readonly IRecursoRepository _recursoRepository;
@@ -17,6 +18,7 @@ namespace SIGEBI.Business.UseCases.Catalogo
             _valoracionRepository = valoracionRepository;
         }
 
+        // Recupera todos los libros y documentos disponibles junto con su calificación promedio.
         public async Task<IEnumerable<RecursoDetalleDTO>> EjecutarAsync()
         {
             // Solo traemos los que estan disponibles para mostrar en la vista
@@ -33,12 +35,14 @@ namespace SIGEBI.Business.UseCases.Catalogo
             return dtos;
         }
 
+        // Filtra los recursos por coincidencia parcial en el título.
         public async Task<IEnumerable<RecursoDetalleDTO>> BuscarPorTituloAsync(string titulo)
         {
             var recursos = await _recursoRepository.BuscarPorTituloAsync(titulo);
             return recursos.Select(RecursoMapper.ToDTO);
         }
 
+        // Obtiene todos los recursos pertenecientes a una categoría específica.
         public async Task<IEnumerable<RecursoDetalleDTO>> BuscarPorCategoriaAsync(int categoriaId)
         {
             var recursos = await _recursoRepository.GetByCategoriaAsync(categoriaId);

@@ -1,17 +1,17 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 
+// ── CONFIGURACIÓN DE LA APLICACIÓN WEB (MVC) ──
 var builder = WebApplication.CreateBuilder(args);
-
 
 builder.Services.AddControllersWithViews();
 
-// HttpClient para consumir la API
+// Configuración del HttpClient para la comunicación con la API central
 builder.Services.AddHttpClient("SIGEBIAPI", client =>
 {
     client.BaseAddress = new Uri("https://localhost:7047/");
 });
 
-// Sesiones para guardar el token JWT
+// Configuración de sesiones para persistir el token JWT en el cliente
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(60);
@@ -20,10 +20,11 @@ builder.Services.AddSession(options =>
 });
 
 
+// Configuración de Autenticación basada en Cookies para el sitio web
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Auth/Login";
+        options.LoginPath = "/Auth/Login"; // Redirección si no está autenticado
         options.AccessDeniedPath = "/Auth/Login";
         options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
         options.SlidingExpiration = true;
@@ -31,6 +32,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization();
 
+// ── PIPELINE DE LA PETICIÓN ──
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -42,9 +44,13 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+
+// El orden es crítico: Autenticación -> Sesión -> Autorización
 app.UseAuthentication();
 app.UseSession();
 app.UseAuthorization();
+
+// Configuración de la ruta por defecto (Catalogo/Index)
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Catalogo}/{action=Index}/{id?}");

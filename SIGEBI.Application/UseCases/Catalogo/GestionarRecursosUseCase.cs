@@ -6,6 +6,7 @@ using SIGEBI.Domain.Entities.Recursos;
 
 namespace SIGEBI.Business.UseCases.Catalogo
 {
+    // Orquesta la creación, edición y eliminación lógica de libros, revistas y documentos.
     public class GestionarRecursosUseCase
     {
         private readonly IRecursoRepository _recursoRepository;
@@ -24,6 +25,7 @@ namespace SIGEBI.Business.UseCases.Catalogo
 
         // ── AGREGAR ──
 
+        // Registra un nuevo libro validando su categoría y persistiendo sus datos específicos (ISBN, etc).
         public async Task<RecursoDetalleDTO> AgregarLibroAsync(string titulo, string autor,
             int categoriaId, int stock, string isbn, string editorial, int anio,
             string? imagenUrl = null, string? genero = null)
@@ -66,6 +68,7 @@ namespace SIGEBI.Business.UseCases.Catalogo
 
         // ── EDITAR ──
 
+        // Actualiza la información de un libro existente en el sistema.
         public async Task<RecursoDetalleDTO> EditarLibroAsync(Guid id, string titulo, string autor,
             int categoriaId, int stock, string isbn, string editorial, int anio,
             string? imagenUrl = null, string? genero = null)
@@ -122,6 +125,7 @@ namespace SIGEBI.Business.UseCases.Catalogo
             await _unitOfWork.SaveChangesAsync();
         }
 
+        // Realiza una baja lógica del recurso cambiándolo de estado (sin borrar el registro).
         public async Task EliminarRecursoAsync(Guid recursoId)
         {
             var recurso = await _recursoRepository.GetByIdAsync(recursoId)

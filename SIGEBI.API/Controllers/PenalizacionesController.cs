@@ -5,6 +5,8 @@ using SIGEBI.Business.UseCases.Usuarios;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
 
+// Controlador encargado de la gestión de multas y sanciones por retrasos en devoluciones.
+// Ayuda a mantener la disciplina en el uso de los recursos bibliotecarios.
 namespace SIGEBI.API.Controllers
 {
     [ApiController]
@@ -19,7 +21,7 @@ namespace SIGEBI.API.Controllers
             _penalizacionesUseCase = penalizacionesUseCase;
         }
 
-        // ── HELPER ──
+        // Recupera el rol para verificar permisos de visualización o aplicación de sanciones.
         private RolUsuario ObtenerRolActual()
         {
             var rolClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
@@ -28,8 +30,7 @@ namespace SIGEBI.API.Controllers
             throw new UnauthorizedAccessException("Rol no identificado en el token.");
         }
 
-        // ── GET ──
-
+        // Muestra el historial de sanciones aplicadas a un usuario en particular.
         [HttpGet("usuario/{usuarioId}")]
         public async Task<IActionResult> ObtenerPorUsuario(Guid usuarioId)
         {
@@ -40,15 +41,14 @@ namespace SIGEBI.API.Controllers
             return Ok(penalizaciones);
         }
 
-        // ── POST ──
-
+        // Ejecuta el proceso global para detectar retrasos y aplicar sanciones a todos los usuarios morosos.
+        // Solo puede ser activado por personal administrativo.
         [HttpPost("aplicar")]
         public async Task<IActionResult> AplicarPenalizaciones()
         {
             var rol = ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPenalizaciones(rol), "aplicar penalizaciones");
 
-            // Llama al caso de uso que procesa a todos los morosos de una
             await _penalizacionesUseCase.AplicarPenalizacionesAsync();
             return Ok("Penalizaciones aplicadas correctamente.");
         }

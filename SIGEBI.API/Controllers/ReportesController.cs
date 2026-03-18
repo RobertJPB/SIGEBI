@@ -1,10 +1,12 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.Services;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
 
+// Provee herramientas de análisis y reporte sobre el estado de la biblioteca.
+// Permite exportar datos consolidados para la toma de decisiones administrativa.
 namespace SIGEBI.API.Controllers
 {
     [ApiController]
@@ -20,6 +22,7 @@ namespace SIGEBI.API.Controllers
         }
 
         // ── HELPER ──
+        // Obtiene el rol para asegurar que solo personal autorizado pueda generar informes de gestión.
         private RolUsuario ObtenerRolActual()
         {
             var rolClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
@@ -30,6 +33,7 @@ namespace SIGEBI.API.Controllers
 
         // ── GET ──
 
+        // Genera un resumen estadístico global: total de libros, usuarios activos, préstamos vigentes, etc.
         [HttpGet("general")]
         public async Task<IActionResult> ObtenerReporteGeneral()
         {
@@ -41,6 +45,7 @@ namespace SIGEBI.API.Controllers
             return Ok(reporte);
         }
 
+        // Recupera la relación detallada de préstamos realizados dentro de un intervalo de tiempo específico.
         [HttpGet("prestamos")]
         public async Task<IActionResult> ObtenerPrestamosPorPeriodo(
             [FromQuery] DateTime fechaInicio,

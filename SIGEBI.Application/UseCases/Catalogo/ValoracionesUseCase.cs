@@ -6,6 +6,7 @@ using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Business.UseCases.Catalogo
 {
+    // Maneja las calificaciones y comentarios sociales de los usuarios sobre el material bibliográfico.
     public class ValoracionesUseCase
     {
         private readonly IValoracionRepository _valoracionRepository;
@@ -25,6 +26,7 @@ namespace SIGEBI.Business.UseCases.Catalogo
             _unitOfWork = unitOfWork;
         }
 
+        // Crea una nueva valoración validando la existencia del usuario y el recurso.
         public async Task<ValoracionDTO> AgregarValoracionAsync(Guid usuarioId, Guid recursoId,
             int calificacion, string? comentario)
         {
@@ -50,6 +52,7 @@ namespace SIGEBI.Business.UseCases.Catalogo
             return valoraciones.Select(ValoracionMapper.ToDTO);
         }
 
+        // Calcula la puntuación media basada en todas las estrellas recibidas por el recurso.
         public async Task<double> ObtenerPromedioAsync(Guid recursoId)
             => await _valoracionRepository.GetPromedioCalificacionAsync(recursoId);
     }

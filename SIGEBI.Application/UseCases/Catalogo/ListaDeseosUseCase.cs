@@ -7,6 +7,7 @@ using SIGEBI.Domain.Entities.Recursos;
 
 namespace SIGEBI.Business.UseCases.Catalogo
 {
+    // Gestiona la colección de recursos que el usuario desea leer o reservar a futuro.
     public class ListaDeseosUseCase
     {
         private readonly IListaDeseosRepository _listaDeseosRepository;
@@ -23,6 +24,7 @@ namespace SIGEBI.Business.UseCases.Catalogo
             _unitOfWork = unitOfWork;
         }
 
+        // Obtiene la lista del usuario o crea una nueva si aún no la tiene.
         public async Task<ListaDeseosDTO> ObtenerPorUsuarioAsync(Guid usuarioId)
         {
             var lista = await _listaDeseosRepository.GetByUsuarioIdAsync(usuarioId);
@@ -38,6 +40,7 @@ namespace SIGEBI.Business.UseCases.Catalogo
             return ListaDeseosMapper.ToDTO(lista);
         }
 
+        // Agrega una referencia de recurso a la lista de deseos del usuario.
         public async Task AgregarRecursoAsync(Guid usuarioId, Guid recursoId)
         {
             var recurso = await _recursoRepository.GetByIdAsync(recursoId)

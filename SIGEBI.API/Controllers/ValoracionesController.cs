@@ -6,6 +6,8 @@ using SIGEBI.Business.UseCases.Catalogo;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
 
+// Permite a los usuarios calificar y dejar comentarios sobre los recursos de la biblioteca.
+// Ayuda a otros usuarios a conocer la calidad y utilidad de la bibliografía disponible.
 namespace SIGEBI.API.Controllers
 {
     [ApiController]
@@ -20,7 +22,7 @@ namespace SIGEBI.API.Controllers
             _valoracionesUseCase = valoracionesUseCase;
         }
 
-        // ── HELPER ──
+        // Recupera el rol para aplicar las políticas de acceso al catálogo y sus interacciones.
         private RolUsuario ObtenerRolActual()
         {
             var rolClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
@@ -29,6 +31,7 @@ namespace SIGEBI.API.Controllers
             throw new UnauthorizedAccessException("Rol no identificado en el token.");
         }
 
+        // Lista todas las reseñas y calificaciones recibidas por un recurso específico.
         [HttpGet("recurso/{recursoId}")]
         public async Task<IActionResult> ObtenerPorRecurso(Guid recursoId)
         {
@@ -39,6 +42,7 @@ namespace SIGEBI.API.Controllers
             return Ok(valoraciones);
         }
 
+        // Calcula y devuelve la puntuación media (estrellas) que los usuarios han dado a un recurso.
         [HttpGet("recurso/{recursoId}/promedio")]
         public async Task<IActionResult> ObtenerPromedio(Guid recursoId)
         {
@@ -49,6 +53,7 @@ namespace SIGEBI.API.Controllers
             return Ok(promedio);
         }
 
+        // Registra una nueva valoración de un usuario sobre un libro o documento.
         [HttpPost]
         public async Task<IActionResult> Agregar([FromBody] ValoracionDTO dto)
         {

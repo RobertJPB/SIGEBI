@@ -6,6 +6,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
 {
     // Solo dependemos de las interfaces estrictamente necesarias para los reportes 
     // (IPrestamoRepository, IUsuarioRepository, etc.) en lugar de un "IGestorCentral" gigante.
+    // Consolida información estadística de múltiples entidades para fines administrativos.
     public class GenerarReportesUseCase
     {
         private readonly IPrestamoRepository _prestamoRepository;
@@ -25,6 +26,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
             _penalizacionRepository = penalizacionRepository;
         }
 
+        // Genera un resumen ejecutivo con métricas clave para el dashboard principal.
         public async Task<ReporteDTO> GenerarReporteGeneralAsync()
         {
             // Contamos los totales para el dashboard del admin
@@ -45,6 +47,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
             };
         }
 
+        // Filtra los préstamos realizados dentro de un intervalo temporal específico.
         public async Task<IEnumerable<PrestamoResponseDTO>> ObtenerPrestamosPorPeriodoAsync(
             DateTime fechaInicio, DateTime fechaFin)
         {

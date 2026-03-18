@@ -4,12 +4,15 @@ using SIGEBI.Business.Interfaces.Services;
 using SIGEBI.Business.UseCases.Usuarios;
 using SIGEBI.Business.Validators;
 
+// Este controlador gestiona los procesos de autenticación y registro de nuevos usuarios.
+// Es la puerta de entrada para obtener acceso seguro al sistema a través de JWT.
 namespace SIGEBI.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
+        // Servicios y casos de uso necesarios para la autenticación y validación.
         private readonly LoginUsuarioUseCase _loginUseCase;
         private readonly RegistrarUsuarioUseCase _registrarUseCase;
         private readonly RegistrarUsuarioValidator _validator;
@@ -27,6 +30,8 @@ namespace SIGEBI.API.Controllers
             _jwtService = jwtService;
         }
 
+        // Procesa el inicio de sesión del usuario.
+        // Si las credenciales son válidas, genera y retorna un token JWT para autorizar futuras peticiones.
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UsuarioDTO dto)
         {
@@ -35,11 +40,9 @@ namespace SIGEBI.API.Controllers
 
             var usuario = await _loginUseCase.EjecutarAsync(dto.Correo, dto.Contrasena);
 
-            // Si falla el login no damos muchos detalles por seguridad
             if (usuario == null)
                 return Unauthorized("Correo o contraseña incorrectos.");
 
-            // Generación del token JWT con los claims del usuario (ID, Rol, etc.)
             var token = _jwtService.GenerarToken(usuario);
 
             return Ok(new
@@ -48,17 +51,21 @@ namespace SIGEBI.API.Controllers
             });
         }
 
+        // Registra un nuevo usuario aplicando las validaciones correspondientes (formato de correo, etc.).
+        // Devuelve éxito una vez que los datos han sido persistidos correctamente.
         [HttpPost("registrar")]
         public async Task<IActionResult> Registrar([FromBody] UsuarioDTO dto)
         {
             if (dto == null)
                 return BadRequest("Datos inválidos.");
 
+            // Verifica que el DTO cumpla con las reglas de negocio definidas.
             var errores = _validator.Validar(dto);
 
             if (errores.Any())
                 return BadRequest(errores);
 
+            // Delega la creación del usuario al caso de uso correspondiente.
             await _registrarUseCase.EjecutarAsync(dto);
 
             return Ok("Usuario registrado exitosamente.");

@@ -8,12 +8,16 @@ using SIGEBI.Domain.Enums.Seguridad;
 
 namespace SIGEBI.API.Controllers
 {
+ 
+    /// Controlador para la gestión de recursos bibliográficos (Libros, Revistas, Documentos).
+    /// El acceso está protegido por [Authorize] y se valida el rol mediante AccesoPolicy.
+ 
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-   
     public class RecursosController : ControllerBase
     {
+        // Casos de uso para desacoplar la lógica de negocio
         private readonly ConsultarLibrosUseCase _consultarUseCase;
         private readonly GestionarRecursosUseCase _gestionarUseCase;
         private readonly IWebHostEnvironment _env;
@@ -29,6 +33,8 @@ namespace SIGEBI.API.Controllers
         }
 
         // ── HELPER — extrae el rol del token JWT ──
+        /// Helper para recuperar el rol del usuario actual desde los Claims del token JWT.
+
         private RolUsuario ObtenerRolActual()
         {
             var rolClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
@@ -38,11 +44,12 @@ namespace SIGEBI.API.Controllers
         }
 
         // ── GET ──
-
+        /// Obtiene todos los recursos disponibles en el catálogo.
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var rol = ObtenerRolActual();
+            // Validación de permisos centralizada en la capa de Dominio (AccesoPolicy)
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver catálogo");
 
             var recursos = await _consultarUseCase.EjecutarAsync();
@@ -70,7 +77,8 @@ namespace SIGEBI.API.Controllers
         }
 
         // ── POST ──
-
+        /// Agrega un nuevo libro al sistema. Requiere permisos de Administrador o Bibliotecario.
+        /// Soporta carga de archivos (multipart/form-data) para la portada.
         [HttpPost("libro")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> AgregarLibro([FromForm] AgregarLibroRequest request)
@@ -79,7 +87,10 @@ namespace SIGEBI.API.Controllers
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "agregar libro");
 
             if (request == null) return BadRequest("Datos inválidos.");
+            
+            // Guardado de la imagen en el servidor (si se proporciona)
             var imagenUrl = await GuardarImagenAsync(request.Imagen);
+
             var resultado = await _gestionarUseCase.AgregarLibroAsync(
                 request.Titulo, request.Autor, request.CategoriaId, request.Stock,
                 request.ISBN, request.Editorial, request.Anio, imagenUrl, request.Genero);
@@ -175,26 +186,32 @@ namespace SIGEBI.API.Controllers
             return Ok("Recurso eliminado correctamente.");
         }
 
-        // ── Helper — guarda imagen en disco ──
+        // ── Helper ──
+        /// Lógica para procesar y guardar imágenes de portada en el sistema de archivos.
+
         private async Task<string?> GuardarImagenAsync(IFormFile? imagen)
         {
-            // Ojo: Si no mandan imagen no pasa nada, devolvemos null y ya
+            // Si no mandan imagen no pasa nada, devolvemos null y ya
             if (imagen == null || imagen.Length == 0) return null;
 
+            // Validaciones básicas de seguridad para archivos
             var extensionesPermitidas = new[] { ".jpg", ".jpeg", ".png", ".webp" };
             var extension = Path.GetExtension(imagen.FileName).ToLowerInvariant();
             if (!extensionesPermitidas.Contains(extension)) return null;
-            if (imagen.Length > 5 * 1024 * 1024) return null;
+            if (imagen.Length > 5 * 1024 * 1024) return null; // Límite de 5MB
 
+            // Definición de la ruta física donde se guardarán las imágenes
             var carpeta = Path.Combine(_env.WebRootPath ?? _env.ContentRootPath, "imagenes", "recursos");
             Directory.CreateDirectory(carpeta);
 
+            // Nombre único para evitar colisiones
             var nombreArchivo = $"{Guid.NewGuid()}{extension}";
             var rutaCompleta = Path.Combine(carpeta, nombreArchivo);
 
             using var stream = new FileStream(rutaCompleta, FileMode.Create);
             await imagen.CopyToAsync(stream);
 
+            // Retornamos la URL relativa para que el cliente pueda acceder a la imagen
             return $"/imagenes/recursos/{nombreArchivo}";
         }
     }

@@ -4,6 +4,7 @@ using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Business.UseCases.Usuarios
 {
+    // Valida las credenciales de los usuarios comparando hashes de contraseñas.
     public class LoginUsuarioUseCase
     {
         private readonly IUsuarioRepository _usuarioRepository;
@@ -17,6 +18,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
             _hashService = hashService;
         }
 
+        // Verifica correo y clave, retornando la entidad de usuario si la validación es exitosa.
         public async Task<Usuario?> EjecutarAsync(string correo, string password)
         {
             var usuario = await _usuarioRepository.GetByCorreoAsync(correo);

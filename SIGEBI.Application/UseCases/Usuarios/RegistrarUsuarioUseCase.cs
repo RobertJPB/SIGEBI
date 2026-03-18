@@ -7,6 +7,7 @@ using SIGEBI.Domain.Enums.Seguridad;
 
 namespace SIGEBI.Business.UseCases.Usuarios
 {
+    // Encargado de dar de alta nuevos usuarios asegurando la seguridad de sus credenciales.
     public class RegistrarUsuarioUseCase
     {
         private readonly IUsuarioRepository _usuarioRepository;
@@ -23,6 +24,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
             _unitOfWork = unitOfWork;
         }
 
+        // Crea un nuevo usuario encriptando su clave y validando que el correo sea único.
         public async Task EjecutarAsync(UsuarioDTO dto)
         {
             // Ojo: validar que el correo no este repetido

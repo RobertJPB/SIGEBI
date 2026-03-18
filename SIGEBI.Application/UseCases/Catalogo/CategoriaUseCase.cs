@@ -21,6 +21,7 @@ namespace SIGEBI.Business.UseCases.Catalogo
             _unitOfWork = unitOfWork;
         }
 
+        // Recupera todas las categorías registradas para poblar selectores y filtros.
         public async Task<IEnumerable<CategoriaDTO>> ObtenerTodasAsync()
         {
             var categorias = await _categoriaRepository.GetAllAsync();
@@ -34,6 +35,7 @@ namespace SIGEBI.Business.UseCases.Catalogo
             return CategoriaMapper.ToDTO(categoria);
         }
 
+        // Crea una nueva categoría validando que el nombre no sea duplicado.
         public async Task<CategoriaDTO> CrearAsync(string nombre)
         {
             var existe = await _categoriaRepository.GetByNombreAsync(nombre);
@@ -49,6 +51,7 @@ namespace SIGEBI.Business.UseCases.Catalogo
             return CategoriaMapper.ToDTO(categoria);
         }
 
+        // Habilita una categoría para que pueda ser asignada a nuevos recursos.
         public async Task ActivarAsync(int id)
         {
             var categoria = await _categoriaRepository.GetByIdAsync(id)

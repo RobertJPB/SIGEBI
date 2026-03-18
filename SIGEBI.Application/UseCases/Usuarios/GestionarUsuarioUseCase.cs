@@ -6,6 +6,7 @@ using SIGEBI.Domain.Enums.Seguridad;
 
 namespace SIGEBI.Business.UseCases.Usuarios
 {
+    // Administra el ciclo de vida y los permisos de los usuarios registrados.
     public class GestionarUsuarioUseCase
     {
         private readonly IUsuarioRepository _usuarioRepository;
@@ -31,6 +32,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
             return usuario == null ? null : UsuarioMapper.ToDTO(usuario);
         }
 
+        // Rehabilita el acceso al sistema para un usuario previamente desactivado.
         public async Task ActivarAsync(Guid id)
         {
             var usuario = await _usuarioRepository.GetByIdAsync(id)
@@ -49,6 +51,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
             await _unitOfWork.SaveChangesAsync();
         }
 
+        // Restringe permanentemente el acceso de un usuario al sistema.
         public async Task BloquearAsync(Guid id)
         {
             // TODO: Agregar motivo de bloqueo despues?

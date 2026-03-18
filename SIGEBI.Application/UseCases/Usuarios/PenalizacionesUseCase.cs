@@ -7,6 +7,7 @@ using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Business.UseCases.Usuarios
 {
+    // Identifica devoluciones tardías y aplica sanciones automáticas a los usuarios.
     public class PenalizacionesUseCase
     {
         private readonly IPrestamoRepository _prestamoRepository;
@@ -26,6 +27,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
             _unitOfWork = unitOfWork;
         }
 
+        // Proceso por lotes que evalúa préstamos atrasados y genera las penalizaciones correspondientes.
         public async Task AplicarPenalizacionesAsync()
         {
             // Este metodo deberia correrse todos los dias con un cronjob o algo asi

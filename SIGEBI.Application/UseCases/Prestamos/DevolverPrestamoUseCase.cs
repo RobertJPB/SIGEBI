@@ -7,6 +7,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
 {
     // SRP: Solo maneja el flujo de devolver un libro.
     // DIP: Depende de interfaces de repositorios para no acoplarse a la base de datos.
+    // Orquesta el proceso de retorno de un recurso y el cálculo de penalizaciones por atraso.
     public class DevolverPrestamoUseCase
     {
         private readonly IPrestamoRepository _prestamoRepository;
@@ -26,6 +27,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
             _unitOfWork = unitOfWork;
         }
 
+        // Registra la devolución real, repone el stock y genera multas si el plazo venció.
         public async Task EjecutarAsync(Guid prestamoId)
         {
             var prestamo = await _prestamoRepository.GetByIdAsync(prestamoId)

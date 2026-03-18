@@ -6,6 +6,7 @@ using SIGEBI.Domain.DomainServices;
 
 namespace SIGEBI.Business.UseCases.Usuarios
 {
+    // Centraliza la gestión de alertas y mensajes enviados a los usuarios.
     public class NotificacionesUseCase
     {
         private readonly INotificacionRepository _notificacionRepository;
@@ -31,6 +32,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
             return notificaciones.Select(NotificacionMapper.ToDTO);
         }
 
+        // Cambia el estado de una alerta para indicar que ya ha sido visualizada.
         public async Task MarcarComoLeidaAsync(Guid notificacionId)
         {
             var notificacion = await _notificacionRepository.GetByIdAsync(notificacionId)

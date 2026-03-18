@@ -4,6 +4,7 @@ using SIGEBI.Business.Mappers;
 
 namespace SIGEBI.Business.UseCases.Prestamos
 {
+    // Provee métodos de lectura para consultar el historial y estado de los préstamos.
     public class ConsultarPrestamoUseCase
     {
         private readonly IPrestamoRepository _prestamoRepository;
@@ -17,12 +18,14 @@ namespace SIGEBI.Business.UseCases.Prestamos
             _usuarioRepository = usuarioRepository;
         }
 
+        // Recupera la lista global de préstamos registrados en el sistema.
         public async Task<IEnumerable<PrestamoResponseDTO>> ObtenerTodosAsync()
         {
             var prestamos = await _prestamoRepository.GetAllAsync();
             return prestamos.Select(PrestamoMapper.ToDTO);
         }
 
+        // Filtra los préstamos pertenecientes a un usuario en particular.
         public async Task<IEnumerable<PrestamoResponseDTO>> ObtenerPorUsuarioAsync(Guid usuarioId)
         {
             // Verificamos que el id sea de alguien real
@@ -39,6 +42,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
             return prestamos.Select(PrestamoMapper.ToDTO);
         }
 
+        // Lista todos los préstamos que han superado su fecha límite de devolución.
         public async Task<IEnumerable<PrestamoResponseDTO>> ObtenerAtrasadosAsync()
         {
             var prestamos = await _prestamoRepository.GetAtrasadosAsync();
