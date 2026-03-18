@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.DTOs;
+using SIGEBI.Business.Services;
 using SIGEBI.Business.UseCases.Prestamos;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
@@ -14,18 +15,11 @@ namespace SIGEBI.API.Controllers
     // El controlador solo orquesta la peticion HTTP. No tiene reglas de negocio.
     public class PrestamosController : ControllerBase
     {
-        private readonly SolicitarPrestamoUseCase _solicitarUseCase;
-        private readonly DevolverPrestamoUseCase _devolverUseCase;
-        private readonly ConsultarPrestamoUseCase _consultarUseCase;
+        private readonly RegistrarPrestamoService _prestamoService;
 
-        public PrestamosController(
-            SolicitarPrestamoUseCase solicitarUseCase,
-            DevolverPrestamoUseCase devolverUseCase,
-            ConsultarPrestamoUseCase consultarUseCase)
+        public PrestamosController(RegistrarPrestamoService prestamoService)
         {
-            _solicitarUseCase = solicitarUseCase;
-            _devolverUseCase = devolverUseCase;
-            _consultarUseCase = consultarUseCase;
+            _prestamoService = prestamoService;
         }
 
         // ── HELPER ──
@@ -45,7 +39,7 @@ namespace SIGEBI.API.Controllers
             var rol = ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerTodosLosPrestamos(rol), "ver todos los préstamos");
 
-            var prestamos = await _consultarUseCase.ObtenerTodosAsync();
+            var prestamos = await _prestamoService.ObtenerTodosAsync();
             return Ok(prestamos);
         }
 
@@ -55,7 +49,7 @@ namespace SIGEBI.API.Controllers
             var rol = ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver préstamos por usuario");
 
-            var prestamos = await _consultarUseCase.ObtenerPorUsuarioAsync(usuarioId);
+            var prestamos = await _prestamoService.ObtenerPorUsuarioAsync(usuarioId);
             return Ok(prestamos);
         }
 
@@ -65,7 +59,7 @@ namespace SIGEBI.API.Controllers
             var rol = ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver préstamos activos");
 
-            var prestamos = await _consultarUseCase.ObtenerActivosPorUsuarioAsync(usuarioId);
+            var prestamos = await _prestamoService.ObtenerActivosPorUsuarioAsync(usuarioId);
             return Ok(prestamos);
         }
 
@@ -75,7 +69,7 @@ namespace SIGEBI.API.Controllers
             var rol = ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerTodosLosPrestamos(rol), "ver préstamos atrasados");
 
-            var prestamos = await _consultarUseCase.ObtenerAtrasadosAsync();
+            var prestamos = await _prestamoService.ObtenerAtrasadosAsync();
             return Ok(prestamos);
         }
 
@@ -88,7 +82,7 @@ namespace SIGEBI.API.Controllers
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeSolicitarPrestamo(rol), "solicitar préstamo");
 
             // Aca toda la logica pesada de validacion la hace el UseCase
-            var resultado = await _solicitarUseCase.EjecutarAsync(dto.UsuarioId, dto.RecursoId);
+            var resultado = await _prestamoService.SolicitarPrestamoAsync(dto.UsuarioId, dto.RecursoId);
             return Ok(resultado);
         }
 
@@ -100,7 +94,7 @@ namespace SIGEBI.API.Controllers
             var rol = ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPrestamos(rol), "devolver préstamo");
 
-            await _devolverUseCase.EjecutarAsync(prestamoId);
+            await _prestamoService.DevolverPrestamoAsync(prestamoId);
             return Ok("Préstamo devuelto correctamente.");
         }
     }

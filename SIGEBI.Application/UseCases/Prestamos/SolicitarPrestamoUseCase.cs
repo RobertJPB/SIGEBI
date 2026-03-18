@@ -1,6 +1,7 @@
 using SIGEBI.Business.DTOs;
 using SIGEBI.Application.Interfaces;
 using SIGEBI.Business.Interfaces.Persistance;
+using SIGEBI.Business.Interfaces.Services;
 using SIGEBI.Business.Mappers;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Entities;
@@ -15,6 +16,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IRecursoRepository _recursoRepository;
         private readonly IPenalizacionRepository _penalizacionRepository;
+        private readonly IEmailAdapter _emailAdapter;
         private readonly IUnitOfWork _unitOfWork;
 
         public SolicitarPrestamoUseCase(
@@ -22,12 +24,14 @@ namespace SIGEBI.Business.UseCases.Prestamos
             IUsuarioRepository usuarioRepository,
             IRecursoRepository recursoRepository,
             IPenalizacionRepository penalizacionRepository,
+            IEmailAdapter emailAdapter,
             IUnitOfWork unitOfWork)
         {
             _prestamoRepository = prestamoRepository;
             _usuarioRepository = usuarioRepository;
             _recursoRepository = recursoRepository;
             _penalizacionRepository = penalizacionRepository;
+            _emailAdapter = emailAdapter;
             _unitOfWork = unitOfWork;
         }
 
@@ -54,6 +58,19 @@ namespace SIGEBI.Business.UseCases.Prestamos
             _recursoRepository.Update(recurso);
             
             await _unitOfWork.SaveChangesAsync();
+
+            // Notificacion proactiva (como dice la documentacion)
+            try 
+            {
+                await _emailAdapter.EnviarAsync(usuario.Correo, "Confirmación de Préstamo - SIGEBI", 
+                    $"Hola {usuario.Nombre}, se ha registrado tu préstamo del recurso: {recurso.Titulo}. " +
+                    $"Fecha de devolución: {prestamo.FechaDevolucionEstimada:dd/MM/yyyy}.");
+            }
+            catch 
+            {
+                // Si falla el mail no rompemos la transaccion que ya se guardo, 
+                // pero lo ideal seria un log aca.
+            }
 
             return PrestamoMapper.ToDTO(prestamo);
         }
