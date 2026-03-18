@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SIGEBI.Domain.Entities;
 
@@ -28,6 +28,9 @@ namespace SIGEBI.Infrastructure.Persistance.Configurations
                 .WithMany()
                 .HasForeignKey(v => v.RecursoId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Impedir que un usuario valore el mismo recurso mas de una vez
+            builder.HasIndex(v => new { v.UsuarioId, v.RecursoId }).IsUnique();
         }
     }
 }

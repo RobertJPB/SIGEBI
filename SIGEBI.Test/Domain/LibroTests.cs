@@ -1,0 +1,129 @@
+﻿using FluentAssertions;
+using SIGEBI.Domain.Entities.Recursos;
+using SIGEBI.Domain.Enums.Biblioteca;
+using Xunit;
+
+namespace SIGEBI.Test.Domain
+{
+    public class LibroTests
+    {
+        // ── CONSTRUCTOR ──
+
+        [Fact]
+        public void Crear_LibroValido_CreaCorrectamente()
+        {
+            // Arrange & Act
+            var libro = new Libro("El Principito", "Antoine de Saint-Exupéry", 1, 5,
+                                  "978-84-261", "Editorial X", 1943);
+
+            // Assert
+            libro.Titulo.Should().Be("El Principito");
+            libro.Autor.Should().Be("Antoine de Saint-Exupéry");
+            libro.ISBN.Should().Be("978-84-261");
+            libro.Stock.Should().Be(5);
+        }
+
+        [Fact]
+        public void Crear_TituloVacio_LanzaExcepcion()
+        {
+            var act = () => new Libro("", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943);
+
+            act.Should().Throw<ArgumentException>()
+               .WithMessage("*título*");
+        }
+
+        [Fact]
+        public void Crear_ISBNVacio_LanzaExcepcion()
+        {
+            var act = () => new Libro("El Principito", "Antoine", 1, 5, "", "Editorial X", 1943);
+
+            act.Should().Throw<ArgumentException>()
+               .WithMessage("*ISBN*");
+        }
+
+        [Fact]
+        public void Crear_EditorialVacia_LanzaExcepcion()
+        {
+            var act = () => new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "", 1943);
+
+            act.Should().Throw<ArgumentException>()
+               .WithMessage("*editorial*");
+        }
+
+        [Fact]
+        public void Crear_AnioInvalido_LanzaExcepcion()
+        {
+            var act = () => new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 0);
+
+            act.Should().Throw<ArgumentException>()
+               .WithMessage("*año*");
+        }
+
+        [Fact]
+        public void Crear_StockNegativo_LanzaExcepcion()
+        {
+            var act = () => new Libro("El Principito", "Antoine", 1, -1, "978-84-261", "Editorial X", 1943);
+
+            act.Should().Throw<ArgumentOutOfRangeException>();
+        }
+
+        // ── DISMINUIR STOCK ──
+
+        [Fact]
+        public void DisminuirStock_StockDisponible_DisminuyeCorrectamente()
+        {
+            var libro = new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943);
+
+            libro.DisminuirStock();
+
+            libro.Stock.Should().Be(4);
+        }
+
+        [Fact]
+        public void DisminuirStock_StockCero_LanzaExcepcion()
+        {
+            var libro = new Libro("El Principito", "Antoine", 1, 0, "978-84-261", "Editorial X", 1943);
+
+            var act = () => libro.DisminuirStock();
+
+            act.Should().Throw<InvalidOperationException>();
+        }
+
+        // ── ACTUALIZAR ──
+
+        [Fact]
+        public void Actualizar_DatosValidos_ActualizaCorrectamente()
+        {
+            var libro = new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943);
+
+            libro.Actualizar("Nuevo Titulo", "Nuevo Autor", 2, 10, "000-00-000", "Nueva Editorial", 2000);
+
+            libro.Titulo.Should().Be("Nuevo Titulo");
+            libro.Stock.Should().Be(10);
+            libro.ISBN.Should().Be("000-00-000");
+        }
+
+        // ── DESACTIVAR / ACTIVAR ──
+
+        [Fact]
+        public void Desactivar_LibroActivo_CambiaEstado()
+        {
+            var libro = new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943);
+
+            libro.Desactivar();
+
+            libro.Estado.Should().Be(EstadoRecurso.Inactivo);
+        }
+
+        [Fact]
+        public void DisminuirStock_LibroInactivo_LanzaExcepcion()
+        {
+            var libro = new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943);
+            libro.Desactivar();
+
+            var act = () => libro.DisminuirStock();
+
+            act.Should().Throw<InvalidOperationException>();
+        }
+    }
+}

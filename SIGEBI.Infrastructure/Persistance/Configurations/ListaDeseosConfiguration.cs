@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Entities.Recursos;
@@ -19,7 +19,7 @@ namespace SIGEBI.Infrastructure.Persistance.Configurations
             builder.HasOne(l => l.Usuario)
                 .WithOne(u => u.ListaDeseos)
                 .HasForeignKey<ListaDeseos>(l => l.UsuarioId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasMany(l => l.Recursos)
                 .WithMany()

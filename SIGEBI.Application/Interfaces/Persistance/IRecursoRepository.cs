@@ -1,7 +1,8 @@
-﻿using SIGEBI.Domain.Entities.Recursos;
+using SIGEBI.Domain.Entities.Recursos;
 
 namespace SIGEBI.Business.Interfaces.Persistance
 {
+    // Interfaz dedicada solo a la gestion de recursos bibliograficos.
     public interface IRecursoRepository
     {
         Task<IEnumerable<RecursoBibliografico>> GetAllAsync();

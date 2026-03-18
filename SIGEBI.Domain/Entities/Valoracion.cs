@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 namespace SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Entities.Recursos;
 
@@ -40,6 +40,7 @@ public class Valoracion
     }
     private static void ValidarCalificacion(int calificacion)
     {
+        // Solo aceptamos de 1 a 5 estrellas
         if (calificacion < 1 || calificacion > 5)
             throw new ArgumentOutOfRangeException(nameof(calificacion), "La calificación debe estar entre 1 y 5.");
     }

@@ -10,7 +10,6 @@ namespace SIGEBI.Infrastructure.Persistance.Configurations
         public void Configure(EntityTypeBuilder<RecursoBibliografico> builder)
         {
             builder.ToTable("RecursosBibliograficos");
-
             builder.HasKey(r => r.Id);
 
             builder.HasDiscriminator<string>("TipoRecurso")
@@ -34,7 +33,7 @@ namespace SIGEBI.Infrastructure.Persistance.Configurations
                 .IsRequired()
                 .HasConversion<int>();
 
-            builder.HasOne<Categoria>()
+            builder.HasOne(r => r.Categoria)
                 .WithMany(c => c.Recursos)
                 .HasForeignKey(r => r.IdCategoria)
                 .OnDelete(DeleteBehavior.Restrict);

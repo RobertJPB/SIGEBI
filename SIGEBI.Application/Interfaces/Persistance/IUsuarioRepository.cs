@@ -1,8 +1,10 @@
-﻿using SIGEBI.Domain.Entities;
+using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Enums.Seguridad;
 
 namespace SIGEBI.Business.Interfaces.Persistance
 {
+    // Definimos un contrato pequeño y especifico para operaciones de Usuario.
+    // Esto evita tener una interfaz monstruosa "IGestorDatos" obligando a las clases a implementar metodos que no usan.
     public interface IUsuarioRepository
     {
         Task<IEnumerable<Usuario>> GetAllAsync();

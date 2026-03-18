@@ -1,6 +1,102 @@
-﻿namespace SIGEBI.API.Controllers
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SIGEBI.Business.DTOs;
+using SIGEBI.Business.Services;
+using SIGEBI.Business.UseCases.Prestamos;
+using SIGEBI.Domain.DomainServices;
+using SIGEBI.Domain.Enums.Seguridad;
+
+namespace SIGEBI.API.Controllers
 {
-    public class PrestamosController
+    [ApiController]
+    [Route("api/[controller]")]
+    [Authorize]
+    // El controlador solo orquesta la peticion HTTP. No tiene reglas de negocio.
+    public class PrestamosController : ControllerBase
     {
+        private readonly RegistrarPrestamoService _prestamoService;
+
+        public PrestamosController(RegistrarPrestamoService prestamoService)
+        {
+            _prestamoService = prestamoService;
+        }
+
+        // ── HELPER ──
+        private RolUsuario ObtenerRolActual()
+        {
+            var rolClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (Enum.TryParse<RolUsuario>(rolClaim, out var rol))
+                return rol;
+            throw new UnauthorizedAccessException("Rol no identificado en el token.");
+        }
+
+        // ── GET ──
+
+        [HttpGet]
+        public async Task<IActionResult> GetTodos()
+        {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerTodosLosPrestamos(rol), "ver todos los préstamos");
+
+            var prestamos = await _prestamoService.ObtenerTodosAsync();
+            return Ok(prestamos);
+        }
+
+        [HttpGet("usuario/{usuarioId}")]
+        public async Task<IActionResult> GetPorUsuario(Guid usuarioId)
+        {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver préstamos por usuario");
+
+            var prestamos = await _prestamoService.ObtenerPorUsuarioAsync(usuarioId);
+            return Ok(prestamos);
+        }
+
+        [HttpGet("activos/{usuarioId}")]
+        public async Task<IActionResult> GetActivosPorUsuario(Guid usuarioId)
+        {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver préstamos activos");
+
+            var prestamos = await _prestamoService.ObtenerActivosPorUsuarioAsync(usuarioId);
+            return Ok(prestamos);
+        }
+
+        [HttpGet("atrasados")]
+        public async Task<IActionResult> GetAtrasados()
+        {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerTodosLosPrestamos(rol), "ver préstamos atrasados");
+
+            var prestamos = await _prestamoService.ObtenerAtrasadosAsync();
+            return Ok(prestamos);
+        }
+
+        // ── POST ──
+
+        [HttpPost]
+        public async Task<IActionResult> SolicitarPrestamo([FromBody] PrestamoRequestDTO dto)
+        {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeSolicitarPrestamo(rol), "solicitar préstamo");
+
+            // Aca toda la logica pesada de validacion la hace el UseCase
+            var resultado = await _prestamoService.SolicitarPrestamoAsync(dto.UsuarioId, dto.RecursoId);
+            return Ok(resultado);
+        }
+
+        // ── PUT ──
+
+        [HttpPut("devolver/{prestamoId}")]
+        public async Task<IActionResult> DevolverPrestamo(Guid prestamoId)
+        {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPrestamos(rol), "devolver préstamo");
+
+            await _prestamoService.DevolverPrestamoAsync(prestamoId);
+            return Ok("Préstamo devuelto correctamente.");
+        }
     }
 }
+

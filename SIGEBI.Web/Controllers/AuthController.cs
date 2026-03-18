@@ -1,0 +1,123 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
+using System.IdentityModel.Tokens.Jwt;
+
+namespace SIGEBI.Web.Controllers
+{
+    public class LoginViewModel
+    {
+        public string Correo { get; set; } = string.Empty;
+        public string Contrasena { get; set; } = string.Empty;
+        public string ErrorMessage { get; set; } = string.Empty;
+    }
+
+    public class AuthController : Controller
+    {
+        private readonly IHttpClientFactory _httpClientFactory;
+
+        public AuthController(IHttpClientFactory httpClientFactory)
+        {
+            _httpClientFactory = httpClientFactory;
+        }
+
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View(new LoginViewModel());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            if (string.IsNullOrWhiteSpace(model.Correo) || string.IsNullOrWhiteSpace(model.Contrasena))
+            {
+                model.ErrorMessage = "Correo y contraseña son obligatorios.";
+                return View(model);
+            }
+
+            try
+            {
+                var client = _httpClientFactory.CreateClient("SIGEBIAPI");
+
+                var payload = new
+                {
+                    correo = model.Correo,
+                    contrasena = model.Contrasena
+                };
+
+                var json = JsonSerializer.Serialize(payload);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await client.PostAsync("api/Auth/login", content);
+                var responseBody = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    model.ErrorMessage = $"Credenciales incorrectas. Código: {(int)response.StatusCode}";
+                    return View(model);
+                }
+
+                var result = JsonSerializer.Deserialize<JsonElement>(responseBody);
+
+                if (!result.TryGetProperty("token", out var tokenElement))
+                {
+                    model.ErrorMessage = $"La API no devolvió token. Respuesta: {responseBody}";
+                    return View(model);
+                }
+
+                var token = tokenElement.GetString();
+
+                if (string.IsNullOrWhiteSpace(token))
+                {
+                    model.ErrorMessage = "El token llegó vacío.";
+                    return View(model);
+                }
+
+                // Guardar token en Session
+                HttpContext.Session.SetString("JwtToken", token);
+
+                // 🔥 Extraer el UsuarioId del token JWT y guardarlo en sesión
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+                var usuarioIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                
+                if (!string.IsNullOrEmpty(usuarioIdClaim))
+                {
+                    HttpContext.Session.SetString("UsuarioId", usuarioIdClaim);
+                }
+
+                // Crear cookie de autenticación
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, model.Correo),
+                    new Claim("JwtToken", token)
+                };
+
+                var claimsIdentity = new ClaimsIdentity(
+                    claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                var authProperties = new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(60)
+                };
+
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity),
+                    authProperties
+                );
+
+                return RedirectToAction("Index", "Catalogo");
+            }
+            catch (Exception ex)
+            {
+                model.ErrorMessage = $"No se pudo conectar con el servidor. Detalle: {ex.Message}";
+                return View(model);
+            }
+        }
+    }
+}

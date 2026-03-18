@@ -1,9 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using SIGEBI.Domain.Enums.Seguridad;
 
 namespace SIGEBI.Domain.Entities
 {
+    // La entidad Usuario solo es responsable de gestionar sus propios datos y su estado.
+    // No sabe como guardarse en la BD ni como mandarse por mail.
     public class Usuario
     {
         public Guid Id { get; private set; }
@@ -24,8 +26,11 @@ namespace SIGEBI.Domain.Entities
 
         public Usuario(string nombre, string correo, string contrasenaHash, RolUsuario rol)
         {
+            // Validaciones re basicas antes de crear el usuario
             if (string.IsNullOrWhiteSpace(nombre))
                 throw new ArgumentException("El nombre es requerido.", nameof(nombre));
+            
+            // TODO: Mejorar la regex del correo usando algo mas robusto
             if (string.IsNullOrWhiteSpace(correo) || !correo.Contains("@"))
                 throw new ArgumentException("Correo inválido.", nameof(correo));
             if (string.IsNullOrWhiteSpace(contrasenaHash))

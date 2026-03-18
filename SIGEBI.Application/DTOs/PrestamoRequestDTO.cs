@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SIGEBI.Business.DTOs
+﻿namespace SIGEBI.Business.DTOs
 {
-    class PrestamoRequestDTO
+    public class PrestamoRequestDTO
     {
+        public Guid UsuarioId { get; set; }
+
+        public Guid RecursoId { get; set; }
     }
 }

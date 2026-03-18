@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SIGEBI.Business.Interfaces.Persistance;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Enums.Seguridad;
@@ -17,6 +17,9 @@ namespace SIGEBI.Infrastructure.Persistance.Repositories
             => await _dbSet.Where(u => u.Rol == rol).ToListAsync();
 
         public async Task<IEnumerable<Usuario>> GetActivosAsync()
-            => await _dbSet.Where(u => u.Estado == EstadoUsuario.Activo).ToListAsync();
+        {
+            // Ojo: Solo trae los que no estan bloqueados ni dados de baja
+            return await _dbSet.Where(u => u.Estado == EstadoUsuario.Activo).ToListAsync();
+        }
     }
 }

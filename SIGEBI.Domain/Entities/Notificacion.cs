@@ -1,15 +1,15 @@
-﻿using System;
+using System;
+
 namespace SIGEBI.Domain.Entities
 {
     public class Notificacion
     {
         public Guid Id { get; private set; }
         public Enums.Operacion.TipoNotificacion Tipo { get; private set; }
-        public string Mensaje { get; private set; }
+        public string Mensaje { get; private set; } = null!;
         public DateTime Fecha { get; private set; }
         public Enums.Operacion.EstadoNotificacion Estado { get; private set; }
         public Guid UsuarioId { get; private set; }
-
         public Usuario Usuario { get; private set; } = null!;
 
         private Notificacion() { }
@@ -24,6 +24,8 @@ namespace SIGEBI.Domain.Entities
             Tipo = tipo;
             Mensaje = mensaje.Trim();
             Fecha = fechaUtc;
+            
+            // Por defecto nacen sin leerse
             Estado = Enums.Operacion.EstadoNotificacion.NoLeida;
         }
 
