@@ -45,7 +45,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-// El orden es crítico: Autenticación -> Sesión -> Autorización
+
 app.UseAuthentication();
 app.UseSession();
 app.UseAuthorization();

@@ -146,6 +146,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
                           .Should().NotThrowAsync();
 
             _listaRepo.Verify(r => r.AddAsync(It.IsAny<ListaDeseos>()), Times.Once);
+            _unitOfWork.Verify(u => u.SaveChangesAsync(), Times.Exactly(2));
         }
 
         // ── REMOVER RECURSO ──

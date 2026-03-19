@@ -51,10 +51,14 @@ namespace SIGEBI.Business.UseCases.Catalogo
             {
                 lista = new ListaDeseos(usuarioId, DateTime.UtcNow);
                 await _listaDeseosRepository.AddAsync(lista);
+                // Guardamos primero la lista para asegurar que el registro padre exista (evita FK conflict)
+                await _unitOfWork.SaveChangesAsync();
             }
 
             lista.AgregarRecurso(recurso);
-            _listaDeseosRepository.Update(lista);
+            
+            // No es necesario llamar a Update() si la entidad ya está siendo trackeada por EF.
+            // Al llamar a SaveChangesAsync(), EF detectará el cambio en la colección Recursos.
             await _unitOfWork.SaveChangesAsync();
         }
 

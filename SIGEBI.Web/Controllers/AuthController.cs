@@ -79,7 +79,7 @@ namespace SIGEBI.Web.Controllers
                 // Guardar token en Session
                 HttpContext.Session.SetString("JwtToken", token);
 
-                // 🔥 Extraer el UsuarioId del token JWT y guardarlo en sesión
+                //  Extraer el UsuarioId del token JWT y guardarlo en sesión
                 var handler = new JwtSecurityTokenHandler();
                 var jwtToken = handler.ReadJwtToken(token);
                 var usuarioIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
