@@ -56,5 +56,29 @@ namespace SIGEBI.Business.UseCases.Usuarios
                 .Where(p => p.FechaInicio >= fechaInicio && p.FechaInicio <= fechaFin)
                 .Select(PrestamoMapper.ToDTO);
         }
+
+        // Identifica a los usuarios con mayor historial de sanciones para seguimiento administrativo.
+        public async Task<IEnumerable<object>> ObtenerUsuariosMasPenalizadosAsync(int top = 5)
+        {
+            var penalizaciones = await _penalizacionRepository.GetAllAsync();
+            return penalizaciones
+                .GroupBy(p => p.UsuarioId)
+                .Select(g => new
+                {
+                    UsuarioId = g.Key,
+                    Nombre = g.First().Usuario?.Nombre ?? "N/A",
+                    CantidadSanciones = g.Count()
+                })
+                .OrderByDescending(x => x.CantidadSanciones)
+                .Take(top)
+                .ToList();
+        }
+
+        // Devuelve el listado consolidado de todas las sanciones vigentes en el sistema.
+        public async Task<IEnumerable<PenalizacionDTO>> ObtenerPenalizacionesActivasAsync()
+        {
+            var penalizaciones = await _penalizacionRepository.GetActivasAsync();
+            return penalizaciones.Select(PenalizacionMapper.ToDTO);
+        }
     }
 }

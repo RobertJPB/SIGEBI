@@ -52,5 +52,27 @@ namespace SIGEBI.API.Controllers
             await _penalizacionesUseCase.AplicarPenalizacionesAsync();
             return Ok("Penalizaciones aplicadas correctamente.");
         }
+
+        // Elimina una penalización del sistema. Solo para casos de error administrativo.
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Eliminar(Guid id)
+        {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPenalizaciones(rol), "eliminar penalización");
+
+            await _penalizacionesUseCase.EliminarPenalizacionAsync(id);
+            return Ok("Penalización eliminada correctamente.");
+        }
+
+        // Finaliza manualmente una penalización activa (por ejemplo, tras el pago de una multa).
+        [HttpPatch("{id}/finalizar")]
+        public async Task<IActionResult> Finalizar(Guid id)
+        {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPenalizaciones(rol), "finalizar penalización");
+
+            await _penalizacionesUseCase.FinalizarPenalizacionAsync(id);
+            return Ok("Penalización finalizada correctamente.");
+        }
     }
 }

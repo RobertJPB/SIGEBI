@@ -58,5 +58,28 @@ namespace SIGEBI.Business.UseCases.Usuarios
             var penalizaciones = await _penalizacionRepository.GetByUsuarioIdAsync(usuarioId);
             return penalizaciones.Select(PenalizacionMapper.ToDTO);
         }
+
+        // Elimina permanentemente una sanción del sistema (hard delete).
+        // Debe ser usado solo para corregir errores administrativos.
+        public async Task EliminarPenalizacionAsync(Guid id)
+        {
+            var penalizacion = await _penalizacionRepository.GetByIdAsync(id)
+                ?? throw new InvalidOperationException("La penalización no existe.");
+
+            _penalizacionRepository.Delete(penalizacion);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        // Resuelve manualmente una sanción antes de que expire su tiempo natural.
+        // Útil si el usuario paga una multa o existe una justificación válida.
+        public async Task FinalizarPenalizacionAsync(Guid id)
+        {
+            var penalizacion = await _penalizacionRepository.GetByIdAsync(id)
+                ?? throw new InvalidOperationException("La penalización no existe.");
+
+            penalizacion.Finalizar(DateTime.UtcNow);
+            _penalizacionRepository.Update(penalizacion);
+            await _unitOfWork.SaveChangesAsync();
+        }
     }
 }

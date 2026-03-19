@@ -19,5 +19,11 @@ namespace SIGEBI.Business.Services
         public async Task<IEnumerable<PrestamoResponseDTO>> ObtenerPrestamosPorPeriodoAsync(
             DateTime fechaInicio, DateTime fechaFin)
             => await _generarReportesUseCase.ObtenerPrestamosPorPeriodoAsync(fechaInicio, fechaFin);
+
+        public async Task<IEnumerable<object>> ObtenerUsuariosMasPenalizadosAsync(int top)
+            => await _generarReportesUseCase.ObtenerUsuariosMasPenalizadosAsync(top);
+
+        public async Task<IEnumerable<PenalizacionDTO>> ObtenerPenalizacionesActivasAsync()
+            => await _generarReportesUseCase.ObtenerPenalizacionesActivasAsync();
     }
 }

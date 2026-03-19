@@ -57,5 +57,27 @@ namespace SIGEBI.API.Controllers
             var prestamos = await _reportesService.ObtenerPrestamosPorPeriodoAsync(fechaInicio, fechaFin);
             return Ok(prestamos);
         }
+
+        // Identifica usuarios con historial recurrente de incumplimiento.
+        [HttpGet("usuarios-morosos")]
+        public async Task<IActionResult> ObtenerUsuariosMasPenalizados([FromQuery] int top = 5)
+        {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGenerarReportes(rol), "ver reporte de usuarios morosos");
+
+            var usuarios = await _reportesService.ObtenerUsuariosMasPenalizadosAsync(top);
+            return Ok(usuarios);
+        }
+
+        // Lista de penalizaciones vigentes en toda la biblioteca.
+        [HttpGet("penalizaciones-activas")]
+        public async Task<IActionResult> ObtenerPenalizacionesActivas()
+        {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGenerarReportes(rol), "ver reporte de penalizaciones activas");
+
+            var penalizaciones = await _reportesService.ObtenerPenalizacionesActivasAsync();
+            return Ok(penalizaciones);
+        }
     }
 }
