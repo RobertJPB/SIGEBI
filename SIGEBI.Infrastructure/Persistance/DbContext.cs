@@ -43,30 +43,35 @@ namespace SIGEBI.Infrastructure.Persistance
                              e.Entity is not Auditoria) // Evitamos auditar la propia tabla de auditoria
                 .ToList();
 
-            foreach (var entrada in entradasModificadas)
+            // Solo auditamos si el Usuario de Sistema existe en la base de datos para evitar el error de FK.
+            // Si es la primera vez que se usa el sistema, no habrá usuario de sistema y simplemente saltamos la auditoría.
+            if (Usuarios.Any(u => u.Id == UsuarioIdSistema))
             {
-                // 2. Determinamos qué tipo de acción fue (Crear, Editar, Borrar)
-                var accion = entrada.State switch
+                foreach (var entrada in entradasModificadas)
                 {
-                    EntityState.Added => Domain.Enums.Auditoria.TipoAccionAuditoria.Crear,
-                    EntityState.Modified => Domain.Enums.Auditoria.TipoAccionAuditoria.Actualizar,
-                    EntityState.Deleted => Domain.Enums.Auditoria.TipoAccionAuditoria.Eliminar,
-                    _ => Domain.Enums.Auditoria.TipoAccionAuditoria.Actualizar
-                };
+                    // 2. Determinamos qué tipo de acción fue (Crear, Editar, Borrar)
+                    var accion = entrada.State switch
+                    {
+                        EntityState.Added => Domain.Enums.Auditoria.TipoAccionAuditoria.Crear,
+                        EntityState.Modified => Domain.Enums.Auditoria.TipoAccionAuditoria.Actualizar,
+                        EntityState.Deleted => Domain.Enums.Auditoria.TipoAccionAuditoria.Eliminar,
+                        _ => Domain.Enums.Auditoria.TipoAccionAuditoria.Actualizar
+                    };
 
-                var nombreTabla = entrada.Entity.GetType().Name;
+                    var nombreTabla = entrada.Entity.GetType().Name;
 
-                // 3. Creamos el registro de auditoría automáticamente
-                var auditoriaAutomatica = new Auditoria(
-                    usuarioId: UsuarioIdSistema, // TODO: Inyectar IHttpContextAccessor en el futuro
-                    accion: accion,
-                    tablaAfectada: nombreTabla,
-                    detalle: $"Cambio automático detectado en {nombreTabla}. Estado EF: {entrada.State}",
-                    ipAddress: "::1", // Localhost
-                    fechaRegistroUtc: DateTime.UtcNow
-                );
+                    // 3. Creamos el registro de auditoría automáticamente
+                    var auditoriaAutomatica = new Auditoria(
+                        usuarioId: UsuarioIdSistema,
+                        accion: accion,
+                        tablaAfectada: nombreTabla,
+                        detalle: $"Cambio automático detectado en {nombreTabla}. Estado EF: {entrada.State}",
+                        ipAddress: "::1",
+                        fechaRegistroUtc: DateTime.UtcNow
+                    );
 
-                Auditorias.Add(auditoriaAutomatica);
+                    Auditorias.Add(auditoriaAutomatica);
+                }
             }
 
             // 4. Dejamos que Entity Framework guarde todo (los datos reales + nuestra auditoría)

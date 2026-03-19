@@ -2,11 +2,8 @@ using System.Text.Json;
 
 namespace SIGEBI.API.Middleware
 {
-
-    /// <summary>
     /// Middleware global para la captura de excepciones.
     /// Centraliza el manejo de errores para devolver respuestas JSON consistentes al cliente.
-    /// </summary>
     public class ExceptionHandlingMiddleware
     {
         private readonly RequestDelegate _next;
@@ -31,9 +28,7 @@ namespace SIGEBI.API.Middleware
             }
         }
 
-        /// <summary>
         /// Determina el código de estado HTTP adecuado basándose en el tipo de excepción capturada.
-        /// </summary>
         private static Task ManejarExcepcionAsync(HttpContext context, Exception ex)
         {
             var statusCode = ex switch
@@ -51,7 +46,8 @@ namespace SIGEBI.API.Middleware
             var respuesta = new
             {
                 status = statusCode,
-                mensaje = ex.Message
+                mensaje = ex.Message,
+                detalle = ex.InnerException?.Message // Agregamos el detalle del error interno para debug
             };
 
             return context.Response.WriteAsJsonAsync(respuesta);

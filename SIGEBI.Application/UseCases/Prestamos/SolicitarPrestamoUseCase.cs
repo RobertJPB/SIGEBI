@@ -64,9 +64,19 @@ namespace SIGEBI.Business.UseCases.Prestamos
             // Notificacion proactiva (como dice la documentacion)
             try 
             {
+                // Notificar al estudiante
                 await _emailAdapter.EnviarAsync(usuario.Correo, "Confirmación de Préstamo - SIGEBI", 
                     $"Hola {usuario.Nombre}, se ha registrado tu préstamo del recurso: {recurso.Titulo}. " +
                     $"Fecha de devolución: {prestamo.FechaDevolucionEstimada:dd/MM/yyyy}.");
+
+                // Notificar a todos los bibliotecarios
+                var bibliotecarios = await _usuarioRepository.GetByRolAsync(SIGEBI.Domain.Enums.Seguridad.RolUsuario.Bibliotecario);
+                foreach (var biblio in bibliotecarios)
+                {
+                    await _emailAdapter.EnviarAsync(biblio.Correo, "Nuevo Préstamo Registrado - SIGEBI",
+                        $"Se ha registrado un nuevo préstamo por el usuario {usuario.Nombre} (ID: {usuario.Id}). " +
+                        $"Recurso: {recurso.Titulo}.");
+                }
             }
             catch 
             {
