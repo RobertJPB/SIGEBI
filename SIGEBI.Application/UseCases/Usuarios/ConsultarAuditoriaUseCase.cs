@@ -8,14 +8,12 @@ namespace SIGEBI.Business.UseCases.Usuarios
     public class ConsultarAuditoriaUseCase
     {
         private readonly IAuditoriaRepository _auditoriaRepository;
-        private readonly SIGEBI.Application.Interfaces.IUnitOfWork _unitOfWork;
+
 
         public ConsultarAuditoriaUseCase(
-            IAuditoriaRepository auditoriaRepository,
-            SIGEBI.Application.Interfaces.IUnitOfWork unitOfWork)
+            IAuditoriaRepository auditoriaRepository)
         {
             _auditoriaRepository = auditoriaRepository;
-            _unitOfWork = unitOfWork;
         }
 
         // Obtiene el historial completo de acciones registradas en la base de datos.
@@ -33,14 +31,6 @@ namespace SIGEBI.Business.UseCases.Usuarios
             return auditorias.Select(AuditoriaMapper.ToDTO);
         }
 
-        // Elimina permanentemente un registro de auditoría.
-        public async Task EliminarAuditoriaAsync(int id)
-        {
-            var auditoria = await _auditoriaRepository.GetByIdAsync(id)
-                ?? throw new InvalidOperationException("Auditoría no encontrada.");
 
-            _auditoriaRepository.Delete(auditoria);
-            await _unitOfWork.SaveChangesAsync();
-        }
     }
 }
