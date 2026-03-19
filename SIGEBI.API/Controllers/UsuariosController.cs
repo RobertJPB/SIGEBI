@@ -113,5 +113,16 @@ namespace SIGEBI.API.Controllers
             await _gestionarUsuario.CambiarRolAsync(id, (RolUsuario)nuevoRol);
             return NoContent();
         }
+
+        // Elimina definitivamente a un usuario del sistema (hard delete).
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Eliminar(Guid id)
+        {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarUsuarios(rol), "eliminar usuario");
+
+            await _gestionarUsuario.EliminarAsync(id);
+            return Ok("Usuario eliminado correctamente.");
+        }
     }
 }

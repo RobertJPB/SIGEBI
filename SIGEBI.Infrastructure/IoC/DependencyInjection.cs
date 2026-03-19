@@ -61,6 +61,7 @@ namespace SIGEBI.Infrastructure.IoC
             services.AddScoped<SolicitarPrestamoUseCase>();
             services.AddScoped<DevolverPrestamoUseCase>();
             services.AddScoped<ConsultarPrestamoUseCase>();
+            services.AddScoped<EliminarPrestamoUseCase>();
 
             // Servicios de aplicación
             services.AddScoped<RegistrarPrestamoService>();

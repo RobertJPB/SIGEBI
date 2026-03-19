@@ -125,13 +125,12 @@ namespace SIGEBI.Business.UseCases.Catalogo
             await _unitOfWork.SaveChangesAsync();
         }
 
-        // Realiza una baja lógica del recurso cambiándolo de estado (sin borrar el registro).
+        // Elimina permanentemente el recurso del sistema (hard delete).
         public async Task EliminarRecursoAsync(Guid recursoId)
         {
             var recurso = await _recursoRepository.GetByIdAsync(recursoId)
                 ?? throw new InvalidOperationException("Recurso no encontrado.");
-            recurso.Desactivar();
-            _recursoRepository.Update(recurso);
+            _recursoRepository.Delete(recurso);
             await _unitOfWork.SaveChangesAsync();
         }
     }

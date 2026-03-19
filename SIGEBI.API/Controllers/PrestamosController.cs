@@ -98,6 +98,17 @@ namespace SIGEBI.API.Controllers
             await _prestamoService.DevolverPrestamoAsync(prestamoId);
             return Ok("Préstamo devuelto correctamente.");
         }
+
+        // Elimina permanentemente un préstamo del historial.
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Eliminar(Guid id)
+        {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPrestamos(rol), "eliminar préstamo");
+
+            await _prestamoService.EliminarPrestamoAsync(id);
+            return Ok("Préstamo eliminado correctamente.");
+        }
     }
 }
 

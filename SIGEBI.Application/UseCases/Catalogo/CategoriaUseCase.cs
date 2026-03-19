@@ -66,22 +66,11 @@ namespace SIGEBI.Business.UseCases.Catalogo
             return CategoriaMapper.ToDTO(categoria);
         }
 
-        // Habilita una categoría para que pueda ser asignada a nuevos recursos.
-        public async Task ActivarAsync(int id)
+        public async Task EliminarAsync(int id)
         {
             var categoria = await _categoriaRepository.GetByIdAsync(id)
                 ?? throw new KeyNotFoundException("Categoria no encontrada.");
-            categoria.Activar();
-            _categoriaRepository.Update(categoria);
-            await _unitOfWork.SaveChangesAsync();
-        }
-
-        public async Task DesactivarAsync(int id)
-        {
-            var categoria = await _categoriaRepository.GetByIdAsync(id)
-                ?? throw new KeyNotFoundException("Categoria no encontrada.");
-            categoria.Desactivar();
-            _categoriaRepository.Update(categoria);
+            _categoriaRepository.Delete(categoria);
             await _unitOfWork.SaveChangesAsync();
         }
     }

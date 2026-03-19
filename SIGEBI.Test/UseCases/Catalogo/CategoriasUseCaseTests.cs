@@ -68,7 +68,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
         }
 
         [Fact]
-        public async Task DesactivarAsync_DebeCambiarEstadoAInactiva()
+        public async Task EliminarAsync_DebeEliminarCategoria()
         {
             // Arrange
             int id = 1;
@@ -76,11 +76,10 @@ namespace SIGEBI.Test.UseCases.Catalogo
             _mockRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(categoria);
 
             // Act
-            await _useCase.DesactivarAsync(id);
+            await _useCase.EliminarAsync(id);
 
             // Assert
-            Assert.Equal(EstadoCategoria.Inactiva, categoria.Estado);
-            _mockRepo.Verify(u => u.Update(categoria), Times.Once);
+            _mockRepo.Verify(u => u.Delete(categoria), Times.Once);
             _mockUow.Verify(u => u.SaveChangesAsync(), Times.Once);
         }
     }

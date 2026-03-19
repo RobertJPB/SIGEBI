@@ -71,5 +71,14 @@ namespace SIGEBI.Business.UseCases.Usuarios
             _usuarioRepository.Update(usuario);
             await _unitOfWork.SaveChangesAsync();
         }
+
+        // Elimina permanentemente un usuario del sistema (hard delete).
+        public async Task EliminarAsync(Guid id)
+        {
+            var usuario = await _usuarioRepository.GetByIdAsync(id)
+                ?? throw new InvalidOperationException("Usuario no encontrado.");
+            _usuarioRepository.Delete(usuario);
+            await _unitOfWork.SaveChangesAsync();
+        }
     }
 }

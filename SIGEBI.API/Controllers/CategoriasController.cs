@@ -73,26 +73,15 @@ namespace SIGEBI.API.Controllers
             return Ok(categoria);
         }
 
-        // Realiza una baja lógica de la categoría desactivándola.
+        // Elimina permanentemente la categoría del sistema.
         [HttpDelete("{id}")]
         public async Task<IActionResult> Eliminar(int id)
         {
             var rol = ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "eliminar categoría");
 
-            await _categoriasUseCase.DesactivarAsync(id);
-            return Ok("Categoría desactivada correctamente.");
-        }
-
-        // Reactiva una categoría previamente desactivada.
-        [HttpPatch("{id}/activar")]
-        public async Task<IActionResult> Activar(int id)
-        {
-            var rol = ObtenerRolActual();
-            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "activar categoría");
-
-            await _categoriasUseCase.ActivarAsync(id);
-            return Ok("Categoría activada correctamente.");
+            await _categoriasUseCase.EliminarAsync(id);
+            return Ok("Categoría eliminada correctamente.");
         }
     }
 }

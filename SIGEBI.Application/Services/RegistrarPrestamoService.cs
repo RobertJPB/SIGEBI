@@ -8,15 +8,18 @@ namespace SIGEBI.Business.Services
         private readonly SolicitarPrestamoUseCase _solicitarUseCase;
         private readonly DevolverPrestamoUseCase _devolverUseCase;
         private readonly ConsultarPrestamoUseCase _consultarUseCase;
+        private readonly EliminarPrestamoUseCase _eliminarUseCase;
 
         public RegistrarPrestamoService(
             SolicitarPrestamoUseCase solicitarUseCase,
             DevolverPrestamoUseCase devolverUseCase,
-            ConsultarPrestamoUseCase consultarUseCase)
+            ConsultarPrestamoUseCase consultarUseCase,
+            EliminarPrestamoUseCase eliminarUseCase)
         {
             _solicitarUseCase = solicitarUseCase;
             _devolverUseCase = devolverUseCase;
             _consultarUseCase = consultarUseCase;
+            _eliminarUseCase = eliminarUseCase;
         }
 
         // Usando un Facade para no inyectar tantos UseCases en el Controller (visto en clase)
@@ -25,6 +28,9 @@ namespace SIGEBI.Business.Services
 
         public async Task DevolverPrestamoAsync(Guid prestamoId)
             => await _devolverUseCase.EjecutarAsync(prestamoId);
+
+        public async Task EliminarPrestamoAsync(Guid prestamoId)
+            => await _eliminarUseCase.EjecutarAsync(prestamoId);
 
         public async Task<IEnumerable<PrestamoResponseDTO>> ObtenerTodosAsync()
             => await _consultarUseCase.ObtenerTodosAsync();

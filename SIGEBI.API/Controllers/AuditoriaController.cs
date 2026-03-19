@@ -54,5 +54,17 @@ namespace SIGEBI.API.Controllers
             var auditorias = await _auditoriaUseCase.ObtenerPorUsuarioAsync(usuarioId);
             return Ok(auditorias);
         }
+
+        // Elimina permanentemente un registro de auditoría.
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Eliminar(int id)
+        {
+            var rol = ObtenerRolActual();
+            // Solo Administrador puede borrar logs de auditoría
+            AccesoPolicy.ValidarAcceso(rol, rol == RolUsuario.Administrador, "eliminar auditoría");
+
+            await _auditoriaUseCase.EliminarAuditoriaAsync(id);
+            return Ok("Registro de auditoría eliminado correctamente.");
+        }
     }
 }
