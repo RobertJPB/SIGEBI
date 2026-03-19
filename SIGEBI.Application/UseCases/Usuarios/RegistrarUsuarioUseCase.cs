@@ -25,7 +25,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
         }
 
         // Crea un nuevo usuario encriptando su clave y validando que el correo sea único.
-        public async Task EjecutarAsync(UsuarioDTO dto)
+        public async Task<Guid> EjecutarAsync(UsuarioDTO dto)
         {
             // Ojo: validar que el correo no este repetido
             var existente = await _usuarioRepository.GetByCorreoAsync(dto.Correo);
@@ -44,6 +44,8 @@ namespace SIGEBI.Business.UseCases.Usuarios
 
             await _usuarioRepository.AddAsync(usuario);
             await _unitOfWork.SaveChangesAsync(); // ← Este era el problema (ya arreglado)
+
+            return usuario.Id;
         }
     }
 }

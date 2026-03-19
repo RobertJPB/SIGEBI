@@ -8,6 +8,16 @@ namespace SIGEBI.Infrastructure.Persistance.Repositories
     public class AuditoriaRepository : BaseRepository<Auditoria>, IAuditoriaRepository
     {
         public AuditoriaRepository(SIGEBIDbContext context) : base(context) { }
+        
+        public async Task<IEnumerable<Auditoria>> GetAllAsync()
+        {
+            // Traemos todo el historial ordenado por fecha de lo más nuevo a lo viejo
+            // Incluimos al Usuario para mostrar su nombre en la tabla
+            return await _dbSet
+                .Include(a => a.Usuario)
+                .OrderByDescending(a => a.FechaRegistro)
+                .ToListAsync();
+        }
 
         public async Task<Auditoria?> GetByIdAsync(int id)
             => await _dbSet.Include(a => a.Usuario).FirstOrDefaultAsync(a => a.Id == id);

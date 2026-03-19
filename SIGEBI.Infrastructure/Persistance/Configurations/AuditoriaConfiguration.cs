@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SIGEBI.Domain.Entities;
 
@@ -33,6 +33,7 @@ namespace SIGEBI.Infrastructure.Persistance.Configurations
             builder.HasOne(a => a.Usuario)
                 .WithMany(u => u.Auditorias)
                 .HasForeignKey(a => a.UsuarioId)
+                .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

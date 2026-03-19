@@ -12,21 +12,27 @@ namespace SIGEBI.Business.UseCases.Catalogo
     {
         private readonly IListaDeseosRepository _listaDeseosRepository;
         private readonly IRecursoRepository _recursoRepository;
+        private readonly IUsuarioRepository _usuarioRepository;
         private readonly IUnitOfWork _unitOfWork;
 
         public ListaDeseosUseCase(
             IListaDeseosRepository listaDeseosRepository,
             IRecursoRepository recursoRepository,
+            IUsuarioRepository usuarioRepository,
             IUnitOfWork unitOfWork)
         {
             _listaDeseosRepository = listaDeseosRepository;
             _recursoRepository = recursoRepository;
+            _usuarioRepository = usuarioRepository;
             _unitOfWork = unitOfWork;
         }
 
         // Obtiene la lista del usuario o crea una nueva si aún no la tiene.
         public async Task<ListaDeseosDTO> ObtenerPorUsuarioAsync(Guid usuarioId)
         {
+            if (!await _usuarioRepository.ExistsAsync(usuarioId))
+                throw new KeyNotFoundException("Usuario no encontrado.");
+
             var lista = await _listaDeseosRepository.GetByUsuarioIdAsync(usuarioId);
             
             // Si el usuario no tiene lista, le creamos una en blanco por defecto
@@ -45,6 +51,9 @@ namespace SIGEBI.Business.UseCases.Catalogo
         {
             var recurso = await _recursoRepository.GetByIdAsync(recursoId)
                 ?? throw new InvalidOperationException("Recurso no encontrado.");
+
+            if (!await _usuarioRepository.ExistsAsync(usuarioId))
+                throw new KeyNotFoundException("Usuario no encontrado.");
 
             var lista = await _listaDeseosRepository.GetByUsuarioIdAsync(usuarioId);
             if (lista == null)

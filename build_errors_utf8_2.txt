@@ -1,0 +1,20 @@
+﻿  Determinando los proyectos que se van a restaurar...
+  Todos los proyectos est├ín actualizados para la restauraci├│n.
+  SIGEBI.Domain -> C:\Users\Administrador\source\repos\SIGEBI\SIGEBI.Domain\bin\Debug\net8.0\SIGEBI.Domain.dll
+C:\Users\Administrador\source\repos\SIGEBI\SIGEBI.Application\UseCases\Catalogo\ListaDeseosUseCase.cs(7,7): warning CS0105: La directiva using para 'SIGEBI.Business.Interfaces.Persistance' aparece previamente en este espacio de nombres [C:\Users\Administrador\source\repos\SIGEBI\SIGEBI.Application\SIGEBI.Business.csproj]
+  SIGEBI -> C:\Users\Administrador\source\repos\SIGEBI\SIGEBII\bin\Debug\net8.0-windows\SIGEBI.dll
+  SIGEBI.Business -> C:\Users\Administrador\source\repos\SIGEBI\SIGEBI.Application\bin\Debug\net8.0\SIGEBI.Business.dll
+  SIGEBI.Web -> C:\Users\Administrador\source\repos\SIGEBI\SIGEBI.Web\bin\Debug\net8.0\SIGEBI.Web.dll
+  SIGEBI.Test -> C:\Users\Administrador\source\repos\SIGEBI\SIGEBI.Test\bin\Debug\net8.0\SIGEBI.Test.dll
+  SIGEBI.Infrastructure -> C:\Users\Administrador\source\repos\SIGEBI\SIGEBI.Infrastructure\bin\Debug\net8.0\SIGEBI.Infrastructure.dll
+  SIGEBI.API -> C:\Users\Administrador\source\repos\SIGEBI\SIGEBI.API\bin\Debug\net8.0\SIGEBI.API.dll
+
+Compilaci├│n correcta.
+
+C:\Users\Administrador\source\repos\SIGEBI\SIGEBI.Application\UseCases\Catalogo\ListaDeseosUseCase.cs(7,7): warning CS0105: La directiva using para 'SIGEBI.Business.Interfaces.Persistance' aparece previamente en este espacio de nombres [C:\Users\Administrador\source\repos\SIGEBI\SIGEBI.Application\SIGEBI.Business.csproj]
+    1 Advertencia(s)
+    0 Errores
+
+Tiempo transcurrido 00:00:07.08
+
+Hay actualizaciones de carga de trabajo disponibles. Ejecute "dotnet workload list" para obtener m├ís informaci├│n.

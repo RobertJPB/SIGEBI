@@ -28,6 +28,18 @@ namespace SIGEBI.Infrastructure.Persistance
             // Simplemente creamos su archivo de configuracion (IEntityTypeConfiguration) 
             // y esta linea lo levanta automaticamente (abierto a extension, cerrado a modificacion).
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(SIGEBIDbContext).Assembly);
+
+            // Seed del Usuario del Sistema para la Auditoria
+            // Esto asegura que la auditoria siempre tenga un usuario al cual referenciarse
+            modelBuilder.Entity<Usuario>().HasData(new
+            {
+                Id = UsuarioIdSistema,
+                Nombre = "Sistema",
+                Correo = "sistema@sigebi.com",
+                ContrasenaHash = "SYSTEM_ACCOUNT_NO_LOGIN",
+                Rol = Domain.Enums.Seguridad.RolUsuario.Bibliotecario, // Rol por defecto
+                Estado = Domain.Enums.Seguridad.EstadoUsuario.Activo
+            });
         }
 
         // ID de sistema para la auditoria cuando no hay un usuario logueado (como en procesos automaticos)
@@ -43,35 +55,42 @@ namespace SIGEBI.Infrastructure.Persistance
                              e.Entity is not Auditoria) // Evitamos auditar la propia tabla de auditoria
                 .ToList();
 
-            // Solo auditamos si el Usuario de Sistema existe en la base de datos para evitar el error de FK.
-            // Si es la primera vez que se usa el sistema, no habrá usuario de sistema y simplemente saltamos la auditoría.
-            if (Usuarios.Any(u => u.Id == UsuarioIdSistema))
+            // Solo auditamos si hay cambios. 
+            // Eliminamos la validación Usuarios.Any() porque ahora el usuario se crea por Seed.
+            foreach (var entrada in entradasModificadas)
             {
-                foreach (var entrada in entradasModificadas)
+                // 2. Determinamos qué tipo de acción fue (Crear, Editar, Borrar)
+                var accion = entrada.State switch
                 {
-                    // 2. Determinamos qué tipo de acción fue (Crear, Editar, Borrar)
-                    var accion = entrada.State switch
-                    {
-                        EntityState.Added => Domain.Enums.Auditoria.TipoAccionAuditoria.Crear,
-                        EntityState.Modified => Domain.Enums.Auditoria.TipoAccionAuditoria.Actualizar,
-                        EntityState.Deleted => Domain.Enums.Auditoria.TipoAccionAuditoria.Eliminar,
-                        _ => Domain.Enums.Auditoria.TipoAccionAuditoria.Actualizar
-                    };
+                    EntityState.Added => Domain.Enums.Auditoria.TipoAccionAuditoria.Crear,
+                    EntityState.Modified => Domain.Enums.Auditoria.TipoAccionAuditoria.Actualizar,
+                    EntityState.Deleted => Domain.Enums.Auditoria.TipoAccionAuditoria.Eliminar,
+                    _ => Domain.Enums.Auditoria.TipoAccionAuditoria.Actualizar
+                };
 
-                    var nombreTabla = entrada.Entity.GetType().Name;
+                var nombreTabla = entrada.Entity.GetType().Name;
 
-                    // 3. Creamos el registro de auditoría automáticamente
-                    var auditoriaAutomatica = new Auditoria(
-                        usuarioId: UsuarioIdSistema,
-                        accion: accion,
-                        tablaAfectada: nombreTabla,
-                        detalle: $"Cambio automático detectado en {nombreTabla}. Estado EF: {entrada.State}",
-                        ipAddress: "::1",
-                        fechaRegistroUtc: DateTime.UtcNow
-                    );
+                // 3. Creamos el registro de auditoría automáticamente. 
+                // Usamos el UsuarioIdSistema como fallback para acciones donde no hay un usuario autenticado (como registro).
+                var actorId = UsuarioIdSistema;
 
-                    Auditorias.Add(auditoriaAutomatica);
+                // FIX: Si el usuario de sistema no existe (por falta de migración), 
+                // y estamos creando un usuario, usamos su propio ID como actor para evitar error de FK.
+                if (entrada.Entity is Usuario u && entrada.State == EntityState.Added)
+                {
+                    actorId = u.Id;
                 }
+
+                var auditoriaAutomatica = new Auditoria(
+                    usuarioId: actorId,
+                    accion: accion,
+                    tablaAfectada: nombreTabla,
+                    detalle: $"Cambio automático detectado en {nombreTabla}. Estado EF: {entrada.State}",
+                    ipAddress: "::1",
+                    fechaRegistroUtc: DateTime.UtcNow
+                );
+
+                Auditorias.Add(auditoriaAutomatica);
             }
 
             // 4. Dejamos que Entity Framework guarde todo (los datos reales + nuestra auditoría)

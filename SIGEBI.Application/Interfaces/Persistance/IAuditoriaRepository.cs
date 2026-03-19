@@ -8,7 +8,6 @@ namespace SIGEBI.Business.Interfaces.Persistance
         Task<Auditoria?> GetByIdAsync(int id);
         Task<IEnumerable<Auditoria>> GetByUsuarioIdAsync(Guid usuarioId);
         Task AddAsync(Auditoria entity);
-
         Task<bool> ExistsAsync(int id);
     }
 }

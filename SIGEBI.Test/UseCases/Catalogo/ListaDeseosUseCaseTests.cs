@@ -13,6 +13,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
     {
         private readonly Mock<IListaDeseosRepository> _listaRepo;
         private readonly Mock<IRecursoRepository> _recursoRepo;
+        private readonly Mock<IUsuarioRepository> _usuarioRepo;
         private readonly Mock<IUnitOfWork> _unitOfWork;
         private readonly ListaDeseosUseCase _useCase;
 
@@ -20,11 +21,13 @@ namespace SIGEBI.Test.UseCases.Catalogo
         {
             _listaRepo = new Mock<IListaDeseosRepository>();
             _recursoRepo = new Mock<IRecursoRepository>();
+            _usuarioRepo = new Mock<IUsuarioRepository>();
             _unitOfWork = new Mock<IUnitOfWork>();
 
             _useCase = new ListaDeseosUseCase(
                 _listaRepo.Object,
                 _recursoRepo.Object,
+                _usuarioRepo.Object,
                 _unitOfWork.Object);
         }
 
@@ -36,6 +39,10 @@ namespace SIGEBI.Test.UseCases.Catalogo
             // Arrange
             var usuarioId = Guid.NewGuid();
             var lista = new ListaDeseos(usuarioId, DateTime.UtcNow);
+
+            _usuarioRepo
+                .Setup(r => r.ExistsAsync(usuarioId))
+                .ReturnsAsync(true);
 
             _listaRepo
                 .Setup(r => r.GetByUsuarioIdAsync(usuarioId))
@@ -54,6 +61,10 @@ namespace SIGEBI.Test.UseCases.Catalogo
         {
             // Arrange
             var usuarioId = Guid.NewGuid();
+
+            _usuarioRepo
+                .Setup(r => r.ExistsAsync(usuarioId))
+                .ReturnsAsync(true);
 
             _listaRepo
                 .Setup(r => r.GetByUsuarioIdAsync(usuarioId))
@@ -88,6 +99,10 @@ namespace SIGEBI.Test.UseCases.Catalogo
             _recursoRepo
                 .Setup(r => r.GetByIdAsync(libro.Id))
                 .ReturnsAsync(libro);
+
+            _usuarioRepo
+                .Setup(r => r.ExistsAsync(usuarioId))
+                .ReturnsAsync(true);
 
             _listaRepo
                 .Setup(r => r.GetByUsuarioIdAsync(usuarioId))
@@ -128,6 +143,10 @@ namespace SIGEBI.Test.UseCases.Catalogo
             _recursoRepo
                 .Setup(r => r.GetByIdAsync(libro.Id))
                 .ReturnsAsync(libro);
+
+            _usuarioRepo
+                .Setup(r => r.ExistsAsync(usuarioId))
+                .ReturnsAsync(true);
 
             _listaRepo
                 .Setup(r => r.GetByUsuarioIdAsync(usuarioId))
@@ -186,6 +205,32 @@ namespace SIGEBI.Test.UseCases.Catalogo
             // Act & Assert
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _useCase.RemoverRecursoAsync(Guid.NewGuid(), Guid.NewGuid()));
+        }
+ 
+        [Fact]
+        public async Task ObtenerPorUsuario_UsuarioNoExiste_LanzaExcepcion()
+        {
+            // Arrange
+            var usuarioId = Guid.NewGuid();
+            _usuarioRepo.Setup(r => r.ExistsAsync(usuarioId)).ReturnsAsync(false);
+ 
+            // Act & Assert
+            await _useCase.Invoking(u => u.ObtenerPorUsuarioAsync(usuarioId))
+                          .Should().ThrowAsync<KeyNotFoundException>();
+        }
+ 
+        [Fact]
+        public async Task AgregarRecurso_UsuarioNoExiste_LanzaExcepcion()
+        {
+            // Arrange
+            var usuarioId = Guid.NewGuid();
+            var recursoId = Guid.NewGuid();
+            _recursoRepo.Setup(r => r.GetByIdAsync(recursoId)).ReturnsAsync(new Libro("Test", "Author", 1, 1, "123", "Edit", 2020));
+            _usuarioRepo.Setup(r => r.ExistsAsync(usuarioId)).ReturnsAsync(false);
+ 
+            // Act & Assert
+            await _useCase.Invoking(u => u.AgregarRecursoAsync(usuarioId, recursoId))
+                          .Should().ThrowAsync<KeyNotFoundException>();
         }
     }
 }

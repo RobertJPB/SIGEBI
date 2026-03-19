@@ -66,9 +66,9 @@ namespace SIGEBI.API.Controllers
                 return BadRequest(errores);
 
             // Delega la creación del usuario al caso de uso correspondiente.
-            await _registrarUseCase.EjecutarAsync(dto);
+            var id = await _registrarUseCase.EjecutarAsync(dto);
 
-            return Ok("Usuario registrado exitosamente.");
+            return Ok(new { Mensaje = "Usuario registrado exitosamente.", Id = id });
         }
     }
 }

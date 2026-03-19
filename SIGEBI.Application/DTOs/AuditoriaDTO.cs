@@ -1,11 +1,11 @@
-﻿using SIGEBI.Domain.Enums.Auditoria;
+using SIGEBI.Domain.Enums.Auditoria;
 
 namespace SIGEBI.Business.DTOs
 {
     public class AuditoriaDTO
     {
         public int Id { get; set; }
-        public Guid UsuarioId { get; set; }
+        public Guid? UsuarioId { get; set; }
         public string NombreUsuario { get; set; } = null!;
         public TipoAccionAuditoria Accion { get; set; }
         public string TablaAfectada { get; set; } = null!;

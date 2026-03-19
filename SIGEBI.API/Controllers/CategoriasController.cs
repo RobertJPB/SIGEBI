@@ -62,16 +62,6 @@ namespace SIGEBI.API.Controllers
             return Ok(categoria);
         }
 
-        // Actualiza el nombre de una categoría existente.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Editar(int id, [FromBody] string nombre)
-        {
-            var rol = ObtenerRolActual();
-            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "editar categoría");
-
-            var categoria = await _categoriasUseCase.EditarAsync(id, nombre);
-            return Ok(categoria);
-        }
 
         // Elimina permanentemente la categoría del sistema.
         [HttpDelete("{id}")]

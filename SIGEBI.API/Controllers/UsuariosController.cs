@@ -46,6 +46,21 @@ namespace SIGEBI.API.Controllers
             return Ok(usuarios);
         }
 
+        // Retorna la información del usuario autenticado actualmente (perfil personal).
+        [HttpGet("perfil")]
+        public async Task<IActionResult> ObtenerPerfil()
+        {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+                return Unauthorized("No se pudo identificar al usuario desde el token.");
+
+            var usuario = await _gestionarUsuario.ObtenerPorIdAsync(userId);
+            if (usuario == null)
+                return NotFound("Información de perfil no encontrada.");
+
+            return Ok(usuario);
+        }
+
         // Consulta la ficha detallada de un usuario específico mediante su ID.
         [HttpGet("{id}")]
         public async Task<IActionResult> ObtenerPorId(Guid id)
@@ -66,8 +81,8 @@ namespace SIGEBI.API.Controllers
             var rol = ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarUsuarios(rol), "registrar usuario");
 
-            await _registrarUsuario.EjecutarAsync(dto);
-            return Ok("Usuario registrado correctamente.");
+            var id = await _registrarUsuario.EjecutarAsync(dto);
+            return Ok(new { Mensaje = "Usuario registrado correctamente.", Id = id });
         }
 
         // Restablece el acceso a un usuario que estaba previamente desactivado o bloqueado.
