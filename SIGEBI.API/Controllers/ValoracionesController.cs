@@ -31,6 +31,15 @@ namespace SIGEBI.API.Controllers
             throw new UnauthorizedAccessException("Rol no identificado en el token.");
         }
 
+        // Recupera el ID del usuario del token JWT.
+        private Guid ObtenerUsuarioIdActual()
+        {
+            var idClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (Guid.TryParse(idClaim, out var id))
+                return id;
+            throw new UnauthorizedAccessException("Usuario no identificado en el token.");
+        }
+
         // Lista todas las reseñas y calificaciones recibidas por un recurso específico.
         [HttpGet("recurso/{recursoId}")]
         public async Task<IActionResult> ObtenerPorRecurso(Guid recursoId)
@@ -53,7 +62,6 @@ namespace SIGEBI.API.Controllers
             return Ok(promedio);
         }
 
-        // Registra una nueva valoración de un usuario sobre un libro o documento.
         [HttpPost]
         public async Task<IActionResult> Agregar([FromBody] ValoracionDTO dto)
         {
@@ -63,6 +71,26 @@ namespace SIGEBI.API.Controllers
             var valoracion = await _valoracionesUseCase.AgregarValoracionAsync(
                 dto.UsuarioId, dto.RecursoId, dto.Calificacion, dto.Comentario);
             return Ok(valoracion);
+        }
+
+        // Elimina una valoración. Solo la puede borrar el autor o un administrador/bibliotecario.
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Eliminar(Guid id)
+        {
+            var rol = ObtenerRolActual();
+            var usuarioId = ObtenerUsuarioIdActual();
+            
+            // Primero obtenemos la valoración para verificar autoría
+            var valoracion = await _valoracionesUseCase.ObtenerPorIdAsync(id);
+            
+            // Si no es admin/bibliote, solo puede borrar su propia valoracion
+            if (!AccesoPolicy.PuedeGestionarRecursos(rol) && valoracion.UsuarioId != usuarioId)
+            {
+                return Forbid("No tienes permiso para eliminar esta valoración.");
+            }
+            
+            await _valoracionesUseCase.EliminarValoracionAsync(id);
+            return Ok("Valoración eliminada correctamente.");
         }
     }
 }

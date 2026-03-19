@@ -21,13 +21,20 @@ namespace SIGEBI.API.Controllers
             _notificacionesUseCase = notificacionesUseCase;
         }
 
-        // Valida la identidad y el rol para asegurar que la información sea privada y autorizada.
         private RolUsuario ObtenerRolActual()
         {
             var rolClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
             if (Enum.TryParse<RolUsuario>(rolClaim, out var rol))
                 return rol;
             throw new UnauthorizedAccessException("Rol no identificado en el token.");
+        }
+
+        private Guid ObtenerUsuarioIdActual()
+        {
+            var idClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (Guid.TryParse(idClaim, out var id))
+                return id;
+            throw new UnauthorizedAccessException("Usuario no identificado en el token.");
         }
 
         // Recupera todas las notificaciones (leídas y no leídas) de un usuario.
@@ -41,7 +48,6 @@ namespace SIGEBI.API.Controllers
             return Ok(notificaciones);
         }
 
-        // Cambia el estado de una notificación para indicar que el usuario ya la ha visto.
         [HttpPut("{notificacionId}/leida")]
         public async Task<IActionResult> MarcarComoLeida(Guid notificacionId)
         {
@@ -50,6 +56,24 @@ namespace SIGEBI.API.Controllers
 
             await _notificacionesUseCase.MarcarComoLeidaAsync(notificacionId);
             return Ok("Notificación marcada como leída.");
+        }
+
+        // Elimina una notificación. El usuario solo puede borrar las suyas.
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Eliminar(Guid id)
+        {
+            var rol = ObtenerRolActual();
+            var usuarioId = ObtenerUsuarioIdActual();
+
+            var notificacion = await _notificacionesUseCase.ObtenerPorIdAsync(id);
+
+            if (notificacion.UsuarioId != usuarioId && !AccesoPolicy.PuedeGestionarUsuarios(rol))
+            {
+                return Forbid("No tienes permiso para eliminar esta notificación.");
+            }
+
+            await _notificacionesUseCase.EliminarNotificacionAsync(id);
+            return Ok("Notificación eliminada correctamente.");
         }
     }
 }

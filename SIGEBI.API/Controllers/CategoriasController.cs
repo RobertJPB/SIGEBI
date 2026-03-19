@@ -52,8 +52,6 @@ namespace SIGEBI.API.Controllers
             return Ok(categoria);
         }
 
-        // Crea una nueva categoría temática.
-        // Requiere privilegios de gestión de recursos (bibliotecario o administrador).
         [HttpPost]
         public async Task<IActionResult> Crear([FromBody] string nombre)
         {
@@ -62,6 +60,39 @@ namespace SIGEBI.API.Controllers
 
             var categoria = await _categoriasUseCase.CrearAsync(nombre);
             return Ok(categoria);
+        }
+
+        // Actualiza el nombre de una categoría existente.
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Editar(int id, [FromBody] string nombre)
+        {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "editar categoría");
+
+            var categoria = await _categoriasUseCase.EditarAsync(id, nombre);
+            return Ok(categoria);
+        }
+
+        // Realiza una baja lógica de la categoría desactivándola.
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Eliminar(int id)
+        {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "eliminar categoría");
+
+            await _categoriasUseCase.DesactivarAsync(id);
+            return Ok("Categoría desactivada correctamente.");
+        }
+
+        // Reactiva una categoría previamente desactivada.
+        [HttpPatch("{id}/activar")]
+        public async Task<IActionResult> Activar(int id)
+        {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "activar categoría");
+
+            await _categoriasUseCase.ActivarAsync(id);
+            return Ok("Categoría activada correctamente.");
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using SIGEBI.Business.DTOs;
+using SIGEBI.Business.DTOs;
 using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Business.Mappers
@@ -13,7 +13,8 @@ namespace SIGEBI.Business.Mappers
                 Mensaje = notificacion.Mensaje,
                 Tipo = notificacion.Tipo.ToString(),
                 Estado = notificacion.Estado.ToString(),
-                Fecha = notificacion.Fecha
+                Fecha = notificacion.Fecha,
+                UsuarioId = notificacion.UsuarioId
             };
         }
     }

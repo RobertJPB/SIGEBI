@@ -35,7 +35,6 @@ namespace SIGEBI.Business.UseCases.Catalogo
             return CategoriaMapper.ToDTO(categoria);
         }
 
-        // Crea una nueva categoría validando que el nombre no sea duplicado.
         public async Task<CategoriaDTO> CrearAsync(string nombre)
         {
             var existe = await _categoriaRepository.GetByNombreAsync(nombre);
@@ -44,10 +43,26 @@ namespace SIGEBI.Business.UseCases.Catalogo
 
             var categoria = new Categoria(nombre);
             
-            // Console.WriteLine("Guardando categoria en BD...");
             await _categoriaRepository.AddAsync(categoria);
             await _unitOfWork.SaveChangesAsync();
             
+            return CategoriaMapper.ToDTO(categoria);
+        }
+
+        // Modifica el nombre de una categoría existente.
+        public async Task<CategoriaDTO> EditarAsync(int id, string nuevoNombre)
+        {
+            var categoria = await _categoriaRepository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException("Categoria no encontrada.");
+
+            var existe = await _categoriaRepository.GetByNombreAsync(nuevoNombre);
+            if (existe != null && existe.Id != id)
+                throw new InvalidOperationException("Ya existe otra categoria con ese nombre.");
+
+            categoria.CambiarNombre(nuevoNombre);
+            _categoriaRepository.Update(categoria);
+            await _unitOfWork.SaveChangesAsync();
+
             return CategoriaMapper.ToDTO(categoria);
         }
 

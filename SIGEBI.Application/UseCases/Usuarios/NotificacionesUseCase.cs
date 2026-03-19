@@ -32,15 +32,30 @@ namespace SIGEBI.Business.UseCases.Usuarios
             return notificaciones.Select(NotificacionMapper.ToDTO);
         }
 
-        // Cambia el estado de una alerta para indicar que ya ha sido visualizada.
         public async Task MarcarComoLeidaAsync(Guid notificacionId)
         {
             var notificacion = await _notificacionRepository.GetByIdAsync(notificacionId)
-                ?? throw new InvalidOperationException("Notificación no encontrada.");
+                ?? throw new KeyNotFoundException("Notificación no encontrada.");
 
             notificacion.MarcarComoLeida(); // cambiamos el estado
             _notificacionRepository.Update(notificacion);
             await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task EliminarNotificacionAsync(Guid id)
+        {
+            var notificacion = await _notificacionRepository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException("Notificación no encontrada.");
+
+            _notificacionRepository.Delete(notificacion);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task<NotificacionDTO> ObtenerPorIdAsync(Guid id)
+        {
+            var notificacion = await _notificacionRepository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException("Notificación no encontrada.");
+            return NotificacionMapper.ToDTO(notificacion);
         }
 
         public async Task EnviarNotificacionPrestamoAsync(Guid usuarioId, DateTime fechaDevolucion)

@@ -52,8 +52,24 @@ namespace SIGEBI.Business.UseCases.Catalogo
             return valoraciones.Select(ValoracionMapper.ToDTO);
         }
 
+        public async Task<ValoracionDTO> ObtenerPorIdAsync(Guid id)
+        {
+            var valoracion = await _valoracionRepository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException("Valoración no encontrada.");
+            return ValoracionMapper.ToDTO(valoracion);
+        }
+
         // Calcula la puntuación media basada en todas las estrellas recibidas por el recurso.
         public async Task<double> ObtenerPromedioAsync(Guid recursoId)
             => await _valoracionRepository.GetPromedioCalificacionAsync(recursoId);
+
+        public async Task EliminarValoracionAsync(Guid id)
+        {
+            var valoracion = await _valoracionRepository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException("Valoración no encontrada.");
+
+            _valoracionRepository.Delete(valoracion);
+            await _unitOfWork.SaveChangesAsync();
+        }
     }
 }
