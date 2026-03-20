@@ -15,9 +15,9 @@ namespace SIGEBI.Business.Mappers
                 NombreUsuario = prestamo.Usuario?.Nombre ?? string.Empty,
                 RecursoId = prestamo.RecursoId,
                 TituloRecurso = prestamo.Recurso?.Titulo ?? string.Empty,
-                FechaInicio = prestamo.FechaInicio,
-                FechaDevolucionEstimada = prestamo.FechaDevolucionEstimada,
-                FechaDevolucionReal = prestamo.FechaDevolucionReal,
+                FechaInicio = prestamo.FechaInicio.ToString("yyyy-MM-dd"),
+                FechaDevolucionEstimada = prestamo.FechaDevolucionEstimada.ToString("yyyy-MM-dd"),
+                FechaDevolucionReal = prestamo.FechaDevolucionReal?.ToString("yyyy-MM-dd"),
                 Estado = prestamo.EstadoActual.ToString()
             };
         }

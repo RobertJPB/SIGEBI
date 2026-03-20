@@ -175,7 +175,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
             var resultado = await _useCase.EjecutarAsync(usuario.Id, libro.Id, fechaPersonalizada);
 
             // Assert
-            resultado.FechaDevolucionEstimada.Should().BeCloseTo(fechaPersonalizada, TimeSpan.FromSeconds(1));
+            resultado.FechaDevolucionEstimada.Should().Be(fechaPersonalizada.ToString("yyyy-MM-dd"));
         }
         [Fact]
         public async Task Ejecutar_FechaExcedeLimite_LanzaExcepcion()
