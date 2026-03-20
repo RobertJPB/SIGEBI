@@ -1,4 +1,4 @@
-﻿using SIGEBI.Business.DTOs;
+using SIGEBI.Business.DTOs;
 using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Business.Mappers
@@ -9,6 +9,7 @@ namespace SIGEBI.Business.Mappers
         {
             Id = listaDeseos.Id,
             UsuarioId = listaDeseos.UsuarioId,
+            UsuarioNombre = listaDeseos.Usuario?.Nombre ?? string.Empty,
             FechaCreacion = listaDeseos.FechaCreacion,
             Recursos = listaDeseos.Recursos.Select(RecursoMapper.ToDTO).ToList()
         };

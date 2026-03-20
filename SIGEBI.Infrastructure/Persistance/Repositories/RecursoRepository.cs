@@ -12,6 +12,9 @@ namespace SIGEBI.Infrastructure.Persistance.Repositories
     {
         public RecursoRepository(SIGEBIDbContext context) : base(context) { }
 
+        public override async Task<IEnumerable<RecursoBibliografico>> GetAllAsync()
+            => await _dbSet.Include(r => r.Categoria).ToListAsync();
+
         public async Task<IEnumerable<RecursoBibliografico>> GetByCategoriaAsync(int categoriaId)
             => await _dbSet
                 .Include(r => r.Categoria)

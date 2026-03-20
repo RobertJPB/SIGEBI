@@ -206,6 +206,22 @@ namespace SIGEBI.Test.UseCases.Catalogo
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _useCase.RemoverRecursoAsync(Guid.NewGuid(), Guid.NewGuid()));
         }
+
+        [Fact]
+        public async Task RemoverRecurso_RecursoNoEnLista_LanzaExcepcion()
+        {
+            // Arrange
+            var usuarioId = Guid.NewGuid();
+            var lista = new ListaDeseos(usuarioId, DateTime.UtcNow);
+
+            _listaRepo
+                .Setup(r => r.GetByUsuarioIdAsync(usuarioId))
+                .ReturnsAsync(lista);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                _useCase.RemoverRecursoAsync(usuarioId, Guid.NewGuid()));
+        }
  
         [Fact]
         public async Task ObtenerPorUsuario_UsuarioNoExiste_LanzaExcepcion()

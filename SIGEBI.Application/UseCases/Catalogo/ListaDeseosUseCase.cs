@@ -76,8 +76,16 @@ namespace SIGEBI.Business.UseCases.Catalogo
             var lista = await _listaDeseosRepository.GetByUsuarioIdAsync(usuarioId)
                 ?? throw new InvalidOperationException("Lista de deseos no encontrada.");
 
+            // Verificamos si el recurso existe antes de intentar removerlo para dar un error claro si no esta
+            if (!lista.Recursos.Any(r => r.Id == recursoId))
+                throw new InvalidOperationException("El recurso no se encuentra en la lista de deseos.");
+
             lista.RemoverRecurso(recursoId);
-            _listaDeseosRepository.Update(lista);
+            
+            // IMPORTANTE: No llamamos a _listaDeseosRepository.Update(lista) porque la entidad 
+            // ya esta siendo trackeada por EF al venir del repositorio con Include().
+            // Llamar a Update() puede interferir con la deteccion de cambios en colecciones many-to-many.
+            
             await _unitOfWork.SaveChangesAsync();
         }
     }

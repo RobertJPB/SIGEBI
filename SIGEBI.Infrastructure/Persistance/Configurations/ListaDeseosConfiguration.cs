@@ -24,6 +24,10 @@ namespace SIGEBI.Infrastructure.Persistance.Configurations
             builder.HasMany(l => l.Recursos)
                 .WithMany()
                 .UsingEntity(j => j.ToTable("ListaDeseosRecursos"));
+
+            // Forzamos el uso del backing field para evitar problemas de tracking
+            builder.Navigation(l => l.Recursos)
+                .UsePropertyAccessMode(PropertyAccessMode.Field);
         }
     }
 }

@@ -13,12 +13,14 @@ namespace SIGEBI.Infrastructure.Persistance.Repositories
         {
             // Necesitamos meter el Include para traer la relacion con Recursos (sino EF te la trae vacia)
             return await _dbSet
+                .Include(l => l.Usuario)
                 .Include(l => l.Recursos)
                 .FirstOrDefaultAsync(l => l.UsuarioId == usuarioId);
         }
 
         public new async Task<ListaDeseos?> GetByIdAsync(Guid id)
             => await _dbSet
+                .Include(l => l.Usuario)
                 .Include(l => l.Recursos)
                 .FirstOrDefaultAsync(l => l.Id == id);
 
