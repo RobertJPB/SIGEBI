@@ -13,17 +13,20 @@ namespace SIGEBI.Business.UseCases.Prestamos
         private readonly IPrestamoRepository _prestamoRepository;
         private readonly IRecursoRepository _recursoRepository;
         private readonly IPenalizacionRepository _penalizacionRepository;
+        private readonly INotificacionRepository _notificacionRepository;
         private readonly IUnitOfWork _unitOfWork;
 
         public DevolverPrestamoUseCase(
             IPrestamoRepository prestamoRepository,
             IRecursoRepository recursoRepository,
             IPenalizacionRepository penalizacionRepository,
+            INotificacionRepository notificacionRepository,
             IUnitOfWork unitOfWork)
         {
             _prestamoRepository = prestamoRepository;
             _recursoRepository = recursoRepository;
             _penalizacionRepository = penalizacionRepository;
+            _notificacionRepository = notificacionRepository;
             _unitOfWork = unitOfWork;
         }
 
@@ -39,6 +42,10 @@ namespace SIGEBI.Business.UseCases.Prestamos
             prestamo.Devolver(DateTime.UtcNow);
             recurso.AumentarStock(); // el libro vuelve a estar disponible
 
+            // Notificación de devolución exitosa
+            var notiDevolucion = NotificacionFactory.CrearNotificacionDevolucion(prestamo.UsuarioId);
+            await _notificacionRepository.AddAsync(notiDevolucion);
+
             // Verificamos si lo entrego tarde para clavarle una multa
             if (PenalizacionCalculator.TienePenalizacion(prestamo.FechaDevolucionEstimada, DateTime.UtcNow))
             {
@@ -48,9 +55,13 @@ namespace SIGEBI.Business.UseCases.Prestamos
                 
                 string motivo = PenalizacionCalculator.ObtenerMotivo(diasAtraso);
 
-                // TODO: ¿Deberíamos notificar por correo aquí también?
                 var penalizacion = new Penalizacion(prestamo.UsuarioId, motivo, diasPenalizacion, DateTime.UtcNow);
                 await _penalizacionRepository.AddAsync(penalizacion);
+
+                // Notificación de penalización
+                var notiPenalizacion = NotificacionFactory.CrearNotificacionPenalizacion(
+                    prestamo.UsuarioId, motivo, penalizacion.FechaFin.Value);
+                await _notificacionRepository.AddAsync(notiPenalizacion);
             }
 
             _prestamoRepository.Update(prestamo);

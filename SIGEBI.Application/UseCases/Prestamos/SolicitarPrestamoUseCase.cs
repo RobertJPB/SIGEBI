@@ -17,6 +17,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IRecursoRepository _recursoRepository;
         private readonly IPenalizacionRepository _penalizacionRepository;
+        private readonly INotificacionRepository _notificacionRepository;
         private readonly IEmailAdapter _emailAdapter;
         private readonly IUnitOfWork _unitOfWork;
 
@@ -25,6 +26,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
             IUsuarioRepository usuarioRepository,
             IRecursoRepository recursoRepository,
             IPenalizacionRepository penalizacionRepository,
+            INotificacionRepository notificacionRepository,
             IEmailAdapter emailAdapter,
             IUnitOfWork unitOfWork)
         {
@@ -32,12 +34,13 @@ namespace SIGEBI.Business.UseCases.Prestamos
             _usuarioRepository = usuarioRepository;
             _recursoRepository = recursoRepository;
             _penalizacionRepository = penalizacionRepository;
+            _notificacionRepository = notificacionRepository;
             _emailAdapter = emailAdapter;
             _unitOfWork = unitOfWork;
         }
 
         // Ejecuta el flujo de préstamo: valida usuario/recurso, comprueba disponibilidad y persiste el registro.
-        public async Task<PrestamoResponseDTO> EjecutarAsync(Guid usuarioId, Guid recursoId)
+        public async Task<PrestamoResponseDTO> EjecutarAsync(Guid usuarioId, Guid recursoId, DateTime? fechaDevolucionEstimada = null)
         {
             // buscamos el usuario primero
             var usuario = await _usuarioRepository.GetByIdAsync(usuarioId)
@@ -53,11 +56,15 @@ namespace SIGEBI.Business.UseCases.Prestamos
             PrestamoPolicy.ValidarPrestamo(usuario, recurso, prestamosActivos, penalizaciones);
 
             int diasPlazo = PrestamoPolicy.ObtenerDiasPlazo(usuario);
-            var prestamo = new Prestamo(usuarioId, recursoId, diasPlazo, DateTime.UtcNow);
+            var prestamo = new Prestamo(usuarioId, recursoId, diasPlazo, DateTime.UtcNow, fechaDevolucionEstimada);
 
             recurso.DisminuirStock(); // bajamos el stock
             await _prestamoRepository.AddAsync(prestamo);
             _recursoRepository.Update(recurso);
+
+            // También generamos una notificación persistente en la base de datos (aparte del correo)
+            var notificacion = NotificacionFactory.CrearNotificacionPrestamo(usuarioId, prestamo.FechaDevolucionEstimada);
+            await _notificacionRepository.AddAsync(notificacion);
             
             await _unitOfWork.SaveChangesAsync();
 

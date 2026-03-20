@@ -16,6 +16,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
         private readonly Mock<IPrestamoRepository> _prestamoRepo;
         private readonly Mock<IRecursoRepository> _recursoRepo;
         private readonly Mock<IPenalizacionRepository> _penalizacionRepo;
+        private readonly Mock<INotificacionRepository> _notificacionRepo;
         private readonly Mock<IUnitOfWork> _unitOfWork;
         private readonly DevolverPrestamoUseCase _useCase;
 
@@ -24,12 +25,14 @@ namespace SIGEBI.Test.UseCases.Prestamos
             _prestamoRepo = new Mock<IPrestamoRepository>();
             _recursoRepo = new Mock<IRecursoRepository>();
             _penalizacionRepo = new Mock<IPenalizacionRepository>();
+            _notificacionRepo = new Mock<INotificacionRepository>();
             _unitOfWork = new Mock<IUnitOfWork>();
 
             _useCase = new DevolverPrestamoUseCase(
                 _prestamoRepo.Object,
                 _recursoRepo.Object,
                 _penalizacionRepo.Object,
+                _notificacionRepo.Object,
                 _unitOfWork.Object);
         }
 

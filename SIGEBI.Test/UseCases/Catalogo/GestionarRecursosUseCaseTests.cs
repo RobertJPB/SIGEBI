@@ -145,25 +145,20 @@ namespace SIGEBI.Test.UseCases.Catalogo
         // ── ELIMINAR ──
 
         [Fact]
-        public async Task EliminarRecurso_RecursoExistente_DesactivaRecurso()
+        public async Task EliminarRecurso_RecursoExistente_LlamadaBorradoFisico()
         {
             // Arrange
             var libro = new Libro("El Principito", "Antoine", 1, 5,
                                   "978-84-261", "Editorial X", 1943);
 
-            _recursoRepo
-                .Setup(r => r.GetByIdAsync(libro.Id))
-                .ReturnsAsync(libro);
-
-            _unitOfWork
-                .Setup(u => u.SaveChangesAsync())
-                .ReturnsAsync(1);
+            _recursoRepo.Setup(r => r.GetByIdAsync(libro.Id)).ReturnsAsync(libro);
+            _unitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
 
             // Act
             await _useCase.EliminarRecursoAsync(libro.Id);
 
             // Assert
-            libro.Estado.Should().Be(EstadoRecurso.Inactivo);
+            _recursoRepo.Verify(r => r.Delete(libro), Times.Once);
         }
 
         [Fact]

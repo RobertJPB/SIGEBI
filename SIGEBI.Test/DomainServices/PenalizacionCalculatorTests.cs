@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using SIGEBI.Domain.DomainServices;
 using Xunit;
 
@@ -115,6 +115,20 @@ namespace SIGEBI.Test.Domain
             // Assert
             motivo.Should().Contain("5");
             motivo.Should().Contain("atraso");
+        }
+        [Fact]
+        public void CalcularDiasPenalizacion_EjemploPersonalizado_CalculaCorrectamente()
+        {
+            // Escenario: Préstamo debía entregarse el 25 y se entrega el 27 (2 días de atraso)
+            // Arrange
+            var estimada = new DateTime(2026, 3, 25);
+            var real = new DateTime(2026, 3, 27);
+
+            // Act
+            var resultado = PenalizacionCalculator.CalcularDiasPenalizacion(estimada, real);
+
+            // Assert
+            resultado.Should().Be(6); // 2 días * 3 = 6 días de castigo
         }
     }
 }

@@ -7,6 +7,7 @@ using SIGEBI.Business.UseCases.Prestamos;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Entities.Recursos;
 using SIGEBI.Domain.Enums.Seguridad;
+using SIGEBI.Domain.DomainServices;
 using Xunit;
 
 namespace SIGEBI.Test.UseCases.Prestamos
@@ -17,6 +18,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
         private readonly Mock<IUsuarioRepository> _usuarioRepo;
         private readonly Mock<IRecursoRepository> _recursoRepo;
         private readonly Mock<IPenalizacionRepository> _penalizacionRepo;
+        private readonly Mock<INotificacionRepository> _notificacionRepo;
         private readonly Mock<IEmailAdapter> _emailAdapter;
         private readonly Mock<IUnitOfWork> _unitOfWork;
         private readonly SolicitarPrestamoUseCase _useCase;
@@ -27,6 +29,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
             _usuarioRepo = new Mock<IUsuarioRepository>();
             _recursoRepo = new Mock<IRecursoRepository>();
             _penalizacionRepo = new Mock<IPenalizacionRepository>();
+            _notificacionRepo = new Mock<INotificacionRepository>();
             _emailAdapter = new Mock<IEmailAdapter>();
             _unitOfWork = new Mock<IUnitOfWork>();
 
@@ -35,6 +38,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
                 _usuarioRepo.Object,
                 _recursoRepo.Object,
                 _penalizacionRepo.Object,
+                _notificacionRepo.Object,
                 _emailAdapter.Object,
                 _unitOfWork.Object);
         }
@@ -151,6 +155,44 @@ namespace SIGEBI.Test.UseCases.Prestamos
 
             // Assert
             libro.Stock.Should().Be(stockInicial - 1);
+        }
+        [Fact]
+        public async Task Ejecutar_ConFechaPersonalizada_RespetaLaFecha()
+        {
+            // Arrange
+            var usuario = CrearUsuarioActivo();
+            var libro = CrearLibroDisponible();
+            var fechaPersonalizada = DateTime.UtcNow.AddDays(10);
+
+            _usuarioRepo.Setup(r => r.GetByIdAsync(usuario.Id)).ReturnsAsync(usuario);
+            _recursoRepo.Setup(r => r.GetByIdAsync(libro.Id)).ReturnsAsync(libro);
+            _prestamoRepo.Setup(r => r.GetActivosByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Prestamo>());
+            _penalizacionRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Penalizacion>());
+            _prestamoRepo.Setup(r => r.AddAsync(It.IsAny<Prestamo>())).Returns(Task.CompletedTask);
+            _unitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
+
+            // Act
+            var resultado = await _useCase.EjecutarAsync(usuario.Id, libro.Id, fechaPersonalizada);
+
+            // Assert
+            resultado.FechaDevolucionEstimada.Should().BeCloseTo(fechaPersonalizada, TimeSpan.FromSeconds(1));
+        }
+        [Fact]
+        public async Task Ejecutar_FechaExcedeLimite_LanzaExcepcion()
+        {
+            // Arrange
+            var usuario = CrearUsuarioActivo();
+            var libro = CrearLibroDisponible();
+            var fechaExcedida = DateTime.UtcNow.AddDays(PrestamoPolicy.MaxDiasPrestamoTotal + 1);
+
+            _usuarioRepo.Setup(r => r.GetByIdAsync(usuario.Id)).ReturnsAsync(usuario);
+            _recursoRepo.Setup(r => r.GetByIdAsync(libro.Id)).ReturnsAsync(libro);
+            _prestamoRepo.Setup(r => r.GetActivosByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Prestamo>());
+            _penalizacionRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Penalizacion>());
+
+            // Act & Assert
+            await Assert.ThrowsAsync<ArgumentException>(() =>
+                _useCase.EjecutarAsync(usuario.Id, libro.Id, fechaExcedida));
         }
     }
 }

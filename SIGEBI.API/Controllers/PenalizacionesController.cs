@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SIGEBI.Business.DTOs;
 using SIGEBI.Business.UseCases.Usuarios;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
@@ -30,15 +31,51 @@ namespace SIGEBI.API.Controllers
             throw new UnauthorizedAccessException("Rol no identificado en el token.");
         }
 
+        // Muestra todas las penalizaciones del sistema (Admin/Bibliotecario).
+        [HttpGet]
+        public async Task<IActionResult> ObtenerTodas()
+        {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPenalizaciones(rol), "ver todas las penalizaciones");
+
+            var penalizaciones = await _penalizacionesUseCase.ObtenerTodasLasPenalizacionesAsync();
+            return Ok(penalizaciones);
+        }
+
         // Muestra el historial de sanciones aplicadas a un usuario en particular.
         [HttpGet("usuario/{usuarioId}")]
         public async Task<IActionResult> ObtenerPorUsuario(Guid usuarioId)
         {
             var rol = ObtenerRolActual();
-            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver penalizaciones");
+            // Cambiamos el permiso para que sea ver usuarios o gestionar penalizaciones
+            bool puedeVer = AccesoPolicy.PuedeVerUsuarios(rol) || AccesoPolicy.PuedeGestionarPenalizaciones(rol);
+            AccesoPolicy.ValidarAcceso(rol, puedeVer, "ver penalizaciones de un usuario");
 
             var penalizaciones = await _penalizacionesUseCase.ObtenerPenalizacionesPorUsuarioAsync(usuarioId);
             return Ok(penalizaciones);
+        }
+
+        // Aplica una penalización manual (POST general con DTO completo).
+        [HttpPost]
+        public async Task<IActionResult> Aplicar([FromBody] AplicarPenalizacionManualDTO dto)
+        {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPenalizaciones(rol), "aplicar penalización manual");
+
+            await _penalizacionesUseCase.AplicarPenalizacionManualAsync(dto);
+            return Ok("Penalización aplicada correctamente.");
+        }
+
+        // Aplica una penalización manual a un usuario específico (Legacy / URL based).
+        [HttpPost("usuario/{usuarioId}")]
+        public async Task<IActionResult> AplicarManual(Guid usuarioId, [FromBody] AplicarPenalizacionManualDTO dto)
+        {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPenalizaciones(rol), "aplicar penalización manual");
+
+            dto.UsuarioId = usuarioId;
+            await _penalizacionesUseCase.AplicarPenalizacionManualAsync(dto);
+            return Ok("Penalización aplicada correctamente.");
         }
 
         // Ejecuta el proceso global para detectar retrasos y aplicar sanciones a todos los usuarios morosos.

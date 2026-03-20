@@ -1,6 +1,7 @@
 using System;
 using SIGEBI.Domain.Entities.Recursos;
 using SIGEBI.Domain.Enums.Biblioteca;
+using SIGEBI.Domain.DomainServices;
 
 namespace SIGEBI.Domain.Entities
 {
@@ -18,17 +19,35 @@ namespace SIGEBI.Domain.Entities
 
         private Prestamo() { }
 
-        public Prestamo(Guid usuarioId, Guid recursoId, int diasPlazo, DateTime fechaInicioUtc)
+        public Prestamo(Guid usuarioId, Guid recursoId, int diasPlazo, DateTime fechaInicioUtc, DateTime? fechaDevolucionEstimada = null)
         {
             if (usuarioId == Guid.Empty) throw new ArgumentException("UsuarioId inválido.", nameof(usuarioId));
             if (recursoId == Guid.Empty) throw new ArgumentException("RecursoId inválido.", nameof(recursoId));
-            if (diasPlazo <= 0) throw new ArgumentException("El plazo debe ser mayor que 0.", nameof(diasPlazo));
-
+            
             Id = Guid.NewGuid();
             UsuarioId = usuarioId;
             RecursoId = recursoId;
             FechaInicio = fechaInicioUtc;
-            FechaDevolucionEstimada = fechaInicioUtc.AddDays(diasPlazo);
+
+            if (fechaDevolucionEstimada.HasValue)
+            {
+                if (fechaDevolucionEstimada.Value <= fechaInicioUtc)
+                    throw new ArgumentException("La fecha de devolución estimada debe ser posterior a la fecha de inicio.", nameof(fechaDevolucionEstimada));
+                
+                if ((fechaDevolucionEstimada.Value - fechaInicioUtc).TotalDays > PrestamoPolicy.MaxDiasPrestamoTotal)
+                    throw new ArgumentException($"La duración del préstamo no puede exceder los {PrestamoPolicy.MaxDiasPrestamoTotal} días.", nameof(fechaDevolucionEstimada));
+
+                FechaDevolucionEstimada = fechaDevolucionEstimada.Value;
+            }
+            else
+            {
+                if (diasPlazo <= 0) throw new ArgumentException("El plazo debe ser mayor que 0.", nameof(diasPlazo));
+                
+                // Aseguramos que el plazo por defecto tampoco exceda el máximo
+                int diasEfectivos = Math.Min(diasPlazo, PrestamoPolicy.MaxDiasPrestamoTotal);
+                FechaDevolucionEstimada = fechaInicioUtc.AddDays(diasEfectivos);
+            }
+
             EstadoActual = EstadoPrestamo.Activo;
         }
 

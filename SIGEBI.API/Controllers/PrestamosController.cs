@@ -84,7 +84,7 @@ namespace SIGEBI.API.Controllers
             var rol = ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeSolicitarPrestamo(rol), "solicitar préstamo");
 
-            var resultado = await _prestamoService.SolicitarPrestamoAsync(dto.UsuarioId, dto.RecursoId);
+            var resultado = await _prestamoService.SolicitarPrestamoAsync(dto.UsuarioId, dto.RecursoId, dto.FechaDevolucionEstimada);
             return Ok(resultado);
         }
 

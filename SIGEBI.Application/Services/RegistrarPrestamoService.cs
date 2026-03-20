@@ -23,8 +23,8 @@ namespace SIGEBI.Business.Services
         }
 
         // Usando un Facade para no inyectar tantos UseCases en el Controller (visto en clase)
-        public async Task<PrestamoResponseDTO> SolicitarPrestamoAsync(Guid usuarioId, Guid recursoId)
-            => await _solicitarUseCase.EjecutarAsync(usuarioId, recursoId);
+        public async Task<PrestamoResponseDTO> SolicitarPrestamoAsync(Guid usuarioId, Guid recursoId, DateTime? fechaDevolucionEstimada = null)
+            => await _solicitarUseCase.EjecutarAsync(usuarioId, recursoId, fechaDevolucionEstimada);
 
         public async Task DevolverPrestamoAsync(Guid prestamoId)
             => await _devolverUseCase.EjecutarAsync(prestamoId);

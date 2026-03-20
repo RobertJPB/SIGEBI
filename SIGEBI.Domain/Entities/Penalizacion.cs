@@ -10,11 +10,13 @@ namespace SIGEBI.Domain.Entities
         public DateTime FechaInicio { get; private set; }
         public DateTime? FechaFin { get; private set; }
         public Enums.Operacion.EstadoPenalizacion Estado { get; private set; }
+        public Guid? PrestamoId { get; private set; }
         public Usuario Usuario { get; private set; } = null!;
+        public Prestamo? Prestamo { get; private set; }
 
         private Penalizacion() { }
 
-        public Penalizacion(Guid usuarioId, string motivo, int diasPenalizacion, DateTime fechaInicioUtc)
+        public Penalizacion(Guid usuarioId, string motivo, int diasPenalizacion, DateTime fechaInicioUtc, Guid? prestamoId = null)
         {
             if (usuarioId == Guid.Empty) throw new ArgumentException("Usuario inválido.", nameof(usuarioId));
             if (string.IsNullOrWhiteSpace(motivo)) throw new ArgumentException("El motivo es obligatorio.", nameof(motivo));
@@ -22,6 +24,7 @@ namespace SIGEBI.Domain.Entities
 
             Id = Guid.NewGuid();
             UsuarioId = usuarioId;
+            PrestamoId = prestamoId;
             Motivo = motivo.Trim();
             FechaInicio = fechaInicioUtc;
             

@@ -16,6 +16,7 @@ namespace SIGEBI.Domain.DomainServices
         private const int DiasPlazoEstudiante = 7;
         private const int DiasPlazoAdministrador = 15;
         private const int DiasPlazoAdminBibliotecario = 14;
+        public const int MaxDiasPrestamoTotal = 30;
 
         public static bool PuedeRealizarPrestamo(Usuario usuario, IEnumerable<Prestamo> prestamosActivos)
         {

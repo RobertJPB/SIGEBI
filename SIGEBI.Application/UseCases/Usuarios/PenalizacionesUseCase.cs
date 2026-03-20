@@ -42,12 +42,28 @@ namespace SIGEBI.Business.UseCases.Usuarios
                     prestamo.FechaDevolucionEstimada, DateTime.UtcNow);
                 string motivo = PenalizacionCalculator.ObtenerMotivo(diasAtraso);
 
-                var penalizacion = new Penalizacion(prestamo.UsuarioId, motivo, diasPenalizacion, DateTime.UtcNow);
+                var penalizacion = new Penalizacion(prestamo.UsuarioId, motivo, diasPenalizacion, DateTime.UtcNow, prestamo.Id);
                 await _penalizacionRepository.AddAsync(penalizacion);
             }
 
             // guardamos todas las multas de una
             await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task AplicarPenalizacionManualAsync(AplicarPenalizacionManualDTO dto)
+        {
+            var usuario = await _usuarioRepository.GetByIdAsync(dto.UsuarioId)
+                ?? throw new InvalidOperationException("Usuario no encontrado.");
+
+            var penalizacion = new Penalizacion(dto.UsuarioId, dto.Motivo, dto.DiasPenalizacion, DateTime.UtcNow, dto.PrestamoId);
+            await _penalizacionRepository.AddAsync(penalizacion);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<PenalizacionDTO>> ObtenerTodasLasPenalizacionesAsync()
+        {
+            var penalizaciones = await _penalizacionRepository.GetAllAsync();
+            return penalizaciones.Select(PenalizacionMapper.ToDTO);
         }
 
         public async Task<IEnumerable<PenalizacionDTO>> ObtenerPenalizacionesPorUsuarioAsync(Guid usuarioId)
