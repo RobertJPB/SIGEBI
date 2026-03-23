@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Infrastructure.Persistence.Repositories;
@@ -11,6 +12,7 @@ namespace SIGEBI.Infrastructure.Persistence
     public class UnitOfWork : IUnitOfWork
     {
         private readonly SIGEBIDbContext _context;
+        private readonly IMemoryCache _cache;
 
         private IUsuarioRepository? _usuarios;
         private IPrestamoRepository? _prestamos;
@@ -22,16 +24,17 @@ namespace SIGEBI.Infrastructure.Persistence
         private IAuditoriaRepository? _auditorias;
         private IListaDeseosRepository? _listasDeseos;
 
-        public UnitOfWork(SIGEBIDbContext context)
+        public UnitOfWork(SIGEBIDbContext context, IMemoryCache cache)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _cache = cache;
         }
 
         // Usamos Lazy loading para los repos (este patron me lo enseño el profe)
         public IUsuarioRepository Usuarios => _usuarios ??= new UsuarioRepository(_context);
         public IPrestamoRepository Prestamos => _prestamos ??= new PrestamoRepository(_context);
         public IRecursoRepository Recursos => _recursos ??= new RecursoRepository(_context);
-        public ICategoriaRepository Categorias => _categorias ??= new CategoriaRepository(_context);
+        public ICategoriaRepository Categorias => _categorias ??= new CategoriaRepository(_context, _cache);
         public IPenalizacionRepository Penalizaciones => _penalizaciones ??= new PenalizacionRepository(_context);
         public IValoracionRepository Valoraciones => _valoraciones ??= new ValoracionRepository(_context);
         public INotificacionRepository Notificaciones => _notificaciones ??= new NotificacionRepository(_context);

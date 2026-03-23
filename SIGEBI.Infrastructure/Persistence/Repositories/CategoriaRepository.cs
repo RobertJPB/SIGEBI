@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Enums.Biblioteca;
@@ -9,7 +10,22 @@ namespace SIGEBI.Infrastructure.Persistence.Repositories
 {
     public class CategoriaRepository : BaseRepository<Categoria>, ICategoriaRepository
     {
-        public CategoriaRepository(SIGEBIDbContext context) : base(context) { }
+        private readonly IMemoryCache _cache;
+
+        public CategoriaRepository(SIGEBIDbContext context, IMemoryCache cache) : base(context) 
+        { 
+            _cache = cache;
+        }
+
+        public override async Task<IEnumerable<Categoria>> GetAllAsync()
+        {
+            if (!_cache.TryGetValue("AllCategorias", out IEnumerable<Categoria>? categorias))
+            {
+                categorias = await base.GetAllAsync();
+                _cache.Set("AllCategorias", categorias, TimeSpan.FromMinutes(15));
+            }
+            return categorias!;
+        }
 
         public async Task<Categoria?> GetByIdAsync(int id)
             => await _dbSet.FindAsync(id);
@@ -22,8 +38,12 @@ namespace SIGEBI.Infrastructure.Persistence.Repositories
 
         public async Task<IEnumerable<Categoria>> GetActivasAsync()
         {
-            // Ojo: Solo listamos las categorias que esten activas para que no salgan cosas borradas
-            return await _dbSet.Where(c => c.Estado == EstadoCategoria.Activa).ToListAsync();
+            if (!_cache.TryGetValue("ActiveCategorias", out IEnumerable<Categoria>? categorias))
+            {
+                categorias = await _dbSet.Where(c => c.Estado == EstadoCategoria.Activa).ToListAsync();
+                _cache.Set("ActiveCategorias", categorias, TimeSpan.FromMinutes(15));
+            }
+            return categorias!;
         }
     }
 }
