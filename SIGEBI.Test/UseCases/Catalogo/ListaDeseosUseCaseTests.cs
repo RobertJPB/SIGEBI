@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Moq;
-using SIGEBI.Application.Interfaces;
+using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistance;
 using SIGEBI.Business.UseCases.Catalogo;
 using SIGEBI.Domain.Entities;

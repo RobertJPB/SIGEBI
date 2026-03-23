@@ -30,8 +30,8 @@ namespace SIGEBI.Domain.Entities
             if (string.IsNullOrWhiteSpace(nombre))
                 throw new ArgumentException("El nombre es requerido.", nameof(nombre));
             
-            // TODO: Mejorar la regex del correo usando algo mas robusto
-            if (string.IsNullOrWhiteSpace(correo) || !correo.Contains("@"))
+            // Validación de correo usando la anotación estándar de .NET
+            if (string.IsNullOrWhiteSpace(correo) || !new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(correo))
                 throw new ArgumentException("Correo inválido.", nameof(correo));
             if (string.IsNullOrWhiteSpace(contrasenaHash))
                 throw new ArgumentException("La contraseña es requerida.", nameof(contrasenaHash));
@@ -63,7 +63,7 @@ namespace SIGEBI.Domain.Entities
 
         public void CambiarCorreo(string nuevoCorreo)
         {
-            if (string.IsNullOrWhiteSpace(nuevoCorreo) || !nuevoCorreo.Contains("@"))
+            if (string.IsNullOrWhiteSpace(nuevoCorreo) || !new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(nuevoCorreo))
                 throw new ArgumentException("Correo inválido.", nameof(nuevoCorreo));
             Correo = nuevoCorreo.Trim();
         }

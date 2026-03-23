@@ -1,7 +1,8 @@
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using SIGEBI.Business.DTOs;
-using SIGEBI.Application.Interfaces;
+using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistance;
 using SIGEBI.Business.UseCases.Usuarios;
 using SIGEBI.Domain.Entities;
@@ -28,7 +29,8 @@ namespace SIGEBI.Test.UseCases.Usuarios
                 _prestamoRepo.Object,
                 _usuarioRepo.Object,
                 _penalizacionRepo.Object,
-                _unitOfWork.Object);
+                _unitOfWork.Object,
+                Microsoft.Extensions.Logging.Abstractions.NullLogger<PenalizacionesUseCase>.Instance);
         }
 
         // ── APLICAR PENALIZACIONES AUTOMATICAS ──
@@ -42,6 +44,8 @@ namespace SIGEBI.Test.UseCases.Usuarios
             // Forzamos que sea atrasado para el test
             var prestamosAtrasados = new List<Prestamo> { prestamo };
             _prestamoRepo.Setup(r => r.GetAtrasadosAsync()).ReturnsAsync(prestamosAtrasados);
+            // Sin penalización previa para el préstamo → el use case debe crear una
+            _penalizacionRepo.Setup(r => r.GetByPrestamoIdAsync(prestamo.Id)).ReturnsAsync((Penalizacion?)null);
             _unitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
 
             // Act

@@ -27,5 +27,8 @@ namespace SIGEBI.Infrastructure.Persistance.Repositories
 
         public new async Task<bool> ExistsAsync(Guid id)
             => await _dbSet.AnyAsync(p => p.Id == id);
+
+        public async Task<Penalizacion?> GetByPrestamoIdAsync(Guid prestamoId)
+            => await _dbSet.FirstOrDefaultAsync(p => p.PrestamoId == prestamoId && p.Estado == EstadoPenalizacion.Activa);
     }
 }

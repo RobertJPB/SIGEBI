@@ -1,4 +1,6 @@
 using System.Text.Json;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SIGEBI.API.Middleware
 {
@@ -40,17 +42,33 @@ namespace SIGEBI.API.Middleware
                 _ => StatusCodes.Status500InternalServerError // Error inesperado del servidor
             };
 
-            context.Response.ContentType = "application/json";
+            context.Response.ContentType = "application/problem+json";
             context.Response.StatusCode = statusCode;
 
-            var respuesta = new
+            var problemDetails = new ProblemDetails
             {
-                status = statusCode,
-                mensaje = ex.Message,
-                detalle = ex.InnerException?.Message // Agregamos el detalle del error interno para debug
+                Status = statusCode,
+                Title = ObtenerTitulo(statusCode),
+                Detail = ex.Message,
+                Instance = context.Request.Path
             };
 
-            return context.Response.WriteAsJsonAsync(respuesta);
+            // Agregamos el detalle del error interno para debug como extensión del ProblemDetails
+            if (ex.InnerException != null)
+            {
+                problemDetails.Extensions["innerException"] = ex.InnerException.Message;
+            }
+
+            return context.Response.WriteAsJsonAsync(problemDetails);
         }
+
+        private static string ObtenerTitulo(int statusCode) => statusCode switch
+        {
+            StatusCodes.Status400BadRequest => "Bad Request - Invalid details provided.",
+            StatusCodes.Status403Forbidden => "Forbidden - You do not have permissions.",
+            StatusCodes.Status404NotFound => "Not Found - The specified resource does not exist.",
+            StatusCodes.Status422UnprocessableEntity => "Unprocessable Entity - Business rule violation.",
+            _ => "Internal Server Error - An unexpected error occurred."
+        };
     }
 }

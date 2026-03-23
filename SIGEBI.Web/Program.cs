@@ -46,8 +46,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 
-app.UseAuthentication();
 app.UseSession();
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Configuración de la ruta por defecto (Catalogo/Index)

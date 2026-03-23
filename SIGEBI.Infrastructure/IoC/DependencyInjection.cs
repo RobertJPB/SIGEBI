@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using SIGEBI.Application.Interfaces;
+using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistance;
 using SIGEBI.Business.Interfaces.Services;
 using SIGEBI.Business.Services;

@@ -1,6 +1,7 @@
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
-using SIGEBI.Application.Interfaces;
+using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistance;
 using SIGEBI.Business.Interfaces.Services;
 using SIGEBI.Business.UseCases.Prestamos;
@@ -40,7 +41,8 @@ namespace SIGEBI.Test.UseCases.Prestamos
                 _penalizacionRepo.Object,
                 _notificacionRepo.Object,
                 _emailAdapter.Object,
-                _unitOfWork.Object);
+                _unitOfWork.Object,
+                Microsoft.Extensions.Logging.Abstractions.NullLogger<SolicitarPrestamoUseCase>.Instance);
         }
 
         // ── HELPERS ──

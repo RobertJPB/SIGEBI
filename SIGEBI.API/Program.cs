@@ -57,7 +57,7 @@ builder.Services.AddDbContext<SIGEBIDbContext>(options =>
 
 // Inyección de dependencias de las capas de infraestructura y servicios
 builder.Services.AddInfrastructure();
-builder.Services.AddScoped<IJwtService, JwtService>();
+ 
 
 // Configuración de Autenticación basada en JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

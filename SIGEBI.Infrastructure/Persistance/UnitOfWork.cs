@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using SIGEBI.Application.Interfaces;
+using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistance;
 using SIGEBI.Infrastructure.Persistance.Repositories;
 
