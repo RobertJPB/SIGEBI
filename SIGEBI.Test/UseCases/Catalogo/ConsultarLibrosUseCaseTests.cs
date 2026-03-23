@@ -1,6 +1,6 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Moq;
-using SIGEBI.Business.Interfaces.Persistance;
+using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.UseCases.Catalogo;
 using SIGEBI.Domain.Entities.Recursos;
 using Xunit;
@@ -23,7 +23,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
                 _valoracionRepo.Object);
         }
 
-        // ── EJECUTAR ──
+        // -- EJECUTAR --
 
         [Fact]
         public async Task Ejecutar_HayRecursos_DevuelveLista()
@@ -87,7 +87,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
             resultado.First().PromedioValoraciones.Should().Be(4.8);
         }
 
-        // ── BUSCAR POR TITULO ──
+        // -- BUSCAR POR TITULO --
 
         [Fact]
         public async Task BuscarPorTitulo_TituloExistente_DevuelveResultados()
@@ -125,7 +125,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
             resultado.Should().BeEmpty();
         }
 
-        // ── BUSCAR POR CATEGORIA ──
+        // -- BUSCAR POR CATEGORIA --
 
         [Fact]
         public async Task BuscarPorCategoria_CategoriaExistente_DevuelveResultados()

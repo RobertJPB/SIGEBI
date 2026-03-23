@@ -1,6 +1,6 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Moq;
-using SIGEBI.Business.Interfaces.Persistance;
+using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.Interfaces.Services;
 using SIGEBI.Business.UseCases.Usuarios;
 using SIGEBI.Domain.Entities;
@@ -25,12 +25,12 @@ namespace SIGEBI.Test.UseCases.Usuarios
                 _hashService.Object);
         }
 
-        // ── HELPER ──
+        // -- HELPER --
 
         private Usuario CrearUsuario()
             => new Usuario("Juan Perez", "juan@test.com", "hash123", RolUsuario.Estudiante);
 
-        // ── PRUEBAS ──
+        // -- PRUEBAS --
 
         [Fact]
         public async Task Ejecutar_CredencialesValidas_DevuelveUsuario()

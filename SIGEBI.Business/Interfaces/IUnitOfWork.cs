@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using SIGEBI.Business.Interfaces.Persistance;
+using SIGEBI.Business.Interfaces.Persistence;
 
 namespace SIGEBI.Business.Interfaces
 {

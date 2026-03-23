@@ -1,5 +1,5 @@
 using SIGEBI.Business.Interfaces;
-using SIGEBI.Business.Interfaces.Persistance;
+using SIGEBI.Business.Interfaces.Persistence;
 
 namespace SIGEBI.Business.UseCases.Prestamos
 {

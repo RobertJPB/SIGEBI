@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces;
-using SIGEBI.Business.Interfaces.Persistance;
+using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.Mappers;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Entities;

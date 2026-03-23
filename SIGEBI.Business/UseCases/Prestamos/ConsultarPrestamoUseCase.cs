@@ -1,5 +1,5 @@
 using SIGEBI.Business.DTOs;
-using SIGEBI.Business.Interfaces.Persistance;
+using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.Mappers;
 
 namespace SIGEBI.Business.UseCases.Prestamos

@@ -4,12 +4,13 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using SIGEBI.API.Middleware;
 using SIGEBI.Business.Interfaces.Services;
-using SIGEBI.Infrastructure.Persistance;
+using SIGEBI.Infrastructure.Persistence;
+using SIGEBI.Business.IoC;
 using SIGEBI.Infrastructure.IoC;
 using SIGEBI.Infrastructure.Services;
 using System.Text;
 
-// ── CONFIGURACIÓN DE LA APLICACIÓN (API) ──
+// CONFIGURACIÓN DE LA APLICACIÓN (API) 
 var builder = WebApplication.CreateBuilder(args);
 
 // Registro de controladores y configuración de JSON para evitar ciclos en las relaciones de las entidades
@@ -20,7 +21,6 @@ builder.Services.AddControllers()
             System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
 
-// Configuración de Swagger para la documentación de la API y pruebas de endpoints
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -53,10 +53,12 @@ builder.Services.AddSwaggerGen(c =>
 // Configuración del Contexto de Base de Datos (Entity Framework Core con SQL Server)
 builder.Services.AddDbContext<SIGEBIDbContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlOptions => sqlOptions.EnableRetryOnFailure()));
 
-// Inyección de dependencias de las capas de infraestructura y servicios
-builder.Services.AddInfrastructure();
+// Inyección de dependencias separada por capa 
+builder.Services.AddBusiness();     
+builder.Services.AddInfrastructure(); 
  
 
 // Configuración de Autenticación basada en JWT
@@ -89,7 +91,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// ── PIPELINE DE LA PETICIÓN (MIDDLEWARE) ──
+// PIPELINE DE LA PETICIÓN (MIDDLEWARE) 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
