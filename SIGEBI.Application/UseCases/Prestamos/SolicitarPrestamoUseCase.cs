@@ -8,9 +8,6 @@ using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Business.UseCases.Prestamos
 {
-    // Esta clase NO conoce a SQL Server ni a Entity Framework. 
-    // Solo conoce las interfaces (IPrestamoRepository, etc) que le inyectaron por constructor.
-    // Gestiona la solicitud de nuevos préstamos validando reglas de negocio y enviando notificaciones.
     public class SolicitarPrestamoUseCase
     {
         private readonly IPrestamoRepository _prestamoRepository;
@@ -46,13 +43,15 @@ namespace SIGEBI.Business.UseCases.Prestamos
             var usuario = await _usuarioRepository.GetByIdAsync(usuarioId)
                 ?? throw new InvalidOperationException("Usuario no encontrado.");
 
+            // PRINCIPIO LSP: 'recurso' puede ser un Libro, Revista o Documento; 
+            // el caso de uso funciona igual con cualquier subtipo (Sustitución de Liskov).
             var recurso = await _recursoRepository.GetByIdAsync(recursoId)
                 ?? throw new InvalidOperationException("Recurso no encontrado.");
 
             var prestamosActivos = await _prestamoRepository.GetActivosByUsuarioIdAsync(usuarioId);
             var penalizaciones = await _penalizacionRepository.GetByUsuarioIdAsync(usuarioId);
 
-            // TODO: Preguntar al profe si esta validacion deberia ir en el dominio o aca
+
             PrestamoPolicy.ValidarPrestamo(usuario, recurso, prestamosActivos, penalizaciones);
 
             int diasPlazo = PrestamoPolicy.ObtenerDiasPlazo(usuario);
@@ -68,7 +67,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
             
             await _unitOfWork.SaveChangesAsync();
 
-            // Notificacion proactiva (como dice la documentacion)
+            // Notificacion proactiva 
             try 
             {
                 // Notificar al estudiante
@@ -87,8 +86,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
             }
             catch 
             {
-                // Si falla el mail no rompemos la transaccion que ya se guardo, 
-                // pero lo ideal seria un log aca.
+             
             }
 
             return PrestamoMapper.ToDTO(prestamo);

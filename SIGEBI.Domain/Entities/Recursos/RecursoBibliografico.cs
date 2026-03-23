@@ -3,8 +3,6 @@ using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Domain.Entities.Recursos
 {
-    // Esta clase esta abierta a la extension (podemos crear nuevos tipos de recursos heredando de aca)
-    // pero cerrada a la modificacion (no hace falta tocar esta clase para agregar un nuevo tipo).
     public abstract class RecursoBibliografico
     {
         public Guid Id { get; private set; }

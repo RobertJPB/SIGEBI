@@ -24,42 +24,36 @@ namespace SIGEBI.Infrastructure.Persistance
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            // Si agregamos una nueva tabla, no modificamos este DbContext gigante.
-            // Simplemente creamos su archivo de configuracion (IEntityTypeConfiguration) 
-            // y esta linea lo levanta automaticamente (abierto a extension, cerrado a modificacion).
+            
+           
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(SIGEBIDbContext).Assembly);
 
-            // Seed del Usuario del Sistema para la Auditoria
-            // Esto asegura que la auditoria siempre tenga un usuario al cual referenciarse
+            // Seed del Usuario del Sistema para Auditoría
             modelBuilder.Entity<Usuario>().HasData(new
             {
                 Id = UsuarioIdSistema,
                 Nombre = "Sistema",
                 Correo = "sistema@sigebi.com",
                 ContrasenaHash = "SYSTEM_ACCOUNT_NO_LOGIN",
-                Rol = Domain.Enums.Seguridad.RolUsuario.Bibliotecario, // Rol por defecto
+                Rol = Domain.Enums.Seguridad.RolUsuario.Bibliotecario,
                 Estado = Domain.Enums.Seguridad.EstadoUsuario.Activo
             });
         }
 
-        // ID de sistema para la auditoria cuando no hay un usuario logueado (como en procesos automaticos)
         private static readonly Guid UsuarioIdSistema = Guid.Parse("00000000-0000-0000-0000-000000000001");
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            // 1. Detectamos todas las entidades que alguien haya insertado, modificado o borrado
+            // Lógica de Auditoría Automática
             var entradasModificadas = ChangeTracker.Entries()
                 .Where(e => (e.State == EntityState.Added || 
                              e.State == EntityState.Modified || 
                              e.State == EntityState.Deleted) && 
-                             e.Entity is not Auditoria) // Evitamos auditar la propia tabla de auditoria
+                             e.Entity is not Auditoria)
                 .ToList();
 
-            // Solo auditamos si hay cambios. 
-            // Eliminamos la validación Usuarios.Any() porque ahora el usuario se crea por Seed.
             foreach (var entrada in entradasModificadas)
             {
-                // 2. Determinamos qué tipo de acción fue (Crear, Editar, Borrar)
                 var accion = entrada.State switch
                 {
                     EntityState.Added => Domain.Enums.Auditoria.TipoAccionAuditoria.Crear,
@@ -69,13 +63,8 @@ namespace SIGEBI.Infrastructure.Persistance
                 };
 
                 var nombreTabla = entrada.Entity.GetType().Name;
-
-                // 3. Creamos el registro de auditoría automáticamente. 
-                // Usamos el UsuarioIdSistema como fallback para acciones donde no hay un usuario autenticado (como registro).
                 var actorId = UsuarioIdSistema;
 
-                // FIX: Si el usuario de sistema no existe (por falta de migración), 
-                // y estamos creando un usuario, usamos su propio ID como actor para evitar error de FK.
                 if (entrada.Entity is Usuario u && entrada.State == EntityState.Added)
                 {
                     actorId = u.Id;
@@ -85,7 +74,7 @@ namespace SIGEBI.Infrastructure.Persistance
                     usuarioId: actorId,
                     accion: accion,
                     tablaAfectada: nombreTabla,
-                    detalle: $"Cambio automático detectado en {nombreTabla}. Estado EF: {entrada.State}",
+                    detalle: $"Cambio automático detectado en {nombreTabla}",
                     ipAddress: "::1",
                     fechaRegistroUtc: DateTime.UtcNow
                 );
@@ -93,7 +82,6 @@ namespace SIGEBI.Infrastructure.Persistance
                 Auditorias.Add(auditoriaAutomatica);
             }
 
-            // 4. Dejamos que Entity Framework guarde todo (los datos reales + nuestra auditoría)
             return await base.SaveChangesAsync(cancellationToken);
         }
     }
