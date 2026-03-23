@@ -15,7 +15,7 @@ namespace SIGEBI.Views.GestionBibliografica
         public GestionBibliograficaPage()
         {
             InitializeComponent();
-            _api = SessionService.ApiService!;
+            _api = (ApiService)SIGEBII.App.Current.Services.GetService(typeof(ApiService))!;
             
             _viewModel = (SIGEBI.ViewModels.GestionBibliograficaViewModel)SIGEBII.App.Current.Services.GetService(typeof(SIGEBI.ViewModels.GestionBibliograficaViewModel))!;
             DataContext = _viewModel;

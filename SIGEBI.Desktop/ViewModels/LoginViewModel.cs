@@ -49,9 +49,7 @@ namespace SIGEBI.ViewModels
                     return;
                 }
 
-                _apiService.SetToken(token);
                 SessionService.Token = token;
-                SessionService.ApiService = _apiService;
 
                 OnLoginSuccess?.Invoke();
             }

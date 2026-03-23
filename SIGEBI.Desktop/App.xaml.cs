@@ -28,7 +28,13 @@ public partial class App : Application
         services.AddTransient<SIGEBI.ViewModels.GestionBibliograficaViewModel>();
 
         // ── Services ──
-        services.AddSingleton<ApiService>();
+        services.AddTransient<AuthHandler>();
+        
+        services.AddHttpClient<ApiService>(client =>
+        {
+            client.BaseAddress = new Uri("https://localhost:7047/");
+        })
+        .AddHttpMessageHandler<AuthHandler>();
 
         return services.BuildServiceProvider();
     }

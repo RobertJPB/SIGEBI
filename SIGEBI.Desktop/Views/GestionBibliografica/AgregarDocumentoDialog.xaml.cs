@@ -1,55 +1,33 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Windows;
 using SIGEBI.Services;
 
 namespace SIGEBI.Views.GestionBibliografica
 {
-    public partial class EditarLibroDialog : Window
+    public partial class AgregarDocumentoDialog : Window
     {
         private readonly ApiService _api;
-        private readonly RecursoDetalleDTO _recurso;
         private byte[]? _imagenBytes;
         private string? _imagenNombre;
 
-        public EditarLibroDialog() : this(SessionService.ApiService!, new RecursoDetalleDTO()) { }
+        public AgregarDocumentoDialog() : this((ApiService)SIGEBII.App.Current.Services.GetService(typeof(ApiService))!) { }
 
-        public EditarLibroDialog(ApiService api, RecursoDetalleDTO recurso)
+        public AgregarDocumentoDialog(ApiService api)
         {
             InitializeComponent();
             _api = api;
-            _recurso = recurso;
             Loaded += async (s, e) =>
             {
                 try
                 {
                     var categorias = await _api.GetCategoriasAsync();
                     CmbCategoria.ItemsSource = categorias;
-                    CmbCategoria.SelectedValue = recurso.CategoriaId;
                 }
                 catch
                 {
                     ErrorText.Text = "No se pudieron cargar las categorias.";
                     ErrorPanel.Visibility = Visibility.Visible;
-                }
-
-                TxtTitulo.Text = recurso.Titulo;
-                TxtAutor.Text = recurso.Autor;
-                TxtISBN.Text = recurso.ISBN ?? "";
-                TxtEditorial.Text = recurso.Editorial ?? "";
-                TxtAnio.Text = recurso.Anio?.ToString() ?? "";
-                TxtGenero.Text = recurso.Genero ?? "";
-                TxtStock.Text = recurso.Stock.ToString();
-
-                if (!string.IsNullOrEmpty(recurso.ImagenUrl))
-                {
-                    TxtRutaImagen.Text = recurso.ImagenUrl;
-                    try
-                    {
-                        ImgPreview.Source = new System.Windows.Media.Imaging.BitmapImage(
-                            new Uri($"https://localhost:7047{recurso.ImagenUrl}"));
-                    }
-                    catch { }
                 }
             };
         }
@@ -93,15 +71,14 @@ namespace SIGEBI.Views.GestionBibliografica
 
             try
             {
-                await _api.EditarLibroAsync(_recurso.Id, new AgregarLibroRequest
+                await _api.AgregarDocumentoAsync(new AgregarDocumentoRequest
                 {
                     Titulo = TxtTitulo.Text.Trim(),
                     Autor = TxtAutor.Text.Trim(),
                     CategoriaId = (int)CmbCategoria.SelectedValue,
-                    ISBN = TxtISBN.Text.Trim(),
-                    Editorial = TxtEditorial.Text.Trim(),
+                    Formato = TxtFormato.Text.Trim(),
+                    Institucion = TxtInstitucion.Text.Trim(),
                     Anio = int.TryParse(TxtAnio.Text, out int anio) ? anio : null,
-                    Genero = string.IsNullOrWhiteSpace(TxtGenero.Text) ? null : TxtGenero.Text.Trim(),
                     Stock = stock,
                     ImagenBytes = _imagenBytes,
                     ImagenNombre = _imagenNombre

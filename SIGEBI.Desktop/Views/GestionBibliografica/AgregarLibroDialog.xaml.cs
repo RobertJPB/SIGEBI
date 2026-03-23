@@ -1,19 +1,19 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Windows;
 using SIGEBI.Services;
 
 namespace SIGEBI.Views.GestionBibliografica
 {
-    public partial class AgregarDocumentoDialog : Window
+    public partial class AgregarLibroDialog : Window
     {
         private readonly ApiService _api;
         private byte[]? _imagenBytes;
         private string? _imagenNombre;
 
-        public AgregarDocumentoDialog() : this(SessionService.ApiService!) { }
+        public AgregarLibroDialog() : this((ApiService)SIGEBII.App.Current.Services.GetService(typeof(ApiService))!) { }
 
-        public AgregarDocumentoDialog(ApiService api)
+        public AgregarLibroDialog(ApiService api)
         {
             InitializeComponent();
             _api = api;
@@ -71,14 +71,15 @@ namespace SIGEBI.Views.GestionBibliografica
 
             try
             {
-                await _api.AgregarDocumentoAsync(new AgregarDocumentoRequest
+                await _api.AgregarLibroAsync(new AgregarLibroRequest
                 {
                     Titulo = TxtTitulo.Text.Trim(),
                     Autor = TxtAutor.Text.Trim(),
                     CategoriaId = (int)CmbCategoria.SelectedValue,
-                    Formato = TxtFormato.Text.Trim(),
-                    Institucion = TxtInstitucion.Text.Trim(),
+                    ISBN = TxtISBN.Text.Trim(),
+                    Editorial = TxtEditorial.Text.Trim(),
                     Anio = int.TryParse(TxtAnio.Text, out int anio) ? anio : null,
+                    Genero = string.IsNullOrWhiteSpace(TxtGenero.Text) ? null : TxtGenero.Text.Trim(),
                     Stock = stock,
                     ImagenBytes = _imagenBytes,
                     ImagenNombre = _imagenNombre

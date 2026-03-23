@@ -1,54 +1,33 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Windows;
 using SIGEBI.Services;
 
 namespace SIGEBI.Views.GestionBibliografica
 {
-    public partial class EditarRevistaDialog : Window
+    public partial class AgregarRevistaDialog : Window
     {
         private readonly ApiService _api;
-        private readonly RecursoDetalleDTO _recurso;
         private byte[]? _imagenBytes;
         private string? _imagenNombre;
 
-        public EditarRevistaDialog() : this(SessionService.ApiService!, new RecursoDetalleDTO()) { }
+        public AgregarRevistaDialog() : this((ApiService)SIGEBII.App.Current.Services.GetService(typeof(ApiService))!) { }
 
-        public EditarRevistaDialog(ApiService api, RecursoDetalleDTO recurso)
+        public AgregarRevistaDialog(ApiService api)
         {
             InitializeComponent();
             _api = api;
-            _recurso = recurso;
             Loaded += async (s, e) =>
             {
                 try
                 {
                     var categorias = await _api.GetCategoriasAsync();
                     CmbCategoria.ItemsSource = categorias;
-                    CmbCategoria.SelectedValue = recurso.CategoriaId;
                 }
                 catch
                 {
                     ErrorText.Text = "No se pudieron cargar las categorias.";
                     ErrorPanel.Visibility = Visibility.Visible;
-                }
-
-                TxtTitulo.Text = recurso.Titulo;
-                TxtAutor.Text = recurso.Autor;
-                TxtISSN.Text = recurso.ISSN ?? "";
-                TxtNumeroEdicion.Text = recurso.NumeroEdicion?.ToString() ?? "";
-                TxtFechaPublicacion.Text = recurso.FechaPublicacion?.ToString("yyyy-MM-dd") ?? "";
-                TxtStock.Text = recurso.Stock.ToString();
-
-                if (!string.IsNullOrEmpty(recurso.ImagenUrl))
-                {
-                    TxtRutaImagen.Text = recurso.ImagenUrl;
-                    try
-                    {
-                        ImgPreview.Source = new System.Windows.Media.Imaging.BitmapImage(
-                            new Uri($"https://localhost:7047{recurso.ImagenUrl}"));
-                    }
-                    catch { }
                 }
             };
         }
@@ -91,7 +70,7 @@ namespace SIGEBI.Views.GestionBibliografica
 
             try
             {
-                await _api.EditarRevistaAsync(_recurso.Id, new AgregarRevistaRequest
+                await _api.AgregarRevistaAsync(new AgregarRevistaRequest
                 {
                     Titulo = TxtTitulo.Text.Trim(),
                     Autor = TxtAutor.Text.Trim(),

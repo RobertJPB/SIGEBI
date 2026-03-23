@@ -1,4 +1,4 @@
-﻿using System.Net.Http;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -13,21 +13,9 @@ namespace SIGEBI.Services
             PropertyNameCaseInsensitive = true
         };
 
-        private const string BaseUrl = "https://localhost:7047/";
-
-        public ApiService()
+        public ApiService(HttpClient httpClient)
         {
-            _httpClient = new HttpClient
-            {
-                BaseAddress = new Uri(BaseUrl)
-            };
-        }
-
-        // ── TOKEN ──
-        public void SetToken(string token)
-        {
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", token);
+            _httpClient = httpClient;
         }
 
         // ── AUTH ──

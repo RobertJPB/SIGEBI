@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Windows;
 using SIGEBI.Services;
@@ -12,7 +12,7 @@ namespace SIGEBI.Views.GestionBibliografica
         private byte[]? _imagenBytes;
         private string? _imagenNombre;
 
-        public EditarDocumentoDialog() : this(SessionService.ApiService!, new RecursoDetalleDTO()) { }
+        public EditarDocumentoDialog() : this((ApiService)SIGEBII.App.Current.Services.GetService(typeof(ApiService))!, new RecursoDetalleDTO()) { }
 
         public EditarDocumentoDialog(ApiService api, RecursoDetalleDTO recurso)
         {
