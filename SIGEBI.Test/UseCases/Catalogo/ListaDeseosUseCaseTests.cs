@@ -93,7 +93,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
         {
             // Arrange
             var usuarioId = Guid.NewGuid();
-            var libro = new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943);
+            var libro = new Libro("El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943);
             var lista = new ListaDeseos(usuarioId, DateTime.UtcNow);
 
             _recursoRepo
@@ -138,7 +138,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
         {
             // Arrange
             var usuarioId = Guid.NewGuid();
-            var libro = new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943);
+            var libro = new Libro("El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943);
 
             _recursoRepo
                 .Setup(r => r.GetByIdAsync(libro.Id))
@@ -175,7 +175,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
         {
             // Arrange
             var usuarioId = Guid.NewGuid();
-            var libro = new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943);
+            var libro = new Libro("El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943);
             var lista = new ListaDeseos(usuarioId, DateTime.UtcNow);
             lista.AgregarRecurso(libro);
 
@@ -241,7 +241,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
             // Arrange
             var usuarioId = Guid.NewGuid();
             var recursoId = Guid.NewGuid();
-            _recursoRepo.Setup(r => r.GetByIdAsync(recursoId)).ReturnsAsync(new Libro("Test", "Author", 1, 1, "123", "Edit", 2020));
+            _recursoRepo.Setup(r => r.GetByIdAsync(recursoId)).ReturnsAsync(new Libro("Test", "Author", 1, 1, null, "123", "Edit", 2020));
             _usuarioRepo.Setup(r => r.ExistsAsync(usuarioId)).ReturnsAsync(false);
  
             // Act & Assert

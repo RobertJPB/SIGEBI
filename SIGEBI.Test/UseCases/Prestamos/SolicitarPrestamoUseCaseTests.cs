@@ -51,7 +51,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
             => new Usuario("Juan Perez", "juan@test.com", "hash123", rol);
 
         private Libro CrearLibroDisponible()
-            => new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943);
+            => new Libro("El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943);
 
         // ── PRUEBAS ──
 
@@ -125,7 +125,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
         {
             // Arrange
             var usuario = CrearUsuarioActivo();
-            var libro = new Libro("El Principito", "Antoine", 1, 0, "978-84-261", "Editorial X", 1943);
+            var libro = new Libro("El Principito", "Antoine", 1, 0, null, "978-84-261", "Editorial X", 1943);
 
             _usuarioRepo.Setup(r => r.GetByIdAsync(usuario.Id)).ReturnsAsync(usuario);
             _recursoRepo.Setup(r => r.GetByIdAsync(libro.Id)).ReturnsAsync(libro);

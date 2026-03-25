@@ -40,7 +40,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
             // Arrange
             _prestamoRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Prestamo> { new Prestamo(Guid.NewGuid(), Guid.NewGuid(), 7, DateTime.UtcNow) });
             _usuarioRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Usuario> { new Usuario("Test", "t@t.com", "h", RolUsuario.Estudiante) });
-            _recursoRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<RecursoBibliografico> { new Libro("T", "A", 1, 1, "I", "E", 2020) });
+            _recursoRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<RecursoBibliografico> { new Libro("T", "A", 1, 1, null, "I", "E", 2020) });
             _penalizacionRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Penalizacion> { new Penalizacion(Guid.NewGuid(), "M", 3, DateTime.UtcNow, Guid.NewGuid()) });
 
             // Act

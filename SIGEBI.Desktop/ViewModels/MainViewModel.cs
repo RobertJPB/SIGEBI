@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace SIGEBII.ViewModels
+namespace SIGEBI.ViewModels
 {
     public partial class MainViewModel : BaseViewModel
     {

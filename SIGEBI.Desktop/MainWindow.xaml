@@ -81,13 +81,15 @@
                 <StackPanel DockPanel.Dock="Top" Margin="0,4,0,0">
 
                     <Button x:Name="BtnBibliografica"
-                            Style="{StaticResource NavBtnActive}"
+                            Style="{StaticResource NavBtn}"
                             Click="BtnBibliografica_Click">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <Border Width="4" Height="16" Background="#4caf7d" CornerRadius="2" Margin="0,0,10,0"/>
-                            <TextBlock Text="Gestión Bibliográfica"
+                            <Border Width="4" Height="16" Background="#4caf7d" CornerRadius="2" Margin="0,0,10,0"
+                                    x:Name="BrdBibliografica"/>
+                            <TextBlock x:Name="TxtNavBibliografica"
+                                       Text="Gestión Bibliográfica"
                                        FontSize="12" FontWeight="SemiBold"
-                                       Foreground="White" VerticalAlignment="Center"/>
+                                       Foreground="#a0c4ac" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
 
@@ -95,8 +97,9 @@
                             Style="{StaticResource NavBtn}"
                             Click="BtnPrestamos_Click">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <Border Width="4" Height="16" Background="#4caf7d" CornerRadius="2" Margin="0,0,10,0"/>
-                            <TextBlock Text="Préstamos"
+                            <Border x:Name="BrdPrestamos" Width="4" Height="16" Background="#4caf7d" CornerRadius="2" Margin="0,0,10,0"/>
+                            <TextBlock x:Name="TxtNavPrestamos"
+                                       Text="Préstamos"
                                        FontSize="12" FontWeight="SemiBold"
                                        Foreground="#a0c4ac" VerticalAlignment="Center"/>
                         </StackPanel>
@@ -106,8 +109,9 @@
                             Style="{StaticResource NavBtn}"
                             Click="BtnUsuarios_Click">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <Border Width="4" Height="16" Background="#4caf7d" CornerRadius="2" Margin="0,0,10,0"/>
-                            <TextBlock Text="Usuarios"
+                            <Border x:Name="BrdUsuarios" Width="4" Height="16" Background="#4caf7d" CornerRadius="2" Margin="0,0,10,0"/>
+                            <TextBlock x:Name="TxtNavUsuarios"
+                                       Text="Usuarios"
                                        FontSize="12" FontWeight="SemiBold"
                                        Foreground="#a0c4ac" VerticalAlignment="Center"/>
                         </StackPanel>
@@ -117,8 +121,9 @@
                             Style="{StaticResource NavBtn}"
                             Click="BtnPenalizaciones_Click">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <Border Width="4" Height="16" Background="#4caf7d" CornerRadius="2" Margin="0,0,10,0"/>
-                            <TextBlock Text="Penalizaciones"
+                            <Border x:Name="BrdPenalizaciones" Width="4" Height="16" Background="#4caf7d" CornerRadius="2" Margin="0,0,10,0"/>
+                            <TextBlock x:Name="TxtNavPenalizaciones"
+                                       Text="Penalizaciones"
                                        FontSize="12" FontWeight="SemiBold"
                                        Foreground="#a0c4ac" VerticalAlignment="Center"/>
                         </StackPanel>
@@ -128,8 +133,9 @@
                             Style="{StaticResource NavBtn}"
                             Click="BtnNotificaciones_Click">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <Border Width="4" Height="16" Background="#4caf7d" CornerRadius="2" Margin="0,0,10,0"/>
-                            <TextBlock Text="Notificaciones"
+                            <Border x:Name="BrdNotificaciones" Width="4" Height="16" Background="#4caf7d" CornerRadius="2" Margin="0,0,10,0"/>
+                            <TextBlock x:Name="TxtNavNotificaciones"
+                                       Text="Notificaciones"
                                        FontSize="12" FontWeight="SemiBold"
                                        Foreground="#a0c4ac" VerticalAlignment="Center"/>
                         </StackPanel>
@@ -139,8 +145,9 @@
                             Style="{StaticResource NavBtn}"
                             Click="BtnAuditoria_Click">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <Border Width="4" Height="16" Background="#4caf7d" CornerRadius="2" Margin="0,0,10,0"/>
-                            <TextBlock Text="Auditoría"
+                            <Border x:Name="BrdAuditoria" Width="4" Height="16" Background="#4caf7d" CornerRadius="2" Margin="0,0,10,0"/>
+                            <TextBlock x:Name="TxtNavAuditoria"
+                                       Text="Auditoría"
                                        FontSize="12" FontWeight="SemiBold"
                                        Foreground="#a0c4ac" VerticalAlignment="Center"/>
                         </StackPanel>

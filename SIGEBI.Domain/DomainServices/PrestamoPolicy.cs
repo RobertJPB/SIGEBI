@@ -12,10 +12,7 @@ namespace SIGEBI.Domain.DomainServices
     public class PrestamoPolicy
     {
         private const int MaxPrestamosPorEstudiante = 3;
-        private const int MaxPrestamosPorBibliotecario = 5;
-        private const int DiasPlazoEstudiante = 7;
-        private const int DiasPlazoAdministrador = 15;
-        private const int DiasPlazoAdminBibliotecario = 14;
+        private const int DiasPlazoEstudiante = 15;
         public const int MaxDiasPrestamoTotal = 30;
 
         public static bool PuedeRealizarPrestamo(Usuario usuario, IEnumerable<Prestamo> prestamosActivos)
@@ -27,11 +24,7 @@ namespace SIGEBI.Domain.DomainServices
                 p.EstadoActual == EstadoPrestamo.Activo ||
                 p.EstadoActual == EstadoPrestamo.Atrasado);
 
-            int maxPrestamos = usuario.Rol == RolUsuario.Estudiante
-                ? MaxPrestamosPorEstudiante
-                : MaxPrestamosPorBibliotecario;
-
-            return activos < maxPrestamos;
+            return activos < MaxPrestamosPorEstudiante;
         }
 
         public static bool TienePenalizacionActiva(IEnumerable<Penalizacion> penalizaciones)
@@ -42,13 +35,7 @@ namespace SIGEBI.Domain.DomainServices
 
         public static int ObtenerDiasPlazo(Usuario usuario)
         {
-            return usuario.Rol switch
-            {
-                RolUsuario.Estudiante => DiasPlazoEstudiante,
-                RolUsuario.Bibliotecario => DiasPlazoAdminBibliotecario,
-                RolUsuario.Administrador => DiasPlazoAdministrador,
-                _ => DiasPlazoEstudiante
-            };
+            return DiasPlazoEstudiante;
         }
 
         public static void ValidarPrestamo(Usuario usuario, RecursoBibliografico recurso,
@@ -58,9 +45,9 @@ namespace SIGEBI.Domain.DomainServices
             if (TienePenalizacionActiva(penalizaciones))
                 throw new InvalidOperationException("El usuario tiene una penalización activa y no puede realizar préstamos.");
 
-            // Luego vemos si no excedio su limite (3 para estudiantes, 5 para bibliotecarios)
+            // Luego vemos si no excedio su limite
             if (!PuedeRealizarPrestamo(usuario, prestamosActivos))
-                throw new InvalidOperationException("El usuario ha alcanzado el límite de préstamos permitidos.");
+                throw new InvalidOperationException($"El usuario ha alcanzado el límite de {MaxPrestamosPorEstudiante} préstamos permitidos.");
 
             // TODO: Revisar si el estado Disponible es suficiente o si hay que chequear algo mas
             if (recurso.Estado != EstadoRecurso.Disponible)

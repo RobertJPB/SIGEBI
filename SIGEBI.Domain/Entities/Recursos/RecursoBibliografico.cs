@@ -10,13 +10,14 @@ namespace SIGEBI.Domain.Entities.Recursos
         public string Autor { get; private set; } = null!;
         public int IdCategoria { get; private set; }
         public int Stock { get; private set; }
+        public string? Descripcion { get; private set; }
         public string? ImagenUrl { get; private set; }
         public Enums.Biblioteca.EstadoRecurso Estado { get; private set; }
         public Categoria Categoria { get; private set; } = null!;
 
         protected RecursoBibliografico() { }
 
-        public RecursoBibliografico(string titulo, string autor, int idCategoria, int stockInicial)
+        public RecursoBibliografico(string titulo, string autor, int idCategoria, int stockInicial, string? descripcion)
         {
             if (string.IsNullOrWhiteSpace(titulo))
                 throw new ArgumentException("El título es obligatorio.", nameof(titulo));
@@ -32,10 +33,11 @@ namespace SIGEBI.Domain.Entities.Recursos
             Autor = autor.Trim();
             IdCategoria = idCategoria;
             Stock = stockInicial;
+            Descripcion = descripcion?.Trim();
             Estado = Enums.Biblioteca.EstadoRecurso.Disponible;
         }
 
-        public void ActualizarDatosBase(string titulo, string autor, int idCategoria, int stock)
+        public void ActualizarDatosBase(string titulo, string autor, int idCategoria, int stock, string? descripcion)
         {
             if (string.IsNullOrWhiteSpace(titulo))
                 throw new ArgumentException("El título es obligatorio.", nameof(titulo));
@@ -50,6 +52,7 @@ namespace SIGEBI.Domain.Entities.Recursos
             Autor = autor.Trim();
             IdCategoria = idCategoria;
             Stock = stock;
+            Descripcion = descripcion?.Trim();
         }
 
         public void ActualizarImagen(string? imagenUrl) => ImagenUrl = imagenUrl;

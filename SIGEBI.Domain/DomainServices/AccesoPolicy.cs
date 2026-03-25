@@ -19,7 +19,7 @@ namespace SIGEBI.Domain.DomainServices
         // ── PRÉSTAMOS ──
 
         public static bool PuedeSolicitarPrestamo(RolUsuario rol)
-            => rol == RolUsuario.Estudiante || rol == RolUsuario.Bibliotecario || rol == RolUsuario.Administrador;
+            => rol == RolUsuario.Estudiante || rol == RolUsuario.Docente || rol == RolUsuario.Bibliotecario || rol == RolUsuario.Administrador;
 
         public static bool PuedeGestionarPrestamos(RolUsuario rol)
             => rol == RolUsuario.Administrador || rol == RolUsuario.Bibliotecario;

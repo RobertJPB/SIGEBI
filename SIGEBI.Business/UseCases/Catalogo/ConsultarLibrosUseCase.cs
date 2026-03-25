@@ -48,5 +48,15 @@ namespace SIGEBI.Business.UseCases.Catalogo
             var recursos = await _recursoRepository.GetByCategoriaAsync(categoriaId);
             return recursos.Select(RecursoMapper.ToDTO);
         }
+
+        public async Task<RecursoDetalleDTO?> GetByIdAsync(Guid id)
+        {
+            var recurso = await _recursoRepository.GetByIdAsync(id);
+            if (recurso == null) return null;
+            
+            var dto = RecursoMapper.ToDTO(recurso);
+            dto.PromedioValoraciones = await _valoracionRepository.GetPromedioCalificacionAsync(recurso.Id);
+            return dto;
+        }
     }
 }

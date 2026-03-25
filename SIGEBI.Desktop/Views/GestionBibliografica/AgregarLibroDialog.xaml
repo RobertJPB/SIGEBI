@@ -147,6 +147,9 @@
                       DisplayMemberPath="Nombre"
                       SelectedValuePath="Id"/>
 
+            <TextBlock Text="Descripcion" Style="{StaticResource Etiqueta}"/>
+            <TextBox x:Name="TxtDescripcion" Style="{StaticResource Campo}" Height="60" TextWrapping="Wrap" AcceptsReturn="True" VerticalContentAlignment="Top" Padding="10,6"/>
+
             <TextBlock Text="ISBN" Style="{StaticResource Etiqueta}"/>
             <TextBox x:Name="TxtISBN" Style="{StaticResource Campo}"/>
 

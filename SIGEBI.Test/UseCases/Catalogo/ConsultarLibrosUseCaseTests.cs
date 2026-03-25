@@ -31,8 +31,8 @@ namespace SIGEBI.Test.UseCases.Catalogo
             // Arrange
             var recursos = new List<RecursoBibliografico>
             {
-                new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943),
-                new Libro("Clean Code", "Robert Martin", 1, 3, "978-01-323", "Editorial X", 2008)
+                new Libro("El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943),
+                new Libro("Clean Code", "Robert Martin", 1, 3, null, "978-01-323", "Editorial X", 2008)
             };
 
             _recursoRepo
@@ -70,7 +70,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
         public async Task Ejecutar_DevuelvePromedioValoraciones()
         {
             // Arrange
-            var libro = new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943);
+            var libro = new Libro("El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943);
 
             _recursoRepo
                 .Setup(r => r.GetDisponiblesAsync())
@@ -95,7 +95,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
             // Arrange
             var recursos = new List<RecursoBibliografico>
             {
-                new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943)
+                new Libro("El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943)
             };
 
             _recursoRepo
@@ -133,8 +133,8 @@ namespace SIGEBI.Test.UseCases.Catalogo
             // Arrange
             var recursos = new List<RecursoBibliografico>
             {
-                new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943),
-                new Libro("Clean Code", "Robert Martin", 1, 3, "978-01-323", "Editorial X", 2008)
+                new Libro("El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943),
+                new Libro("Clean Code", "Robert Martin", 1, 3, null, "978-01-323", "Editorial X", 2008)
             };
 
             _recursoRepo

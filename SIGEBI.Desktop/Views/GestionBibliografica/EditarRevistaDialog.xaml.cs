@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Windows;
 using SIGEBI.Services;
+using SIGEBI.Business.DTOs;
 
 namespace SIGEBI.Views.GestionBibliografica
 {
@@ -12,7 +13,7 @@ namespace SIGEBI.Views.GestionBibliografica
         private byte[]? _imagenBytes;
         private string? _imagenNombre;
 
-        public EditarRevistaDialog() : this((ApiService)SIGEBII.App.Current.Services.GetService(typeof(ApiService))!, new RecursoDetalleDTO()) { }
+        public EditarRevistaDialog() : this((ApiService)SIGEBI.App.Current.Services.GetService(typeof(ApiService))!, new RecursoDetalleDTO()) { }
 
         public EditarRevistaDialog(ApiService api, RecursoDetalleDTO recurso)
         {
@@ -35,6 +36,7 @@ namespace SIGEBI.Views.GestionBibliografica
 
                 TxtTitulo.Text = recurso.Titulo;
                 TxtAutor.Text = recurso.Autor;
+                TxtDescripcion.Text = recurso.Descripcion ?? "";
                 TxtISSN.Text = recurso.ISSN ?? "";
                 TxtNumeroEdicion.Text = recurso.NumeroEdicion?.ToString() ?? "";
                 TxtFechaPublicacion.Text = recurso.FechaPublicacion?.ToString("yyyy-MM-dd") ?? "";
@@ -96,6 +98,7 @@ namespace SIGEBI.Views.GestionBibliografica
                     Titulo = TxtTitulo.Text.Trim(),
                     Autor = TxtAutor.Text.Trim(),
                     CategoriaId = (int)CmbCategoria.SelectedValue,
+                    Descripcion = string.IsNullOrWhiteSpace(TxtDescripcion.Text) ? null : TxtDescripcion.Text.Trim(),
                     ISSN = TxtISSN.Text.Trim(),
                     NumeroEdicion = int.TryParse(TxtNumeroEdicion.Text, out int num) ? num : 0,
                     FechaPublicacion = DateTime.TryParse(TxtFechaPublicacion.Text, out DateTime fecha) ? fecha : null,

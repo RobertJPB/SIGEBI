@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 namespace SIGEBI.Domain.Enums.Seguridad
 {
     public enum RolUsuario
     {
         Administrador = 1,
         Bibliotecario = 2,
-        Estudiante = 3
+        Estudiante = 3,
+        Docente = 4
     }
 }

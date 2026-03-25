@@ -1,28 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using SIGEBI.ViewModels;
 
 namespace SIGEBI.Views.GestionPrestamos
 {
-    /// <summary>
-    /// Lógica de interacción para GestionPrestamosPage.xaml
-    /// </summary>
     public partial class GestionPrestamosPage : Page
     {
+        private readonly GestionPrestamosViewModel _viewModel;
+
         public GestionPrestamosPage()
         {
             InitializeComponent();
+            _viewModel = (GestionPrestamosViewModel)SIGEBI.App.Current.Services.GetService(typeof(GestionPrestamosViewModel))!;
+            DataContext = _viewModel;
+            Loaded += (s, e) => _ = _viewModel.CargarPrestamosAsync();
         }
+
+        private async void BtnRegistrarPrestamo_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new AgregarPrestamoDialog();
+            dialog.Owner = Window.GetWindow(this);
+            if (dialog.ShowDialog() == true)
+            {
+                await _viewModel.CargarPrestamosAsync();
+            }
+        }
+
     }
 }

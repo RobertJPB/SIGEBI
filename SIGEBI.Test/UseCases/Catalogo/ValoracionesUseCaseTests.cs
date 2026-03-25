@@ -38,7 +38,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
             => new Usuario("Juan Perez", "juan@test.com", "hash123", RolUsuario.Estudiante);
 
         private Libro CrearLibro()
-            => new Libro("El Quijote", "Cervantes", 1, 10, "123456", "Editorial", 1605);
+            => new Libro("El Quijote", "Cervantes", 1, 10, null, "123456", "Editorial", 1605);
 
         // ── AGREGAR VALORACION ──
 

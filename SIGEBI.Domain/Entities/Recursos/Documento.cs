@@ -11,9 +11,9 @@ namespace SIGEBI.Domain.Entities.Recursos
 
         private Documento() { }
 
-        public Documento(string titulo, string autor, int idCategoria, int stockInicial,
+        public Documento(string titulo, string autor, int idCategoria, int stockInicial, string? descripcion,
                          string formato, string institucion, int anio)
-            : base(titulo, autor, idCategoria, stockInicial)
+            : base(titulo, autor, idCategoria, stockInicial, descripcion)
         {
             // Validaciones para documentos (como tesis y manuales)
             if (string.IsNullOrWhiteSpace(formato))
@@ -28,10 +28,10 @@ namespace SIGEBI.Domain.Entities.Recursos
             Anio = anio;
         }
 
-        public void Actualizar(string titulo, string autor, int idCategoria, int stock,
+        public void Actualizar(string titulo, string autor, int idCategoria, int stock, string? descripcion,
                                string formato, string institucion, int anio)
         {
-            ActualizarDatosBase(titulo, autor, idCategoria, stock);
+            ActualizarDatosBase(titulo, autor, idCategoria, stock, descripcion);
 
             if (string.IsNullOrWhiteSpace(formato))
                 throw new ArgumentException("El formato es obligatorio.", nameof(formato));

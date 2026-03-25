@@ -1,0 +1,42 @@
+﻿  Determinando los proyectos que se van a restaurar...
+  Todos los proyectos est├ín actualizados para la restauraci├│n.
+  SIGEBI.Domain -> c:\Users\Administrador\source\repos\SIGEBI\SIGEBI.Domain\bin\Debug\net8.0\SIGEBI.Domain.dll
+  SIGEBI.Business -> c:\Users\Administrador\source\repos\SIGEBI\SIGEBI.Business\bin\Debug\net8.0\SIGEBI.Business.dll
+  SIGEBI.Test -> c:\Users\Administrador\source\repos\SIGEBI\SIGEBI.Test\bin\Debug\net8.0\SIGEBI.Test.dll
+Serie de pruebas para c:\Users\Administrador\source\repos\SIGEBI\SIGEBI.Test\bin\Debug\net8.0\SIGEBI.Test.dll (.NETCoreApp,Version=v8.0)
+Versi├│n 17.12.0 (x64) de VSTest
+
+Iniciando la ejecuci├│n de pruebas, espere...
+1 archivos de prueba en total coincidieron con el patr├│n especificado.
+  Con error SIGEBI.Test.Domain.PremiumPolicyTests.ObtenerDiasPlazo_Bibliotecario_DevuelteCatorceDias [91 ms]
+  Mensaje de error:
+   Expected dias to be 14, but found 15 (difference of 1).
+  Seguimiento de la pila:
+     at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message)
+   at FluentAssertions.Execution.DefaultAssertionStrategy.HandleFailure(String message)
+   at FluentAssertions.Execution.AssertionScope.AddPreFormattedFailure(String formattedFailureMessage)
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason)
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason)
+   at FluentAssertions.Execution.AssertionChain.FailWith(String message, Object[] args)
+   at FluentAssertions.Numeric.NumericAssertionsBase`3.Be(T expected, String because, Object[] becauseArgs)
+   at SIGEBI.Test.Domain.PremiumPolicyTests.ObtenerDiasPlazo_Bibliotecario_DevuelteCatorceDias() in c:\Users\Administrador\source\repos\SIGEBI\SIGEBI.Test\DomainServices\PremiumPolicyTests.cs:line 120
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+  Con error SIGEBI.Test.Domain.PremiumPolicyTests.ObtenerDiasPlazo_Estudiante_DevuelteSieteDias [2 ms]
+  Mensaje de error:
+   Expected dias to be 7, but found 15 (difference of 8).
+  Seguimiento de la pila:
+     at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message)
+   at FluentAssertions.Execution.DefaultAssertionStrategy.HandleFailure(String message)
+   at FluentAssertions.Execution.AssertionScope.AddPreFormattedFailure(String formattedFailureMessage)
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason)
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason)
+   at FluentAssertions.Execution.AssertionChain.FailWith(String message, Object[] args)
+   at FluentAssertions.Numeric.NumericAssertionsBase`3.Be(T expected, String because, Object[] becauseArgs)
+   at SIGEBI.Test.Domain.PremiumPolicyTests.ObtenerDiasPlazo_Estudiante_DevuelteSieteDias() in c:\Users\Administrador\source\repos\SIGEBI\SIGEBI.Test\DomainServices\PremiumPolicyTests.cs:line 100
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+Con error! - Con error:     2, Superado:   123, Omitido:     0, Total:   125, Duraci├│n: 361 ms - SIGEBI.Test.dll (net8.0)
+
+Hay actualizaciones de carga de trabajo disponibles. Ejecute "dotnet workload list" para obtener m├ís informaci├│n.

@@ -17,13 +17,16 @@ namespace SIGEBI.API.Controllers
     {
         private readonly GestionarUsuarioUseCase _gestionarUsuario;
         private readonly RegistrarUsuarioUseCase _registrarUsuario;
+        private readonly IWebHostEnvironment _env;
 
         public UsuariosController(
             GestionarUsuarioUseCase gestionarUsuario,
-            RegistrarUsuarioUseCase registrarUsuario)
+            RegistrarUsuarioUseCase registrarUsuario,
+            IWebHostEnvironment env)
         {
             _gestionarUsuario = gestionarUsuario;
             _registrarUsuario = registrarUsuario;
+            _env = env;
         }
 
         // Recupera el rol para validar los permisos de gestión de cuentas de usuario.
@@ -138,6 +141,39 @@ namespace SIGEBI.API.Controllers
 
             await _gestionarUsuario.EliminarAsync(id);
             return Ok("Usuario eliminado correctamente.");
+        }
+
+        // Permite al usuario actuar sobre su propia foto de perfil.
+        [HttpPost("perfil/foto")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> ActualizarFotoPerfil(IFormFile foto)
+        {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+                return Unauthorized("No se pudo identificar al usuario desde el token.");
+
+            var imagenUrl = await GuardarImagenAsync(foto);
+            if (imagenUrl == null) return BadRequest("Error al procesar la imagen.");
+
+            await _gestionarUsuario.ActualizarImagenAsync(userId, imagenUrl);
+            return Ok(new { Mensaje = "Foto de perfil actualizada.", Url = imagenUrl });
+        }
+
+        private async Task<string?> GuardarImagenAsync(IFormFile? imagen)
+        {
+            if (imagen == null || imagen.Length == 0) return null;
+            var extensionesPermitidas = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            var extension = Path.GetExtension(imagen.FileName).ToLowerInvariant();
+            if (!extensionesPermitidas.Contains(extension)) return null;
+
+            var carpeta = Path.Combine(_env.WebRootPath ?? _env.ContentRootPath, "imagenes", "usuarios");
+            Directory.CreateDirectory(carpeta);
+            var nombreArchivo = $"{Guid.NewGuid()}{extension}";
+            var rutaCompleta = Path.Combine(carpeta, nombreArchivo);
+
+            using var stream = new FileStream(rutaCompleta, FileMode.Create);
+            await imagen.CopyToAsync(stream);
+            return $"/imagenes/usuarios/{nombreArchivo}";
         }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Windows;
 using SIGEBI.Services;
+using SIGEBI.Business.DTOs;
 
 namespace SIGEBI.Views.GestionBibliografica
 {
@@ -11,7 +12,7 @@ namespace SIGEBI.Views.GestionBibliografica
         private byte[]? _imagenBytes;
         private string? _imagenNombre;
 
-        public AgregarRevistaDialog() : this((ApiService)SIGEBII.App.Current.Services.GetService(typeof(ApiService))!) { }
+        public AgregarRevistaDialog() : this((ApiService)SIGEBI.App.Current.Services.GetService(typeof(ApiService))!) { }
 
         public AgregarRevistaDialog(ApiService api)
         {
@@ -75,6 +76,7 @@ namespace SIGEBI.Views.GestionBibliografica
                     Titulo = TxtTitulo.Text.Trim(),
                     Autor = TxtAutor.Text.Trim(),
                     CategoriaId = (int)CmbCategoria.SelectedValue,
+                    Descripcion = string.IsNullOrWhiteSpace(TxtDescripcion.Text) ? null : TxtDescripcion.Text.Trim(),
                     ISSN = TxtISSN.Text.Trim(),
                     NumeroEdicion = int.TryParse(TxtNumeroEdicion.Text, out int num) ? num : 0,
                     FechaPublicacion = DateTime.TryParse(TxtFechaPublicacion.Text, out DateTime fecha) ? fecha : null,

@@ -7,11 +7,11 @@ namespace SIGEBI.Web.Controllers
     public class PrestamoViewModel
     {
         public Guid Id { get; set; }
-        public string RecursoTitulo { get; set; } = string.Empty;
-        public DateTime FechaInicio { get; set; }
-        public DateTime FechaDevolucionEstimada { get; set; }
-        public DateTime? FechaDevolucionReal { get; set; }
-        public string? EstadoActual { get; set; }
+        public string TituloRecurso { get; set; } = string.Empty;
+        public string FechaInicio { get; set; } = string.Empty;
+        public string FechaDevolucionEstimada { get; set; } = string.Empty;
+        public string? FechaDevolucionReal { get; set; }
+        public string Estado { get; set; } = string.Empty;
     }
 
     public class PrestamosIndexViewModel

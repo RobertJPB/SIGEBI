@@ -1,4 +1,5 @@
 using SIGEBI.Services;
+using SIGEBI.Business.DTOs;
 
 namespace SIGEBI.Services
 {

@@ -49,7 +49,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
 
             // Act
             var resultado = await _useCase.AgregarLibroAsync(
-                "El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943);
+                "El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943);
 
             // Assert
             resultado.Should().NotBeNull();
@@ -68,7 +68,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
             // Act & Assert
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _useCase.AgregarLibroAsync(
-                    "El Principito", "Antoine", 99, 5, "978-84-261", "Editorial X", 1943));
+                    "El Principito", "Antoine", 99, 5, null, "978-84-261", "Editorial X", 1943));
         }
 
         [Fact]
@@ -89,7 +89,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
 
             // Act
             var resultado = await _useCase.AgregarLibroAsync(
-                "El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943,
+                "El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943,
                 imagenUrl: "/imagenes/recursos/portada.jpg");
 
             // Assert
@@ -102,7 +102,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
         public async Task EditarLibro_LibroExistente_ActualizaCorrectamente()
         {
             // Arrange
-            var libro = new Libro("Titulo Viejo", "Autor Viejo", 1, 3,
+            var libro = new Libro("Titulo Viejo", "Autor Viejo", 1, 3, null,
                                   "000-00-000", "Editorial Vieja", 2000);
 
             _recursoRepo
@@ -119,7 +119,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
 
             // Act
             var resultado = await _useCase.EditarLibroAsync(
-                libro.Id, "Titulo Nuevo", "Autor Nuevo", 1, 10,
+                libro.Id, "Titulo Nuevo", "Autor Nuevo", 1, 10, null,
                 "111-11-111", "Editorial Nueva", 2024);
 
             // Assert
@@ -138,7 +138,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
             // Act & Assert
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _useCase.EditarLibroAsync(
-                    Guid.NewGuid(), "Titulo", "Autor", 1, 5,
+                    Guid.NewGuid(), "Titulo", "Autor", 1, 5, null,
                     "978-84-261", "Editorial X", 1943));
         }
 
@@ -148,7 +148,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
         public async Task EliminarRecurso_RecursoExistente_LlamadaBorradoFisico()
         {
             // Arrange
-            var libro = new Libro("El Principito", "Antoine", 1, 5,
+            var libro = new Libro("El Principito", "Antoine", 1, 5, null,
                                   "978-84-261", "Editorial X", 1943);
 
             _recursoRepo.Setup(r => r.GetByIdAsync(libro.Id)).ReturnsAsync(libro);

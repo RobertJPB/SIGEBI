@@ -12,9 +12,9 @@ namespace SIGEBI.Domain.Entities.Recursos
 
         private Libro() { }
 
-        public Libro(string titulo, string autor, int idCategoria, int stockInicial,
+        public Libro(string titulo, string autor, int idCategoria, int stockInicial, string? descripcion,
                      string isbn, string editorial, int anio, string? genero = null)
-            : base(titulo, autor, idCategoria, stockInicial)
+            : base(titulo, autor, idCategoria, stockInicial, descripcion)
         {
             // Validaciones especificas del libro (adicionales a las del recurso base)
             if (string.IsNullOrWhiteSpace(isbn))
@@ -30,10 +30,10 @@ namespace SIGEBI.Domain.Entities.Recursos
             Genero = genero?.Trim();
         }
 
-        public void Actualizar(string titulo, string autor, int idCategoria, int stock,
+        public void Actualizar(string titulo, string autor, int idCategoria, int stock, string? descripcion,
                                string isbn, string editorial, int anio, string? genero = null)
         {
-            ActualizarDatosBase(titulo, autor, idCategoria, stock);
+            ActualizarDatosBase(titulo, autor, idCategoria, stock, descripcion);
 
             if (string.IsNullOrWhiteSpace(isbn))
                 throw new ArgumentException("El ISBN es obligatorio.", nameof(isbn));

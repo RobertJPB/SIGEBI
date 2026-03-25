@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Windows;
 using SIGEBI.Services;
+using SIGEBI.Business.DTOs;
 
 namespace SIGEBI.Views.GestionBibliografica
 {
@@ -11,7 +12,7 @@ namespace SIGEBI.Views.GestionBibliografica
         private byte[]? _imagenBytes;
         private string? _imagenNombre;
 
-        public AgregarLibroDialog() : this((ApiService)SIGEBII.App.Current.Services.GetService(typeof(ApiService))!) { }
+        public AgregarLibroDialog() : this((ApiService)SIGEBI.App.Current.Services.GetService(typeof(ApiService))!) { }
 
         public AgregarLibroDialog(ApiService api)
         {
@@ -76,6 +77,7 @@ namespace SIGEBI.Views.GestionBibliografica
                     Titulo = TxtTitulo.Text.Trim(),
                     Autor = TxtAutor.Text.Trim(),
                     CategoriaId = (int)CmbCategoria.SelectedValue,
+                    Descripcion = string.IsNullOrWhiteSpace(TxtDescripcion.Text) ? null : TxtDescripcion.Text.Trim(),
                     ISBN = TxtISBN.Text.Trim(),
                     Editorial = TxtEditorial.Text.Trim(),
                     Anio = int.TryParse(TxtAnio.Text, out int anio) ? anio : null,

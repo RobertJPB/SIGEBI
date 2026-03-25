@@ -1,28 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using SIGEBI.ViewModels;
 
 namespace SIGEBI.Views.Notificaciones
 {
-    /// <summary>
-    /// Lógica de interacción para NotificacionesPage.xaml
-    /// </summary>
     public partial class NotificacionesPage : Page
     {
+        private readonly NotificacionesViewModel _viewModel;
+
         public NotificacionesPage()
         {
             InitializeComponent();
+            _viewModel = (NotificacionesViewModel)SIGEBI.App.Current.Services.GetService(typeof(NotificacionesViewModel))!;
+            DataContext = _viewModel;
+            Loaded += (s, e) => _ = _viewModel.CargarNotificacionesAsync();
         }
     }
 }

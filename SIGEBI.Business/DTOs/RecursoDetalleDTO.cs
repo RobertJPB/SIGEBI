@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace SIGEBI.Business.DTOs
 {
@@ -13,7 +13,9 @@ namespace SIGEBI.Business.DTOs
         public int Stock { get; set; }
         public string TipoRecurso { get; set; } = string.Empty;
         public string? ImagenUrl { get; set; }
+        public string? Descripcion { get; set; }
         public double PromedioValoraciones { get; set; }
+        public double? PromedioValoracionesNullable => PromedioValoraciones; // Alias para Desktop
         // Libro
         public string? ISBN { get; set; }
         public string? Editorial { get; set; }

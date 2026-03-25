@@ -1,0 +1,409 @@
+@model SIGEBI.Web.Models.RecursoViewModel
+@{
+    ViewData["Title"] = Model.Titulo;
+    Layout = null; 
+    var apiBase = ViewBag.ApiBaseUrl as string;
+    var avgRating = Math.Round(Model.PromedioValoraciones, 1);
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIGEBI - @Model.Titulo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --green-900: #0f3d20;
+            --green-800: #1a5c2e;
+            --green-600: #2e8b4a;
+            --green-400: #4caf7d;
+            --green-100: #e8f5ee;
+            --cream: #faf8f4;
+            --ink: #1a1f1c;
+            --muted: #5a6b60;
+            --border: #dde8e2;
+        }
+
+        body {
+            background-color: var(--cream);
+            font-family: 'Outfit', sans-serif;
+            color: var(--ink);
+            padding-bottom: 5rem;
+        }
+
+        .navbar {
+            background-color: #0d2e18;
+            padding: 0.8rem 2.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            color: white;
+            font-weight: 700;
+            font-size: 1.5rem;
+            text-decoration: none;
+        }
+
+        .nav-link { color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-left: 1.5rem; text-decoration: none; }
+
+        .container-custom {
+            max-width: 1100px;
+            margin: 2.5rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .btn-back {
+            color: var(--muted);
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1.5rem;
+            transition: color 0.2s;
+        }
+        .btn-back:hover { color: var(--green-800); }
+
+        /* Main Card */
+        .detail-card {
+            background: white;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            display: flex;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.04);
+        }
+
+        .image-side {
+            width: 400px;
+            background: #f8faf9;
+            padding: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid var(--border);
+        }
+
+        .resource-img {
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            transition: transform 0.3s;
+        }
+        .resource-img:hover { transform: scale(1.02); }
+
+        .info-side {
+            flex: 1;
+            padding: 3rem;
+        }
+
+        .title { font-size: 2.5rem; font-weight: 700; color: var(--green-900); margin-bottom: 0.5rem; }
+        .author { font-size: 1.2rem; color: var(--muted); margin-bottom: 1.2rem; }
+
+        /* Stars */
+        .stars-row { display: flex; align-items: center; gap: 8px; margin-bottom: 2rem; }
+        .star-filled { color: #ffca28; font-size: 1.2rem; }
+        .star-empty { color: #e0e0e0; font-size: 1.2rem; }
+        .rating-num { font-weight: 700; font-size: 1.1rem; color: var(--ink); margin-left: 4px; }
+        .rating-count { color: var(--muted); font-size: 0.85rem; }
+
+        /* Grid info */
+        .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2.5rem; }
+        .meta-item label { display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 4px; }
+        .meta-item span { font-weight: 600; color: var(--ink); }
+
+        .availability { font-size: 0.95rem; display: flex; align-items: center; gap: 8px; margin-bottom: 1.5rem; }
+        .availability.in-stock { color: var(--green-600); }
+        .availability.out-stock { color: #c62828; }
+
+        .action-buttons { display: flex; flex-direction: column; gap: 12px; }
+        .btn-main { background: var(--green-600); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 600; transition: all 0.2s; }
+        .btn-main:hover { background: var(--green-800); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(46,139,74,0.3); }
+        .btn-main:disabled { background: #ccc; transform: none; box-shadow: none; cursor: not-allowed; }
+
+        .btn-wishlist { background: transparent; color: var(--green-800); border: 1.5px solid var(--green-800); padding: 14px; border-radius: 12px; font-weight: 600; transition: all 0.2s; }
+        .btn-wishlist:hover { background: var(--green-100); }
+
+        .availability.in-stock span { color: var(--ink); }
+        .availability.in-stock strong { color: var(--green-600); }
+
+        /* Reviews Section */
+        .reviews-section { background: white; border-radius: 24px; border: 1px solid var(--border); padding: 3rem; margin-top: 2.5rem; }
+        .section-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem; color: var(--green-900); }
+
+        .add-review-box { background: var(--green-50); border-radius: 16px; padding: 2rem; margin-bottom: 3rem; border: 1px dashed var(--green-400); }
+        .star-input { font-size: 1.8rem; color: #ddd; cursor: pointer; transition: color 0.2s; }
+        .star-input.active { color: #ffca28; }
+        .comment-area { width: 100%; border: 1px solid var(--border); border-radius: 12px; padding: 1rem; margin-top: 1rem; font-family: inherit; resize: none; outline: none; }
+        .comment-area:focus { border-color: var(--green-600); box-shadow: 0 0 0 3px rgba(46,139,74,0.1); }
+
+        .review-item { border-bottom: 1px solid #f0f0f0; padding: 1.5rem 0; position: relative; }
+        .review-item:last-child { border-bottom: none; }
+        .review-user { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+        .review-stars { color: #ffca28; font-size: 0.85rem; margin-bottom: 8px; }
+        .review-text { color: #444; line-height: 1.5; }
+        .review-delete { position: absolute; right: 0; top: 1.5rem; color: #ff5252; cursor: pointer; padding: 5px; opacity: 0.5; transition: opacity 0.2s; }
+        .review-delete:hover { opacity: 1; }
+
+        /* Modal Custom */
+        .modal-content { border-radius: 20px; border: none; }
+        .modal-header { border-bottom: none; padding: 2rem 2rem 0.5rem; }
+        .modal-body { padding: 0.5rem 2rem 2rem; }
+        .modal-footer { border-top: none; padding: 0 2rem 2rem; justify-content: space-between; }
+        .confirm-date-badge { background: var(--green-100); color: var(--green-800); padding: 8px 16px; border-radius: 10px; font-weight: 700; display: inline-block; margin: 1rem 0; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <a class="navbar-brand" href="/Catalogo/Index">SIGEBI <span style="font-weight:300; font-size: 0.8rem; opacity: 0.6; display: block; line-height: 1;">Biblioteca</span></a>
+            <div class="d-flex align-items-center">
+                <a href="/Catalogo/Index" class="nav-link"><i class="bi bi-grid"></i> Catálogo</a>
+                <a href="/ListaDeseos" class="nav-link"><i class="bi bi-heart"></i> Lista Deseos</a>
+                <a href="/Prestamos" class="nav-link"><i class="bi bi-book"></i> Mis Préstamos</a>
+                <a href="/Perfil" class="nav-link d-flex align-items-center gap-2">
+                    <i class="bi bi-person-circle" style="font-size: 1.2rem;"></i>
+                    <span>@Context.Session.GetString("UsuarioNombre")</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-custom">
+        <a href="/Catalogo/Index" class="btn-back">
+            <i class="bi bi-arrow-left"></i> Volver al catálogo
+        </a>
+
+        <!-- Resource Detail Card -->
+        <div class="detail-card">
+            <div class="image-side">
+                @if (!string.IsNullOrEmpty(Model.ImagenUrl))
+                {
+                    <img class="resource-img shadow-lg" src="@(apiBase + Model.ImagenUrl)" alt="@Model.Titulo" />
+                }
+                else
+                {
+                    <div style="width: 200px; height: 300px; background: #eee; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                         <i class="bi bi-image" style="font-size: 4rem; color: #ccc;"></i>
+                    </div>
+                }
+            </div>
+
+            <div class="info-side">
+                <h1 class="title">@Model.Titulo</h1>
+                <p class="author">@Model.Autor</p>
+
+                <div class="stars-row">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        if (i <= (int)Model.PromedioValoraciones)
+                        { <i class="bi bi-star-fill star-filled"></i> }
+                        else if (i - 1 < Model.PromedioValoraciones && Model.PromedioValoraciones < i)
+                        { <i class="bi bi-star-half star-filled"></i> }
+                        else
+                        { <i class="bi bi-star star-empty"></i> }
+                    }
+                    <span class="rating-num">@avgRating</span>
+                    <span class="rating-count">(@Model.Valoraciones.Count valoraciones de alumnos)</span>
+                </div>
+
+                <p style="color: #444; line-height: 1.6; margin-bottom: 2rem; font-size: 1.05rem;">
+                    @Model.Descripcion
+                </p>
+
+                <div class="meta-grid">
+                    <div class="meta-item">
+                        <label>Tipo</label>
+                        <span>@Model.TipoRecurso</span>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.ISBN)) {
+                        <div class="meta-item">
+                            <label>ISBN</label>
+                            <span>@Model.ISBN</span>
+                        </div>
+                    }
+                    <div class="meta-item">
+                        <label>Editorial</label>
+                        <span>@(Model.Editorial ?? "N/A")</span>
+                    </div>
+                    <div class="meta-item">
+                        <label>Año</label>
+                        <span>@(Model.Anio?.ToString() ?? "N/A")</span>
+                    </div>
+                </div>
+
+                <div class="availability @(Model.Stock > 0 ? "in-stock" : "out-stock")">
+                    @if (Model.Stock > 0) {
+                        <i class="bi bi-check-circle-fill" style="color: var(--green-600)"></i> <span>Disponibles: <strong>@Model.Stock unidades</strong></span>
+                    } else {
+                        <i class="bi bi-x-circle-fill"></i> <span>Actualmente agotado</span>
+                    }
+                </div>
+
+                <div style="font-size: 0.85rem; color: var(--muted); margin-bottom: 2rem;">
+                    <i class="bi bi-info-circle"></i> Nota: Plazo de devolución de 15 días para tu perfil.
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-main" @(Model.Stock == 0 ? "disabled" : "") data-bs-toggle="modal" data-bs-target="#loanModal">
+                        Solicitar Préstamo
+                    </button>
+                    <button id="btnWishlist" class="btn-wishlist">
+                        <i class="bi bi-heart"></i> Añadir a Lista de Deseos
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Community Ratings -->
+        <div class="reviews-section">
+            <h2 class="section-title">Valoraciones y Comentarios</h2>
+
+            <div class="add-review-box">
+                <h5 style="font-weight: 700; margin-bottom: 1rem;">¿Qué te pareció este material? Califícalo:</h5>
+                <form action="/Catalogo/Valorar" method="post">
+                    <input type="hidden" name="recursoId" value="@Model.Id" />
+                    <input type="hidden" name="calificacion" id="inputRating" value="5" />
+                    
+                    <div class="rating-selector mb-3">
+                        <i class="bi bi-star-fill star-input active" data-value="1"></i>
+                        <i class="bi bi-star-fill star-input active" data-value="2"></i>
+                        <i class="bi bi-star-fill star-input active" data-value="3"></i>
+                        <i class="bi bi-star-fill star-input active" data-value="4"></i>
+                        <i class="bi bi-star-fill star-input active" data-value="5"></i>
+                    </div>
+
+                    <textarea name="comentario" class="comment-area" rows="3" placeholder="Escribe tu opinión aquí..."></textarea>
+                    
+                    <button type="submit" class="btn btn-success mt-3" style="border-radius: 8px; padding: 10px 20px; font-weight:600;">
+                        Enviar Valoración
+                    </button>
+                </form>
+            </div>
+
+            <div class="reviews-list">
+                @if (Model.Valoraciones.Any())
+                {
+                    var currentUserId = Context.Session.GetString("UsuarioId");
+                    @foreach (var val in Model.Valoraciones.OrderByDescending(v => v.Id))
+                    {
+                        <div class="review-item">
+                            <div class="review-user">@(string.IsNullOrEmpty(val.NombreUsuario) ? "Usuario de SIGEBI" : val.NombreUsuario)</div>
+                            <div class="review-stars">
+                                @for (int i = 0; i < val.Calificacion; i++) { <i class="bi bi-star-fill"></i> }
+                            </div>
+                            <div class="review-text">@val.Comentario</div>
+                            
+                            @if (currentUserId != null && val.UsuarioId == Guid.Parse(currentUserId))
+                            {
+                                <button class="review-delete border-0 bg-transparent" onclick="eliminarValoracion('@val.Id')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            }
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-center text-muted my-5">Aún no hay valoraciones para este recurso. ¡Sé el primero en opinar!</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Loan Modal -->
+    <div class="modal fade" id="loanModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title fw-bold" style="color:var(--green-900)">Confirmar Solicitud</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted">¿Estás seguro de solicitar el préstamo de <strong>@Model.Titulo</strong>?</p>
+                    <p class="mb-1">La fecha estimada de devolución es:</p>
+                    <div class="confirm-date-badge">
+                        @DateTime.Now.AddDays(15).ToString("dd/MM/yyyy")
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius:10px; padding:10px 20px;">Cancelar</button>
+                    <button type="button" id="confirmLoanBtn" class="btn btn-success" style="background:var(--green-900); border:none; border-radius:10px; padding:10px 20px;">Confirmar Préstamo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Interactive Stars
+            $('.star-input').click(function() {
+                const val = $(this).data('value');
+                $('#inputRating').val(val);
+                $('.star-input').each(function() {
+                    if ($(this).data('value') <= val) {
+                        $(this).addClass('active').removeClass('bi-star').addClass('bi-star-fill');
+                    } else {
+                        $(this).removeClass('active').removeClass('bi-star-fill').addClass('bi-star');
+                    }
+                });
+            });
+
+            // Wishlist Action
+            $('#btnWishlist').click(function() {
+                const btn = $(this);
+                btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Guardando...');
+                
+                $.post('/Catalogo/AgregarAListaDeseos', { recursoId: '@Model.Id' }, function(data) {
+                    if (data.success) {
+                        alert('¡Agregado a tu lista de deseos!');
+                        btn.html('<i class="bi bi-check-circle"></i> En tu lista').addClass('btn-outline-success');
+                    } else {
+                        alert('Error: ' + data.message);
+                        btn.prop('disabled', false).html('<i class="bi bi-heart"></i> Añadir a Lista de Deseos');
+                    }
+                });
+            });
+
+            // Loan Confirmation
+            $('#confirmLoanBtn').click(function() {
+                const btn = $(this);
+                btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Procesando...');
+                
+                $.post('/Catalogo/SolicitarPrestamo', { recursoId: '@Model.Id' }, function(data) {
+                    if (data.success) {
+                        alert('¡Préstamo solicitado con éxito!');
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                        btn.prop('disabled', false).text('Confirmar Préstamo');
+                    }
+                });
+            });
+        });
+
+        function eliminarValoracion(id) {
+            if (confirm('¿Estás seguro de eliminar tu comentario?')) {
+                $.post('/Catalogo/EliminarValoracion', { id: id, recursoId: '@Model.Id' }, function(data) {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
+

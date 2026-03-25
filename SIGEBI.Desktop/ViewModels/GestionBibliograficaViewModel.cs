@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SIGEBI.Services;
-using SIGEBII.ViewModels;
+using SIGEBI.Business.DTOs;
 
 namespace SIGEBI.ViewModels
 {

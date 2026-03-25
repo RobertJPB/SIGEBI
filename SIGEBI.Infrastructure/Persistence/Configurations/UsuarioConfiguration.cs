@@ -34,6 +34,9 @@ namespace SIGEBI.Infrastructure.Persistence.Configurations
                 .IsRequired()
                 .HasConversion<int>();
 
+            builder.Property(u => u.ImagenUrl)
+                .HasMaxLength(500);
+
             builder.HasMany(u => u.Prestamos)
                 .WithOne(p => p.Usuario)
                 .HasForeignKey(p => p.UsuarioId)

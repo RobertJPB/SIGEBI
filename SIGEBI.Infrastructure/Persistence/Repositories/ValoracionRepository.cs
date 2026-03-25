@@ -10,10 +10,10 @@ namespace SIGEBI.Infrastructure.Persistence.Repositories
         public ValoracionRepository(SIGEBIDbContext context) : base(context) { }
 
         public async Task<IEnumerable<Valoracion>> GetByRecursoIdAsync(Guid recursoId)
-            => await _dbSet.Where(v => v.RecursoId == recursoId).ToListAsync();
+            => await _dbSet.Include(v => v.Usuario).Where(v => v.RecursoId == recursoId).ToListAsync();
 
         public async Task<IEnumerable<Valoracion>> GetByUsuarioIdAsync(Guid usuarioId)
-            => await _dbSet.Where(v => v.UsuarioId == usuarioId).ToListAsync();
+            => await _dbSet.Include(v => v.Usuario).Where(v => v.UsuarioId == usuarioId).ToListAsync();
 
         public async Task<double> GetPromedioCalificacionAsync(Guid recursoId)
         {

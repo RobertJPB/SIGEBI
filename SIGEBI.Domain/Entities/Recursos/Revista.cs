@@ -11,9 +11,9 @@ namespace SIGEBI.Domain.Entities.Recursos
 
         private Revista() { }
 
-        public Revista(string titulo, string autor, int idCategoria, int stockInicial,
+        public Revista(string titulo, string autor, int idCategoria, int stockInicial, string? descripcion,
                        int numeroEdicion, string issn, DateTime fechaPublicacion)
-            : base(titulo, autor, idCategoria, stockInicial)
+            : base(titulo, autor, idCategoria, stockInicial, descripcion)
         {
             // Validaciones especificas de la revista
             if (numeroEdicion <= 0)
@@ -26,10 +26,10 @@ namespace SIGEBI.Domain.Entities.Recursos
             FechaPublicacion = fechaPublicacion;
         }
 
-        public void Actualizar(string titulo, string autor, int idCategoria, int stock,
+        public void Actualizar(string titulo, string autor, int idCategoria, int stock, string? descripcion,
                                int numeroEdicion, string issn, DateTime fechaPublicacion)
         {
-            ActualizarDatosBase(titulo, autor, idCategoria, stock);
+            ActualizarDatosBase(titulo, autor, idCategoria, stock, descripcion);
 
             if (numeroEdicion <= 0)
                 throw new ArgumentException("El número de edición es inválido.", nameof(numeroEdicion));

@@ -64,11 +64,11 @@ namespace SIGEBI.API.Middleware
 
         private static string ObtenerTitulo(int statusCode) => statusCode switch
         {
-            StatusCodes.Status400BadRequest => "Bad Request - Invalid details provided.",
-            StatusCodes.Status403Forbidden => "Forbidden - You do not have permissions.",
-            StatusCodes.Status404NotFound => "Not Found - The specified resource does not exist.",
-            StatusCodes.Status422UnprocessableEntity => "Unprocessable Entity - Business rule violation.",
-            _ => "Internal Server Error - An unexpected error occurred."
+            StatusCodes.Status400BadRequest => "Solicitud Incorrecta - Los datos proporcionados son inválidos.",
+            StatusCodes.Status403Forbidden => "Acceso Denegado - No tiene permisos para realizar esta acción.",
+            StatusCodes.Status404NotFound => "No Encontrado - El recurso especificado no existe.",
+            StatusCodes.Status422UnprocessableEntity => "Entidad No Procesable - Se ha violado una regla de negocio.",
+            _ => "Error Interno del Servidor - Ha ocurrido un error inesperado."
         };
     }
 }

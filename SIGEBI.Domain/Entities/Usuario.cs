@@ -21,6 +21,7 @@ namespace SIGEBI.Domain.Entities
         public ICollection<Valoracion> Valoraciones { get; private set; } = new List<Valoracion>();
         public ICollection<Auditoria> Auditorias { get; private set; } = new List<Auditoria>();
         public ListaDeseos? ListaDeseos { get; private set; }
+        public string? ImagenUrl { get; private set; }
 
         private Usuario() { }
 
@@ -74,5 +75,7 @@ namespace SIGEBI.Domain.Entities
                 throw new ArgumentException("La contraseña es requerida.", nameof(nuevoHash));
             ContrasenaHash = nuevoHash;
         }
+
+        public void ActualizarImagen(string? nuevaUrl) => ImagenUrl = nuevaUrl;
     }
 }

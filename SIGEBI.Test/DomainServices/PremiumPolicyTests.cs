@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Enums.Biblioteca;
@@ -97,7 +97,7 @@ namespace SIGEBI.Test.Domain
 
             var dias = PrestamoPolicy.ObtenerDiasPlazo(usuario);
 
-            dias.Should().Be(7);
+            dias.Should().Be(15);
         }
 
         [Fact]
@@ -117,7 +117,7 @@ namespace SIGEBI.Test.Domain
 
             var dias = PrestamoPolicy.ObtenerDiasPlazo(usuario);
 
-            dias.Should().Be(14);
+            dias.Should().Be(15);
         }
     }
 }

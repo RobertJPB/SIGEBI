@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using SIGEBI.Domain.Entities.Recursos;
 using SIGEBI.Domain.Enums.Biblioteca;
 using Xunit;
@@ -13,7 +13,7 @@ namespace SIGEBI.Test.Domain
         public void Crear_LibroValido_CreaCorrectamente()
         {
             // Arrange & Act
-            var libro = new Libro("El Principito", "Antoine de Saint-Exupéry", 1, 5,
+            var libro = new Libro("El Principito", "Antoine de Saint-Exupéry", 1, 5, null,
                                   "978-84-261", "Editorial X", 1943);
 
             // Assert
@@ -26,7 +26,7 @@ namespace SIGEBI.Test.Domain
         [Fact]
         public void Crear_TituloVacio_LanzaExcepcion()
         {
-            var act = () => new Libro("", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943);
+            var act = () => new Libro("", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943);
 
             act.Should().Throw<ArgumentException>()
                .WithMessage("*título*");
@@ -35,7 +35,7 @@ namespace SIGEBI.Test.Domain
         [Fact]
         public void Crear_ISBNVacio_LanzaExcepcion()
         {
-            var act = () => new Libro("El Principito", "Antoine", 1, 5, "", "Editorial X", 1943);
+            var act = () => new Libro("El Principito", "Antoine", 1, 5, null, "", "Editorial X", 1943);
 
             act.Should().Throw<ArgumentException>()
                .WithMessage("*ISBN*");
@@ -44,7 +44,7 @@ namespace SIGEBI.Test.Domain
         [Fact]
         public void Crear_EditorialVacia_LanzaExcepcion()
         {
-            var act = () => new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "", 1943);
+            var act = () => new Libro("El Principito", "Antoine", 1, 5, null, "978-84-261", "", 1943);
 
             act.Should().Throw<ArgumentException>()
                .WithMessage("*editorial*");
@@ -53,7 +53,7 @@ namespace SIGEBI.Test.Domain
         [Fact]
         public void Crear_AnioInvalido_LanzaExcepcion()
         {
-            var act = () => new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 0);
+            var act = () => new Libro("El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 0);
 
             act.Should().Throw<ArgumentException>()
                .WithMessage("*año*");
@@ -62,7 +62,7 @@ namespace SIGEBI.Test.Domain
         [Fact]
         public void Crear_StockNegativo_LanzaExcepcion()
         {
-            var act = () => new Libro("El Principito", "Antoine", 1, -1, "978-84-261", "Editorial X", 1943);
+            var act = () => new Libro("El Principito", "Antoine", 1, -1, null, "978-84-261", "Editorial X", 1943);
 
             act.Should().Throw<ArgumentOutOfRangeException>();
         }
@@ -72,7 +72,7 @@ namespace SIGEBI.Test.Domain
         [Fact]
         public void DisminuirStock_StockDisponible_DisminuyeCorrectamente()
         {
-            var libro = new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943);
+            var libro = new Libro("El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943);
 
             libro.DisminuirStock();
 
@@ -82,7 +82,7 @@ namespace SIGEBI.Test.Domain
         [Fact]
         public void DisminuirStock_StockCero_LanzaExcepcion()
         {
-            var libro = new Libro("El Principito", "Antoine", 1, 0, "978-84-261", "Editorial X", 1943);
+            var libro = new Libro("El Principito", "Antoine", 1, 0, null, "978-84-261", "Editorial X", 1943);
 
             var act = () => libro.DisminuirStock();
 
@@ -94,9 +94,9 @@ namespace SIGEBI.Test.Domain
         [Fact]
         public void Actualizar_DatosValidos_ActualizaCorrectamente()
         {
-            var libro = new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943);
+            var libro = new Libro("El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943);
 
-            libro.Actualizar("Nuevo Titulo", "Nuevo Autor", 2, 10, "000-00-000", "Nueva Editorial", 2000);
+            libro.Actualizar("Nuevo Titulo", "Nuevo Autor", 2, 10, null, "000-00-000", "Nueva Editorial", 2000);
 
             libro.Titulo.Should().Be("Nuevo Titulo");
             libro.Stock.Should().Be(10);
@@ -108,7 +108,7 @@ namespace SIGEBI.Test.Domain
         [Fact]
         public void Desactivar_LibroActivo_CambiaEstado()
         {
-            var libro = new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943);
+            var libro = new Libro("El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943);
 
             libro.Desactivar();
 
@@ -118,7 +118,7 @@ namespace SIGEBI.Test.Domain
         [Fact]
         public void DisminuirStock_LibroInactivo_LanzaExcepcion()
         {
-            var libro = new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943);
+            var libro = new Libro("El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943);
             libro.Desactivar();
 
             var act = () => libro.DisminuirStock();

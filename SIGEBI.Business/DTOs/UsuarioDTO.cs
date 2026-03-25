@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace SIGEBI.Business.DTOs
 {
@@ -15,5 +15,6 @@ namespace SIGEBI.Business.DTOs
         public int IdRol { get; set; }
 
         public short Estado { get; set; }
+        public string? ImagenUrl { get; set; }
     }
 }

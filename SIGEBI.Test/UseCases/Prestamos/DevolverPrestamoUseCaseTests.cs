@@ -39,7 +39,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
         // ── HELPERS ──
 
         private Libro CrearLibroDisponible()
-            => new Libro("El Principito", "Antoine", 1, 5, "978-84-261", "Editorial X", 1943);
+            => new Libro("El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943);
 
         private Prestamo CrearPrestamoActivo(Guid? usuarioId = null, Guid? recursoId = null)
             => new Prestamo(

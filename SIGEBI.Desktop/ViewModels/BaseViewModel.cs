@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace SIGEBII.ViewModels
+namespace SIGEBI.ViewModels
 {
     // Clase base para todos los ViewModels del sistema.
     // ObservableObject ya implementa INotifyPropertyChanged.

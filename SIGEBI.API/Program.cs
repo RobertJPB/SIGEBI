@@ -10,8 +10,12 @@ using SIGEBI.Infrastructure.IoC;
 using SIGEBI.Infrastructure.Services;
 using System.Text;
 
-// CONFIGURACIÓN DE LA APLICACIÓN (API) 
+// configuracion de la aplicacion API
 var builder = WebApplication.CreateBuilder(args);
+
+// Inyección de dependencias por capas
+builder.Services.AddBusiness();
+builder.Services.AddInfrastructure();
 
 // Registro de controladores y configuración de JSON para evitar ciclos en las relaciones de las entidades
 builder.Services.AddControllers()
@@ -56,10 +60,6 @@ builder.Services.AddDbContext<SIGEBIDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         sqlOptions => sqlOptions.EnableRetryOnFailure()));
-
-// Inyección de dependencias separada por capa 
-builder.Services.AddBusiness();     
-builder.Services.AddInfrastructure(); 
  
 
 // Configuración de Autenticación basada en JWT
@@ -92,7 +92,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// PIPELINE DE LA PETICIÓN (MIDDLEWARE) 
+// pipeline de la peticion middleware 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

@@ -18,7 +18,8 @@ namespace SIGEBI.Business.Mappers
                 TipoRecurso = recurso.GetType().Name,
                 CategoriaId = recurso.IdCategoria,
                 CategoriaNombre = recurso.Categoria?.Nombre ?? string.Empty,
-                ImagenUrl = recurso.ImagenUrl
+                ImagenUrl = recurso.ImagenUrl,
+                Descripcion = recurso.Descripcion
             };
 
             if (recurso is Libro libro)

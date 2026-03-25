@@ -14,7 +14,8 @@ namespace SIGEBI.Business.Mappers
                 Nombre = usuario.Nombre,
                 Correo = usuario.Correo,
                 IdRol = (int)usuario.Rol,
-                Estado = (short)usuario.Estado
+                Estado = (short)usuario.Estado,
+                ImagenUrl = usuario.ImagenUrl
             };
         }
     }

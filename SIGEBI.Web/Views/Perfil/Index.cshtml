@@ -1,4 +1,4 @@
-﻿@model SIGEBI.Web.Controllers.PerfilIndexViewModel
+@model SIGEBI.Web.Controllers.PerfilIndexViewModel
 @{
     ViewData["Title"] = "Mi Perfil";
     Layout = null;
@@ -49,35 +49,63 @@
             padding: 2.5rem;
             display: flex;
             align-items: center;
-            gap: 1.5rem;
+            gap: 2rem;
+            position: relative;
+        }
+        .avatar-container {
+            position: relative;
+            cursor: pointer;
         }
         .avatar {
-            width: 80px; height: 80px;
+            width: 100px; height: 100px;
             border-radius: 50%;
             background: var(--green-400);
             display: flex; align-items: center; justify-content: center;
-            font-size: 2rem; color: white; font-weight: 700;
+            font-size: 2.5rem; color: white; font-weight: 700;
             flex-shrink: 0;
+            border: 4px solid rgba(255,255,255,0.2);
+            object-fit: cover;
+            transition: all 0.3s;
         }
-        .perfil-info h2 { font-size: 1.5rem; font-weight: 700; color: white; margin-bottom: 4px; }
-        .perfil-info p { font-size: 0.85rem; color: rgba(255,255,255,0.65); }
-        .rol-badge { display: inline-block; background: var(--green-400); color: white; font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; margin-top: 6px; }
+        .avatar-container:hover .avatar {
+            opacity: 0.8;
+            border-color: white;
+        }
+        .avatar-overlay {
+            position: absolute;
+            bottom: 0; right: 0;
+            background: var(--green-600);
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white;
+            border: 2px solid var(--green-800);
+            font-size: 0.9rem;
+        }
+        .perfil-info h2 { font-size: 1.6rem; font-weight: 700; color: white; margin-bottom: 4px; }
+        .perfil-info p { font-size: 0.9rem; color: rgba(255,255,255,0.7); }
+        .rol-badge { display: inline-block; background: var(--green-400); color: white; font-size: 0.72rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-top: 8px; }
 
-        .perfil-body { padding: 2rem; }
-        .campo-grupo { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.2rem; }
-        .campo { }
-        .campo label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
-        .campo p { font-size: 0.95rem; color: var(--ink); font-weight: 500; background: var(--green-50, #f4faf7); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); }
-        .campo-full { margin-bottom: 1.2rem; }
+        .alert {
+            padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;
+            font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; gap: 10px;
+        }
+        .alert-success { background: #e8f5ee; color: #1a5c2e; border: 1px solid #c3e6cb; }
+        .alert-error { background: #fdecea; color: #c62828; border: 1px solid #f5c6cb; }
 
+        .perfil-body { padding: 2.5rem; }
+        .campo-grupo { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .campo label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .campo p { font-size: 0.95rem; color: var(--ink); font-weight: 500; background: #f9fbf9; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border); }
+        
         .btn-logout {
             display: inline-flex; align-items: center; gap: 8px;
-            background: #fdecea; color: #c62828; padding: 10px 22px;
-            border-radius: 8px; font-weight: 600; font-size: 0.9rem;
-            text-decoration: none; transition: background 0.2s; border: none; cursor: pointer;
+            background: #fdecea; color: #c62828; padding: 12px 24px;
+            border-radius: 10px; font-weight: 600; font-size: 0.9rem;
+            text-decoration: none; transition: all 0.2s; border: none; cursor: pointer;
         }
-        .btn-logout:hover { background: #f5c6cb; }
-        .perfil-footer { padding: 1.2rem 2rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; }
+        .btn-logout:hover { background: #f5c6cb; transform: translateY(-1px); }
+        .perfil-footer { padding: 1.5rem 2.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; background: #fcfdfc; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; }
     </style>
 </head>
 <body>
@@ -90,26 +118,58 @@
             </div>
         </a>
         <div class="nav-links">
-            <a class="nav-link" href="/Catalogo/Index"><i class="bi bi-grid"></i> CatÃ¡logo</a>
+            <a class="nav-link" href="/Catalogo/Index"><i class="bi bi-grid"></i> Catálogo</a>
             <a class="nav-link" href="/ListaDeseos/Index"><i class="bi bi-heart"></i> Lista de Deseos</a>
-            <a class="nav-link" href="/Prestamos/Index"><i class="bi bi-book"></i> Mis PrÃ©stamos</a>
+            <a class="nav-link" href="/Prestamos/Index"><i class="bi bi-book"></i> Mis Préstamos</a>
             <a class="nav-link" href="/Notificaciones/Index"><i class="bi bi-bell"></i> Notificaciones</a>
             <div class="nav-divider"></div>
-            <a class="nav-link active" href="/Perfil/Index"><i class="bi bi-person-circle"></i> Perfil</a>
+            <a class="nav-link active" href="/Perfil/Index">
+                @if(!string.IsNullOrEmpty(Model.ImagenUrl))
+                {
+                    <img src="@Model.ImagenUrl" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.3);" />
+                }
+                else
+                {
+                    <i class="bi bi-person-circle"></i>
+                }
+                Perfil
+            </a>
         </div>
     </nav>
 
     <div class="page-header">
         <div class="header-content">
-            <p class="header-eyebrow">ConfiguraciÃ³n</p>
+            <p class="header-eyebrow">Configuración</p>
             <h1 class="header-title">Mi Perfil</h1>
         </div>
     </div>
 
     <div class="main-content">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success"><i class="bi bi-check-circle-fill"></i> @TempData["Success"]</div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-error"><i class="bi bi-exclamation-triangle-fill"></i> @TempData["Error"]</div>
+        }
+
         <div class="perfil-card">
             <div class="perfil-header">
-                <div class="avatar">@(Model.Nombre?.Length > 0 ? Model.Nombre[0].ToString().ToUpper() : "?")</div>
+                <form id="fotoForm" asp-action="ActualizarFoto" method="post" enctype="multipart/form-data" class="avatar-container" onclick="document.getElementById('fileInput').click()">
+                    <input type="file" id="fileInput" name="foto" style="display:none" onchange="document.getElementById('fotoForm').submit()" accept="image/*" />
+                    @if(!string.IsNullOrEmpty(Model.ImagenUrl))
+                    {
+                        <img src="@Model.ImagenUrl" class="avatar" alt="Foto de perfil" />
+                    }
+                    else
+                    {
+                        <div class="avatar">@(Model.Nombre?.Length > 0 ? Model.Nombre[0].ToString().ToUpper() : "?")</div>
+                    }
+                    <div class="avatar-overlay">
+                        <i class="bi bi-camera-fill"></i>
+                    </div>
+                </form>
                 <div class="perfil-info">
                     <h2>@Model.Nombre</h2>
                     <p>@Model.Correo</p>
@@ -123,13 +183,13 @@
                         <p>@Model.Nombre</p>
                     </div>
                     <div class="campo">
-                        <label>Correo electrÃ³nico</label>
+                        <label>Correo electrónico</label>
                         <p>@Model.Correo</p>
                     </div>
                 </div>
                 <div class="campo-grupo">
                     <div class="campo">
-                        <label>Rol</label>
+                        <label>Rol del Sistema</label>
                         <p>@Model.Rol</p>
                     </div>
                     <div class="campo">
@@ -139,10 +199,9 @@
                 </div>
             </div>
             <div class="perfil-footer">
-                <form method="post" asp-page-handler="Logout">
-                    @Html.AntiForgeryToken()
+                <form asp-action="Logout" method="post">
                     <button type="submit" class="btn-logout">
-                        <i class="bi bi-box-arrow-left"></i> Cerrar sesiÃ³n
+                        <i class="bi bi-box-arrow-left"></i> Cerrar Sesión
                     </button>
                 </form>
             </div>

@@ -89,6 +89,12 @@ namespace SIGEBI.Web.Controllers
                     HttpContext.Session.SetString("UsuarioId", usuarioIdClaim);
                 }
 
+                var usuarioNombreClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+                if (!string.IsNullOrEmpty(usuarioNombreClaim))
+                {
+                    HttpContext.Session.SetString("UsuarioNombre", usuarioNombreClaim);
+                }
+
                 // Crear cookie de autenticación
                 var claims = new List<Claim>
                 {

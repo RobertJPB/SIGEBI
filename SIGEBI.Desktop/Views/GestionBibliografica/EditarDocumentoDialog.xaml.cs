@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Windows;
 using SIGEBI.Services;
+using SIGEBI.Business.DTOs;
 
 namespace SIGEBI.Views.GestionBibliografica
 {
@@ -12,7 +13,7 @@ namespace SIGEBI.Views.GestionBibliografica
         private byte[]? _imagenBytes;
         private string? _imagenNombre;
 
-        public EditarDocumentoDialog() : this((ApiService)SIGEBII.App.Current.Services.GetService(typeof(ApiService))!, new RecursoDetalleDTO()) { }
+        public EditarDocumentoDialog() : this((ApiService)SIGEBI.App.Current.Services.GetService(typeof(ApiService))!, new RecursoDetalleDTO()) { }
 
         public EditarDocumentoDialog(ApiService api, RecursoDetalleDTO recurso)
         {
@@ -35,6 +36,7 @@ namespace SIGEBI.Views.GestionBibliografica
 
                 TxtTitulo.Text = recurso.Titulo;
                 TxtAutor.Text = recurso.Autor;
+                TxtDescripcion.Text = recurso.Descripcion ?? "";
                 TxtFormato.Text = recurso.Formato ?? "";
                 TxtInstitucion.Text = recurso.Institucion ?? "";
                 TxtAnio.Text = recurso.Anio?.ToString() ?? "";
@@ -97,6 +99,7 @@ namespace SIGEBI.Views.GestionBibliografica
                     Titulo = TxtTitulo.Text.Trim(),
                     Autor = TxtAutor.Text.Trim(),
                     CategoriaId = (int)CmbCategoria.SelectedValue,
+                    Descripcion = string.IsNullOrWhiteSpace(TxtDescripcion.Text) ? null : TxtDescripcion.Text.Trim(),
                     Formato = TxtFormato.Text.Trim(),
                     Institucion = TxtInstitucion.Text.Trim(),
                     Anio = int.TryParse(TxtAnio.Text, out int anio) ? anio : null,

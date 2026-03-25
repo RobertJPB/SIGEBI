@@ -1,6 +1,6 @@
 using System.Windows;
 using SIGEBI.Services;
-using SIGEBII;
+using SIGEBI.Business.DTOs;
 
 namespace SIGEBI.Views.Auth
 {
@@ -11,7 +11,7 @@ namespace SIGEBI.Views.Auth
         public LoginWindow()
         {
             InitializeComponent();
-            _viewModel = (SIGEBI.ViewModels.LoginViewModel)SIGEBII.App.Current.Services.GetService(typeof(SIGEBI.ViewModels.LoginViewModel))!;
+            _viewModel = (SIGEBI.ViewModels.LoginViewModel)SIGEBI.App.Current.Services.GetService(typeof(SIGEBI.ViewModels.LoginViewModel))!;
             DataContext = _viewModel;
 
             _viewModel.OnLoginSuccess = () =>

@@ -1,9 +1,10 @@
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using SIGEBI.Services;
-using SIGEBII.ViewModels;
+using SIGEBI.Business.DTOs;
+using SIGEBI.ViewModels;
 
-namespace SIGEBII;
+namespace SIGEBI;
 
 /// <summary>
 /// Interaction logic for App.xaml
@@ -22,11 +23,6 @@ public partial class App : Application
     {
         var services = new ServiceCollection();
 
-        // ── ViewModels ──
-        services.AddTransient<MainViewModel>();
-        services.AddTransient<SIGEBI.ViewModels.LoginViewModel>();
-        services.AddTransient<SIGEBI.ViewModels.GestionBibliograficaViewModel>();
-
         // ── Services ──
         services.AddTransient<AuthHandler>();
         
@@ -35,6 +31,16 @@ public partial class App : Application
             client.BaseAddress = new Uri("https://localhost:7047/");
         })
         .AddHttpMessageHandler<AuthHandler>();
+
+        // ── ViewModels ──
+        services.AddTransient<MainViewModel>();
+        services.AddTransient<LoginViewModel>();
+        services.AddTransient<GestionBibliograficaViewModel>();
+        services.AddTransient<GestionPrestamosViewModel>();
+        services.AddTransient<GestionUsuariosViewModel>();
+        services.AddTransient<PenalizacionesViewModel>();
+        services.AddTransient<NotificacionesViewModel>();
+        services.AddTransient<AuditoriaViewModel>();
 
         return services.BuildServiceProvider();
     }

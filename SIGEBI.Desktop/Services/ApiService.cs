@@ -60,8 +60,7 @@ namespace SIGEBI.Services
             return JsonSerializer.Deserialize<List<RecursoDetalleDTO>>(json, _jsonOptions) ?? new();
         }
 
-        // ── AGREGAR ──
-
+        // ── AGREGAR RECURSOS ──
         public async Task<RecursoDetalleDTO?> AgregarLibroAsync(AgregarLibroRequest request)
         {
             var form = BuildLibroForm(request);
@@ -89,8 +88,7 @@ namespace SIGEBI.Services
             return JsonSerializer.Deserialize<RecursoDetalleDTO>(json, _jsonOptions);
         }
 
-        // ── EDITAR ──
-
+        // ── EDITAR RECURSOS ──
         public async Task<RecursoDetalleDTO?> EditarLibroAsync(Guid id, AgregarLibroRequest request)
         {
             var form = BuildLibroForm(request);
@@ -145,6 +143,17 @@ namespace SIGEBI.Services
             response.EnsureSuccessStatusCode();
         }
 
+        public async Task ActualizarFotoPerfilAsync(byte[] imageBytes, string fileName)
+        {
+            using var content = new MultipartFormDataContent();
+            var fileContent = new ByteArrayContent(imageBytes);
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg"); // Genérico
+            content.Add(fileContent, "foto", fileName);
+
+            var response = await _httpClient.PostAsync("api/Usuarios/perfil/foto", content);
+            response.EnsureSuccessStatusCode();
+        }
+
         // ── PRÉSTAMOS ──
         public async Task<List<PrestamoResponseDTO>> GetPrestamosAsync()
         {
@@ -164,11 +173,62 @@ namespace SIGEBI.Services
 
         public async Task DevolverPrestamoAsync(Guid prestamoId)
         {
-            var response = await _httpClient.PutAsync($"api/Prestamos/{prestamoId}/devolver", null);
+            var response = await _httpClient.PutAsync($"api/Prestamos/devolver/{prestamoId}", null);
             response.EnsureSuccessStatusCode();
         }
 
-        // ── HELPERS ──
+        public async Task EliminarPrestamoAsync(Guid prestamoId)
+        {
+            var response = await _httpClient.DeleteAsync($"api/Prestamos/{prestamoId}");
+            response.EnsureSuccessStatusCode();
+        }
+
+        // ── PENALIZACIONES ──
+        public async Task<List<PenalizacionDTO>> GetPenalizacionesAsync()
+        {
+            var response = await _httpClient.GetAsync("api/Penalizaciones");
+            response.EnsureSuccessStatusCode();
+            var json = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<List<PenalizacionDTO>>(json, _jsonOptions) ?? new();
+        }
+
+        public async Task FinalizarPenalizacionAsync(Guid id)
+        {
+            var response = await _httpClient.PatchAsync($"api/Penalizaciones/{id}/finalizar", null);
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task AplicarPenalizacionesAsync()
+        {
+            var response = await _httpClient.PostAsync("api/Penalizaciones/aplicar", null);
+            response.EnsureSuccessStatusCode();
+        }
+
+        // ── NOTIFICACIONES ──
+        public async Task<List<NotificacionDTO>> GetNotificacionesAsync(Guid usuarioId)
+        {
+            var response = await _httpClient.GetAsync($"api/Notificaciones/usuario/{usuarioId}");
+            response.EnsureSuccessStatusCode();
+            var json = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<List<NotificacionDTO>>(json, _jsonOptions) ?? new();
+        }
+
+        public async Task EliminarNotificacionAsync(Guid id)
+        {
+            var response = await _httpClient.DeleteAsync($"api/Notificaciones/{id}");
+            response.EnsureSuccessStatusCode();
+        }
+
+        // ── AUDITORÍA ──
+        public async Task<List<AuditoriaDTO>> GetAuditoriasAsync()
+        {
+            var response = await _httpClient.GetAsync("api/Auditoria");
+            response.EnsureSuccessStatusCode();
+            var json = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<List<AuditoriaDTO>>(json, _jsonOptions) ?? new();
+        }
+
+        // ── HELPERS PRIVADOS ──
         private MultipartFormDataContent BuildLibroForm(AgregarLibroRequest request)
         {
             var form = new MultipartFormDataContent();
@@ -179,6 +239,8 @@ namespace SIGEBI.Services
             form.Add(new StringContent(request.ISBN ?? ""), "ISBN");
             form.Add(new StringContent(request.Editorial ?? ""), "Editorial");
             form.Add(new StringContent(request.Anio?.ToString() ?? "0"), "Anio");
+            if (request.Descripcion != null)
+                form.Add(new StringContent(request.Descripcion), "Descripcion");
             if (request.Genero != null)
                 form.Add(new StringContent(request.Genero), "Genero");
             if (request.ImagenBytes != null && request.ImagenNombre != null)
@@ -196,6 +258,8 @@ namespace SIGEBI.Services
             form.Add(new StringContent(request.ISSN ?? ""), "ISSN");
             form.Add(new StringContent(request.NumeroEdicion.ToString()), "NumeroEdicion");
             form.Add(new StringContent(request.FechaPublicacion?.ToString("yyyy-MM-dd") ?? ""), "FechaPublicacion");
+            if (request.Descripcion != null)
+                form.Add(new StringContent(request.Descripcion), "Descripcion");
             if (request.ImagenBytes != null && request.ImagenNombre != null)
                 form.Add(new ByteArrayContent(request.ImagenBytes), "Imagen", request.ImagenNombre);
             return form;
@@ -211,6 +275,8 @@ namespace SIGEBI.Services
             form.Add(new StringContent(request.Formato ?? ""), "Formato");
             form.Add(new StringContent(request.Institucion ?? ""), "Institucion");
             form.Add(new StringContent(request.Anio?.ToString() ?? "0"), "Anio");
+            if (request.Descripcion != null)
+                form.Add(new StringContent(request.Descripcion), "Descripcion");
             if (request.ImagenBytes != null && request.ImagenNombre != null)
                 form.Add(new ByteArrayContent(request.ImagenBytes), "Imagen", request.ImagenNombre);
             return form;
@@ -222,104 +288,5 @@ namespace SIGEBI.Services
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             return await _httpClient.PostAsync(url, content);
         }
-    }
-
-    // ── DTOs ──
-
-    public class CategoriaDTO
-    {
-        public int Id { get; set; }
-        public string Nombre { get; set; } = string.Empty;
-    }
-
-    public class RecursoDetalleDTO
-    {
-        public Guid Id { get; set; }
-        public string Titulo { get; set; } = string.Empty;
-        public string Autor { get; set; } = string.Empty;
-        public int CategoriaId { get; set; }
-        public string? CategoriaNombre { get; set; }
-        public int Stock { get; set; }
-        public string Estado { get; set; } = string.Empty;
-        public string TipoRecurso { get; set; } = string.Empty;
-        public string? ISBN { get; set; }
-        public string? Editorial { get; set; }
-        public int? Anio { get; set; }
-        public string? Genero { get; set; }
-        public int? NumeroEdicion { get; set; }
-        public string? ISSN { get; set; }
-        public DateTime? FechaPublicacion { get; set; }
-        public string? Formato { get; set; }
-        public string? Institucion { get; set; }
-        public string? ImagenUrl { get; set; }
-        public double? PromedioValoraciones { get; set; }
-    }
-
-    public class UsuarioDTO
-    {
-        public Guid Id { get; set; }
-        public string Nombre { get; set; } = string.Empty;
-        public string Correo { get; set; } = string.Empty;
-        public string Contrasena { get; set; } = string.Empty;
-        public int IdRol { get; set; }
-        public short Estado { get; set; }
-    }
-
-    public class PrestamoRequestDTO
-    {
-        public Guid UsuarioId { get; set; }
-        public Guid RecursoId { get; set; }
-    }
-
-    public class PrestamoResponseDTO
-    {
-        public Guid Id { get; set; }
-        public Guid UsuarioId { get; set; }
-        public string UsuarioNombre { get; set; } = string.Empty;
-        public Guid RecursoId { get; set; }
-        public string RecursoTitulo { get; set; } = string.Empty;
-        public DateTime FechaInicio { get; set; }
-        public DateTime FechaLimite { get; set; }
-        public string Estado { get; set; } = string.Empty;
-    }
-
-    public class AgregarLibroRequest
-    {
-        public string Titulo { get; set; } = string.Empty;
-        public string Autor { get; set; } = string.Empty;
-        public int CategoriaId { get; set; }
-        public int Stock { get; set; }
-        public string? ISBN { get; set; }
-        public string? Editorial { get; set; }
-        public int? Anio { get; set; }
-        public string? Genero { get; set; }
-        public byte[]? ImagenBytes { get; set; }
-        public string? ImagenNombre { get; set; }
-    }
-
-    public class AgregarRevistaRequest
-    {
-        public string Titulo { get; set; } = string.Empty;
-        public string? Autor { get; set; }
-        public int CategoriaId { get; set; }
-        public int Stock { get; set; }
-        public int NumeroEdicion { get; set; }
-        public string? ISSN { get; set; }
-        public DateTime? FechaPublicacion { get; set; }
-        public byte[]? ImagenBytes { get; set; }
-        public string? ImagenNombre { get; set; }
-    }
-
-    public class AgregarDocumentoRequest
-    {
-        public string Titulo { get; set; } = string.Empty;
-        public string? Autor { get; set; }
-        public int CategoriaId { get; set; }
-        public int Stock { get; set; }
-        public string? Formato { get; set; }
-        public string? Institucion { get; set; }
-        public int? Anio { get; set; }
-        public byte[]? ImagenBytes { get; set; }
-        public string? ImagenNombre { get; set; }
     }
 }

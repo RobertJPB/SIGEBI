@@ -76,6 +76,18 @@ namespace SIGEBI.API.Controllers
             return Ok(recursos);
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver detalle de recurso");
+
+            var recurso = await _consultarUseCase.GetByIdAsync(id);
+            if (recurso == null) return NotFound("Recurso no encontrado.");
+
+            return Ok(recurso);
+        }
+
         // ── POST ──
         /// Agrega un nuevo libro al sistema. Requiere permisos de Administrador o Bibliotecario.
         /// Soporta carga de archivos (multipart/form-data) para la portada.
@@ -92,7 +104,7 @@ namespace SIGEBI.API.Controllers
             var imagenUrl = await GuardarImagenAsync(request.Imagen);
 
             var resultado = await _gestionarUseCase.AgregarLibroAsync(
-                request.Titulo, request.Autor, request.CategoriaId, request.Stock,
+                request.Titulo, request.Autor, request.CategoriaId, request.Stock, request.Descripcion,
                 request.ISBN, request.Editorial, request.Anio, imagenUrl, request.Genero);
             return Ok(resultado);
         }
@@ -107,7 +119,7 @@ namespace SIGEBI.API.Controllers
             if (request == null) return BadRequest("Datos inválidos.");
             var imagenUrl = await GuardarImagenAsync(request.Imagen);
             var resultado = await _gestionarUseCase.AgregarRevistaAsync(
-                request.Titulo, request.Autor, request.CategoriaId, request.Stock,
+                request.Titulo, request.Autor, request.CategoriaId, request.Stock, request.Descripcion,
                 request.NumeroEdicion, request.ISSN, request.FechaPublicacion, imagenUrl);
             return Ok(resultado);
         }
@@ -122,7 +134,7 @@ namespace SIGEBI.API.Controllers
             if (request == null) return BadRequest("Datos inválidos.");
             var imagenUrl = await GuardarImagenAsync(request.Imagen);
             var resultado = await _gestionarUseCase.AgregarDocumentoAsync(
-                request.Titulo, request.Autor, request.CategoriaId, request.Stock,
+                request.Titulo, request.Autor, request.CategoriaId, request.Stock, request.Descripcion,
                 request.Formato, request.Institucion, request.Anio, imagenUrl);
             return Ok(resultado);
         }
@@ -139,7 +151,7 @@ namespace SIGEBI.API.Controllers
             if (request == null) return BadRequest("Datos inválidos.");
             var imagenUrl = await GuardarImagenAsync(request.Imagen);
             var resultado = await _gestionarUseCase.EditarLibroAsync(
-                id, request.Titulo, request.Autor, request.CategoriaId, request.Stock,
+                id, request.Titulo, request.Autor, request.CategoriaId, request.Stock, request.Descripcion,
                 request.ISBN, request.Editorial, request.Anio, imagenUrl, request.Genero);
             return Ok(resultado);
         }
@@ -154,7 +166,7 @@ namespace SIGEBI.API.Controllers
             if (request == null) return BadRequest("Datos inválidos.");
             var imagenUrl = await GuardarImagenAsync(request.Imagen);
             var resultado = await _gestionarUseCase.EditarRevistaAsync(
-                id, request.Titulo, request.Autor, request.CategoriaId, request.Stock,
+                id, request.Titulo, request.Autor, request.CategoriaId, request.Stock, request.Descripcion,
                 request.NumeroEdicion, request.ISSN, request.FechaPublicacion, imagenUrl);
             return Ok(resultado);
         }
@@ -169,7 +181,7 @@ namespace SIGEBI.API.Controllers
             if (request == null) return BadRequest("Datos inválidos.");
             var imagenUrl = await GuardarImagenAsync(request.Imagen);
             var resultado = await _gestionarUseCase.EditarDocumentoAsync(
-                id, request.Titulo, request.Autor, request.CategoriaId, request.Stock,
+                id, request.Titulo, request.Autor, request.CategoriaId, request.Stock, request.Descripcion,
                 request.Formato, request.Institucion, request.Anio, imagenUrl);
             return Ok(resultado);
         }
@@ -226,6 +238,7 @@ namespace SIGEBI.API.Controllers
         public string Editorial { get; set; } = string.Empty;
         public int Anio { get; set; }
         public string? Genero { get; set; }
+        public string? Descripcion { get; set; }
         public IFormFile? Imagen { get; set; }
     }
 
@@ -238,6 +251,7 @@ namespace SIGEBI.API.Controllers
         public int NumeroEdicion { get; set; }
         public string ISSN { get; set; } = string.Empty;
         public DateTime FechaPublicacion { get; set; }
+        public string? Descripcion { get; set; }
         public IFormFile? Imagen { get; set; }
     }
 
@@ -250,6 +264,7 @@ namespace SIGEBI.API.Controllers
         public string Formato { get; set; } = string.Empty;
         public string Institucion { get; set; } = string.Empty;
         public int Anio { get; set; }
+        public string? Descripcion { get; set; }
         public IFormFile? Imagen { get; set; }
     }
 }

@@ -1,28 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using SIGEBI.ViewModels;
 
 namespace SIGEBI.Views.GestionUsuarios
 {
-    /// <summary>
-    /// Lógica de interacción para GestionUsuariosPage.xaml
-    /// </summary>
     public partial class GestionUsuariosPage : Page
     {
+        private readonly GestionUsuariosViewModel _viewModel;
+
         public GestionUsuariosPage()
         {
             InitializeComponent();
+            _viewModel = (GestionUsuariosViewModel)((global::SIGEBI.App)Application.Current).Services.GetService(typeof(GestionUsuariosViewModel))!;
+            DataContext = _viewModel;
+            Loaded += (s, e) => _ = _viewModel.CargarUsuariosAsync();
         }
     }
 }

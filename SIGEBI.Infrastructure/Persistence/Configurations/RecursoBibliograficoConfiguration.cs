@@ -37,42 +37,14 @@ namespace SIGEBI.Infrastructure.Persistence.Configurations
                 .IsRequired()
                 .HasConversion<int>();
 
+            builder.Property(r => r.Descripcion)
+                .HasMaxLength(2000)
+                .IsRequired(false);
+
             builder.HasOne(r => r.Categoria)
                 .WithMany(c => c.Recursos)
                 .HasForeignKey(r => r.IdCategoria)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            // Campos de Libro
-            builder.Property<string>("ISBN")
-                .HasMaxLength(20)
-                .IsRequired(false);
-
-            builder.Property<string>("Editorial")
-                .HasMaxLength(100)
-                .IsRequired(false);
-
-            builder.Property<int?>("Anio")
-                .IsRequired(false);
-
-            // Campos de Revista
-            builder.Property<int?>("NumeroEdicion")
-                .IsRequired(false);
-
-            builder.Property<string>("ISSN")
-                .HasMaxLength(20)
-                .IsRequired(false);
-
-            builder.Property<DateTime?>("FechaPublicacion")
-                .IsRequired(false);
-
-            // Campos de Documento
-            builder.Property<string>("Formato")
-                .HasMaxLength(50)
-                .IsRequired(false);
-
-            builder.Property<string>("Institucion")
-                .HasMaxLength(150)
-                .IsRequired(false);
         }
     }
 }

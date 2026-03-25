@@ -42,6 +42,11 @@ namespace SIGEBI.Business.UseCases.Usuarios
                 (RolUsuario)dto.IdRol
             );
 
+            if (!string.IsNullOrEmpty(dto.ImagenUrl))
+            {
+                usuario.ActualizarImagen(dto.ImagenUrl);
+            }
+
             await _usuarioRepository.AddAsync(usuario);
             await _unitOfWork.SaveChangesAsync(); // ← Este era el problema (ya arreglado)
 

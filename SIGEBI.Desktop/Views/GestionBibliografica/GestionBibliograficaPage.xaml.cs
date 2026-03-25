@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using SIGEBI.Services;
+using SIGEBI.Business.DTOs;
 
 namespace SIGEBI.Views.GestionBibliografica
 {
@@ -15,9 +16,9 @@ namespace SIGEBI.Views.GestionBibliografica
         public GestionBibliograficaPage()
         {
             InitializeComponent();
-            _api = (ApiService)SIGEBII.App.Current.Services.GetService(typeof(ApiService))!;
+            _api = (ApiService)SIGEBI.App.Current.Services.GetService(typeof(ApiService))!;
             
-            _viewModel = (SIGEBI.ViewModels.GestionBibliograficaViewModel)SIGEBII.App.Current.Services.GetService(typeof(SIGEBI.ViewModels.GestionBibliograficaViewModel))!;
+            _viewModel = (SIGEBI.ViewModels.GestionBibliograficaViewModel)SIGEBI.App.Current.Services.GetService(typeof(SIGEBI.ViewModels.GestionBibliograficaViewModel))!;
             DataContext = _viewModel;
 
             Loaded += (s, e) => _ = _viewModel.CargarRecursosAsync();
