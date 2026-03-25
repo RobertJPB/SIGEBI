@@ -79,7 +79,8 @@ namespace SIGEBI.Views.GestionBibliografica
                     Descripcion = string.IsNullOrWhiteSpace(TxtDescripcion.Text) ? null : TxtDescripcion.Text.Trim(),
                     ISSN = TxtISSN.Text.Trim(),
                     NumeroEdicion = int.TryParse(TxtNumeroEdicion.Text, out int num) ? num : 0,
-                    FechaPublicacion = DateTime.TryParse(TxtFechaPublicacion.Text, out DateTime fecha) ? fecha : null,
+                    Anio = int.TryParse(TxtAnio.Text, out int anio) ? anio : 0,
+                    Editorial = TxtEditorial.Text.Trim(),
                     Stock = stock,
                     ImagenBytes = _imagenBytes,
                     ImagenNombre = _imagenNombre

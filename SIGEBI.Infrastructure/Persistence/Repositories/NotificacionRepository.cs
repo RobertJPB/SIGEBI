@@ -12,6 +12,9 @@ namespace SIGEBI.Infrastructure.Persistence.Repositories
         public async Task<IEnumerable<Notificacion>> GetByUsuarioIdAsync(Guid usuarioId)
             => await _dbSet.Where(n => n.UsuarioId == usuarioId).ToListAsync();
 
+        public async Task<int> GetCantPendientesAsync(Guid usuarioId)
+            => await _dbSet.CountAsync(n => n.UsuarioId == usuarioId && n.Estado == SIGEBI.Domain.Enums.Operacion.EstadoNotificacion.NoLeida);
+
         public new async Task<Notificacion?> GetByIdAsync(Guid id)
             => await _dbSet.FirstOrDefaultAsync(n => n.Id == id);
 

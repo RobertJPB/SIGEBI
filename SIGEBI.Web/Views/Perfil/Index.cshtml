@@ -30,6 +30,19 @@
         .nav-link:hover, .nav-link.active { color: white; background: rgba(255,255,255,0.1); }
         .nav-divider { width: 1px; height: 20px; background: rgba(255,255,255,0.15); margin: 0 6px; }
 
+        .notification-dot {
+            position: absolute;
+            top: 6px;
+            right: 10px;
+            width: 8px;
+            height: 8px;
+            background-color: #ff4d4f;
+            border-radius: 50%;
+            border: 1.5px solid #0d2e18;
+            display: none;
+            box-shadow: 0 0 0 2px rgba(255,77,79,0.2);
+        }
+
         .page-header { background: linear-gradient(160deg, rgba(15,61,32,0.92) 0%, rgba(26,92,46,0.88) 60%, rgba(46,139,74,0.85) 100%); padding: 3rem 2.5rem 4rem; }
         .header-content { max-width: 800px; margin: 0 auto; }
         .header-eyebrow { font-size: 0.72rem; letter-spacing: 3px; text-transform: uppercase; color: var(--green-400); font-weight: 600; margin-bottom: 10px; }
@@ -54,6 +67,8 @@
         }
         .avatar-container {
             position: relative;
+        }
+        body.is-editing .avatar-container {
             cursor: pointer;
         }
         .avatar {
@@ -67,7 +82,7 @@
             object-fit: cover;
             transition: all 0.3s;
         }
-        .avatar-container:hover .avatar {
+        body.is-editing .avatar-container:hover .avatar {
             opacity: 0.8;
             border-color: white;
         }
@@ -81,6 +96,10 @@
             color: white;
             border: 2px solid var(--green-800);
             font-size: 0.9rem;
+            display: none;
+        }
+        body.is-editing .avatar-overlay {
+            display: flex;
         }
         .perfil-info h2 { font-size: 1.6rem; font-weight: 700; color: white; margin-bottom: 4px; }
         .perfil-info p { font-size: 0.9rem; color: rgba(255,255,255,0.7); }
@@ -93,19 +112,59 @@
         .alert-success { background: #e8f5ee; color: #1a5c2e; border: 1px solid #c3e6cb; }
         .alert-error { background: #fdecea; color: #c62828; border: 1px solid #f5c6cb; }
 
-        .perfil-body { padding: 2.5rem; }
-        .campo-grupo { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
-        .campo label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-        .campo p { font-size: 0.95rem; color: var(--ink); font-weight: 500; background: #f9fbf9; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border); }
+        .perfil-body { padding: 0.5rem 0; }
+        .perfil-form-body { padding: 2.5rem; }
+        .campo-grupo { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+        .campo label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .form-input { 
+            width: 100%; border-radius: 10px; border: 1.5px solid var(--border); 
+            padding: 14px 18px; font-family: inherit; font-size: 0.95rem; 
+            color: var(--ink); background: white; transition: all 0.2s; 
+        }
+        .form-input:focus { 
+            outline: none; border-color: var(--green-600); 
+            box-shadow: 0 0 0 4px rgba(46,139,74,0.1); 
+        }
+        .form-input[readonly] { background: #f9fbf9; cursor: not-allowed; border-style: dashed; }
         
+        .btn-save { 
+            background: var(--green-600); color: white; border: none; 
+            padding: 14px 28px; border-radius: 12px; font-weight: 600; 
+            font-size: 0.92rem; cursor: pointer; transition: all 0.2s; 
+            display: inline-flex; align-items: center; gap: 10px; 
+        }
+        .btn-save:hover { background: var(--green-800); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(26,92,46,0.25); }
+        .btn-save:active { transform: translateY(0); }
+
         .btn-logout {
             display: inline-flex; align-items: center; gap: 8px;
-            background: #fdecea; color: #c62828; padding: 12px 24px;
-            border-radius: 10px; font-weight: 600; font-size: 0.9rem;
-            text-decoration: none; transition: all 0.2s; border: none; cursor: pointer;
+            background: #fdf2f2; color: #dc2626; padding: 12px 20px;
+            border-radius: 10px; font-weight: 600; font-size: 0.85rem;
+            text-decoration: none; transition: all 0.2s; border: 1px solid #fee2e2; cursor: pointer;
         }
-        .btn-logout:hover { background: #f5c6cb; transform: translateY(-1px); }
-        .perfil-footer { padding: 1.5rem 2.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; background: #fcfdfc; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; }
+        .btn-logout:hover { background: #fee2e2; color: #b91c1c; }
+        
+        .perfil-footer { 
+            padding: 1.5rem 2.5rem; border-top: 1px solid var(--border); 
+            display: flex; justify-content: space-between; align-items: center;
+            background: #fcfdfc; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; 
+        }
+
+        /* Modo edición */
+        .form-input:not([readonly]) {
+            border-color: var(--green-400);
+            background: white;
+        }
+        .edit-mode-only { display: none; }
+        .view-mode-only { display: inline-flex; }
+        
+        body.is-editing .edit-mode-only { display: inline-flex; }
+        body.is-editing .view-mode-only { display: none; }
+        body.is-editing .form-input:not(.always-readonly) { 
+            background: white; 
+            cursor: text;
+            border-style: solid;
+        }
     </style>
 </head>
 <body>
@@ -121,12 +180,18 @@
             <a class="nav-link" href="/Catalogo/Index"><i class="bi bi-grid"></i> Catálogo</a>
             <a class="nav-link" href="/ListaDeseos/Index"><i class="bi bi-heart"></i> Lista de Deseos</a>
             <a class="nav-link" href="/Prestamos/Index"><i class="bi bi-book"></i> Mis Préstamos</a>
-            <a class="nav-link" href="/Notificaciones/Index"><i class="bi bi-bell"></i> Notificaciones</a>
+            <a class="nav-link" href="/Notificaciones/Index">
+                <span style="position: relative; display: inline-flex;">
+                    <i class="bi bi-bell"></i>
+                    <span id="unread-dot" class="notification-dot"></span>
+                </span>
+                Notificaciones
+            </a>
             <div class="nav-divider"></div>
             <a class="nav-link active" href="/Perfil/Index">
                 @if(!string.IsNullOrEmpty(Model.ImagenUrl))
                 {
-                    <img src="@Model.ImagenUrl" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.3);" />
+                    <img src="@(Model.ApiBaseUrl.TrimEnd('/') + "/" + Model.ImagenUrl.TrimStart('/'))" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.3);" />
                 }
                 else
                 {
@@ -156,11 +221,11 @@
 
         <div class="perfil-card">
             <div class="perfil-header">
-                <form id="fotoForm" asp-action="ActualizarFoto" method="post" enctype="multipart/form-data" class="avatar-container" onclick="document.getElementById('fileInput').click()">
+                <form id="fotoForm" asp-action="ActualizarFoto" method="post" enctype="multipart/form-data" class="avatar-container" onclick="if(document.body.classList.contains('is-editing')) document.getElementById('fileInput').click()">
                     <input type="file" id="fileInput" name="foto" style="display:none" onchange="document.getElementById('fotoForm').submit()" accept="image/*" />
                     @if(!string.IsNullOrEmpty(Model.ImagenUrl))
                     {
-                        <img src="@Model.ImagenUrl" class="avatar" alt="Foto de perfil" />
+                        <img src="@(Model.ApiBaseUrl.TrimEnd('/') + "/" + Model.ImagenUrl.TrimStart('/'))" class="avatar" alt="Foto de perfil" />
                     }
                     else
                     {
@@ -176,38 +241,82 @@
                     <span class="rol-badge">@Model.Rol</span>
                 </div>
             </div>
-            <div class="perfil-body">
-                <div class="campo-grupo">
-                    <div class="campo">
-                        <label>Nombre completo</label>
-                        <p>@Model.Nombre</p>
+            <form asp-action="ActualizarDatos" method="post" class="perfil-body">
+                <div class="perfil-form-body">
+                    <div class="campo-grupo">
+                        <div class="campo">
+                            <label>Nombre completo</label>
+                            <input type="text" id="inputNombre" name="nombre" value="@Model.Nombre" class="form-input" required readonly />
+                        </div>
+                        <div class="campo">
+                            <label>Correo electrónico</label>
+                            <input type="email" id="inputCorreo" name="correo" value="@Model.Correo" class="form-input" required readonly />
+                        </div>
                     </div>
-                    <div class="campo">
-                        <label>Correo electrónico</label>
-                        <p>@Model.Correo</p>
+                    <div class="campo-grupo">
+                        <div class="campo">
+                            <label>Rol del Sistema</label>
+                            <input type="text" value="@Model.Rol" class="form-input always-readonly" readonly />
+                        </div>
+                        <div class="campo">
+                            <label>Estado de cuenta</label>
+                            <input type="text" value="@Model.Estado" class="form-input always-readonly" readonly />
+                        </div>
                     </div>
                 </div>
-                <div class="campo-grupo">
-                    <div class="campo">
-                        <label>Rol del Sistema</label>
-                        <p>@Model.Rol</p>
+                <div class="perfil-footer">
+                    <div>
+                        <button type="button" id="btnEdit" class="btn-save view-mode-only" onclick="toggleEdit(true)">
+                            <i class="bi bi-pencil-square"></i> Editar Perfil
+                        </button>
+                        <button type="submit" class="btn-save edit-mode-only">
+                            <i class="bi bi-save-fill"></i> Guardar Cambios
+                        </button>
+                        <button type="button" class="btn-logout edit-mode-only" style="margin-left: 10px; background: #f3f4f6; color: #4b5563; border-color: #d1d5db;" onclick="toggleEdit(false)">
+                            Cancelar
+                        </button>
                     </div>
-                    <div class="campo">
-                        <label>Estado de cuenta</label>
-                        <p>@Model.Estado</p>
-                    </div>
-                </div>
-            </div>
-            <div class="perfil-footer">
-                <form asp-action="Logout" method="post">
-                    <button type="submit" class="btn-logout">
+                    
+                    <button type="button" class="btn-logout view-mode-only" onclick="document.getElementById('logoutForm').submit()">
                         <i class="bi bi-box-arrow-left"></i> Cerrar Sesión
                     </button>
-                </form>
-            </div>
+                </div>
+            </form>
+            <form id="logoutForm" asp-action="Logout" method="post" style="display:none"></form>
         </div>
     </div>
 
+    </div>
+
+    <script>
+        function toggleEdit(editing) {
+            if (editing) {
+                document.body.classList.add('is-editing');
+                document.getElementById('inputNombre').removeAttribute('readonly');
+                document.getElementById('inputCorreo').removeAttribute('readonly');
+                document.getElementById('inputNombre').focus();
+            } else {
+                document.body.classList.remove('is-editing');
+                document.getElementById('inputNombre').setAttribute('readonly', true);
+                document.getElementById('inputCorreo').setAttribute('readonly', true);
+                // Restaurar valores originales (opcional si no se recarga)
+                location.reload(); 
+            }
+        }
+
+        // Script para el punto rojo de notificaciones
+        (function() {
+            fetch('/Notificaciones/GetUnreadCount')
+                .then(response => response.json())
+                .then(data => {
+                    const dot = document.getElementById('unread-dot');
+                    if (data.count > 0 && dot) {
+                        dot.style.display = 'block';
+                    }
+                })
+                .catch(err => console.error('Error fetching unread count:', err));
+        })();
+    </script>
 </body>
 </html>
 

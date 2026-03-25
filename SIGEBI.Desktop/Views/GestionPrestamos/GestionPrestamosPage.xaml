@@ -122,14 +122,29 @@
                 </DataGrid.CellStyle>
 
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Usuario" Binding="{Binding NombreUsuario}" Width="1.5*"/>
-                    <DataGridTextColumn Header="Recurso" Binding="{Binding TituloRecurso}" Width="1.5*"/>
-                    <DataGridTextColumn Header="F. Inicio" Binding="{Binding FechaInicio, StringFormat=dd/MM/yyyy}" Width="100"/>
-                    <DataGridTextColumn Header="F. Límite" Binding="{Binding FechaDevolucionEstimada, StringFormat=dd/MM/yyyy}" Width="100"/>
-                    <DataGridTemplateColumn Header="F. Devolución" Width="100">
+                    <DataGridTextColumn Header="Usuario" Binding="{Binding NombreUsuario}" Width="1.8*"/>
+                    <DataGridTextColumn Header="Recurso" Binding="{Binding TituloRecurso}" Width="2*"/>
+                    
+                    <DataGridTextColumn Header="F. Inicio" Binding="{Binding FechaInicio, StringFormat=dd/MM/yyyy}" Width="110">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Header="F. Límite" Binding="{Binding FechaDevolucionEstimada, StringFormat=dd/MM/yyyy}" Width="110">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <DataGridTemplateColumn Header="F. Devolución" Width="110">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock VerticalAlignment="Center">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Text" Value="{Binding FechaDevolucionReal}"/>
@@ -156,7 +171,7 @@
                     <DataGridTemplateColumn Header="Estado" Width="100">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Border CornerRadius="6" Padding="8,4" HorizontalAlignment="Left">
+                                <Border CornerRadius="6" Padding="8,4" HorizontalAlignment="Center">
                                     <Border.Style>
                                         <Style TargetType="Border">
                                             <Setter Property="Background" Value="#e8f5ee"/>
@@ -197,10 +212,10 @@
                     </DataGridTemplateColumn>
 
                     <!-- Acciones -->
-                    <DataGridTemplateColumn Header="Acciones" Width="260">
+                    <DataGridTemplateColumn Header="Acciones" Width="200">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                     <Button Command="{Binding DataContext.DevolverCommand, RelativeSource={RelativeSource AncestorType=Page}}" CommandParameter="{Binding Id}"
                                             Margin="0,0,6,0">
                                         <Button.Style>

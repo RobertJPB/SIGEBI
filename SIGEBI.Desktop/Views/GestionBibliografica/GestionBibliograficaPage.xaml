@@ -283,15 +283,38 @@
 
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Título"    Binding="{Binding Titulo}"         Width="2*"/>
-                    <DataGridTextColumn Header="Autor"     Binding="{Binding Autor}"           Width="*"/>
-                    <DataGridTextColumn Header="Tipo"      Binding="{Binding TipoRecurso}"     Width="90"/>
-                    <DataGridTextColumn Header="Categoría" Binding="{Binding CategoriaNombre}" Width="120"/>
-                    <DataGridTextColumn Header="Stock"     Binding="{Binding Stock}"           Width="60"/>
-                    <DataGridTextColumn Header="Estado"    Binding="{Binding Estado}"          Width="100"/>
-                    <DataGridTemplateColumn Header="" Width="160">
+                    <DataGridTextColumn Header="Autor"     Binding="{Binding Autor}"           Width="1.5*"/>
+                    
+                    <DataGridTextColumn Header="Tipo"      Binding="{Binding TipoRecurso}"     Width="100">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Header="Categoría" Binding="{Binding CategoriaNombre}" Width="130"/>
+                    
+                    <DataGridTextColumn Header="Stock"     Binding="{Binding Stock}"           Width="80">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Header="Estado"    Binding="{Binding Estado}"          Width="110">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <DataGridTemplateColumn Header="" Width="180">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                     <Button Content="Editar"
                                             Style="{StaticResource BtnEditar}"
                                             Tag="{Binding}"

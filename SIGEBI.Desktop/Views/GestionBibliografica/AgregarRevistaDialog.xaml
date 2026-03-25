@@ -156,8 +156,11 @@
             <TextBlock Text="Numero de edicion" Style="{StaticResource Etiqueta}"/>
             <TextBox x:Name="TxtNumeroEdicion" Style="{StaticResource Campo}"/>
 
-            <TextBlock Text="Fecha de publicacion" Style="{StaticResource Etiqueta}"/>
-            <TextBox x:Name="TxtFechaPublicacion" Style="{StaticResource Campo}"/>
+            <TextBlock Text="Editorial" Style="{StaticResource Etiqueta}"/>
+            <TextBox x:Name="TxtEditorial" Style="{StaticResource Campo}"/>
+
+            <TextBlock Text="Año" Style="{StaticResource Etiqueta}"/>
+            <TextBox x:Name="TxtAnio" Style="{StaticResource Campo}"/>
 
             <TextBlock Text="Stock *" Style="{StaticResource Etiqueta}"/>
             <TextBox x:Name="TxtStock" Style="{StaticResource Campo}"/>

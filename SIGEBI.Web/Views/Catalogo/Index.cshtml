@@ -28,7 +28,13 @@
         <div class="nav-links">
             <a class="nav-link" href="/ListaDeseos/Index"><i class="bi bi-heart"></i> Lista de Deseos</a>
             <a class="nav-link" href="/Prestamos/Index"><i class="bi bi-book"></i> Mis Préstamos</a>
-            <a class="nav-link" href="/Notificaciones/Index"><i class="bi bi-bell"></i> Notificaciones</a>
+            <a class="nav-link" href="/Notificaciones/Index">
+                <span style="position: relative; display: inline-flex;">
+                    <i class="bi bi-bell"></i>
+                    <span id="unread-dot" class="notification-dot"></span>
+                </span>
+                Notificaciones
+            </a>
             <div class="nav-divider"></div>
             <a class="nav-link" href="/Perfil/Index"><i class="bi bi-person-circle"></i> Perfil</a>
         </div>
@@ -133,6 +139,20 @@
         }
     </div>
 
+    <script>
+        // Script para el punto rojo de notificaciones
+        (function() {
+            fetch('/Notificaciones/GetUnreadCount')
+                .then(response => response.json())
+                .then(data => {
+                    const dot = document.getElementById('unread-dot');
+                    if (data.count > 0 && dot) {
+                        dot.style.display = 'block';
+                    }
+                })
+                .catch(err => console.error('Error fetching unread count:', err));
+        })();
+    </script>
 </body>
 </html>
 

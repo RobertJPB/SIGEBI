@@ -8,8 +8,9 @@ namespace SIGEBI.Web.Controllers
     {
         public Guid Id { get; set; }
         public string Mensaje { get; set; } = string.Empty;
-        public bool Leida { get; set; }
-        public DateTime FechaCreacion { get; set; }
+        public string Estado { get; set; } = string.Empty;
+        public DateTime Fecha { get; set; }
+        public bool Leida => Estado == "Leida";
     }
 
     public class NotificacionesIndexViewModel
@@ -54,10 +55,13 @@ namespace SIGEBI.Web.Controllers
                 }
 
                 var json = await response.Content.ReadAsStringAsync();
-                model.Notificaciones = JsonSerializer.Deserialize<List<NotificacionViewModel>>(
+                var list = JsonSerializer.Deserialize<List<NotificacionViewModel>>(
                     json,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
                     ?? new List<NotificacionViewModel>();
+
+                // Ordenamos por fecha descendente (más nuevas primero)
+                model.Notificaciones = list.OrderByDescending(n => n.Fecha).ToList();
             }
             catch
             {
@@ -65,6 +69,57 @@ namespace SIGEBI.Web.Controllers
             }
 
             return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MarcarLeida(Guid id)
+        {
+            try
+            {
+                var token = HttpContext.Session.GetString("JwtToken");
+                if (string.IsNullOrWhiteSpace(token))
+                    return Json(new { success = false, message = "Sesión expirada" });
+
+                var client = _httpClientFactory.CreateClient("SIGEBIAPI");
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                var response = await client.PutAsync($"api/Notificaciones/{id}/leida", null);
+
+                if (response.IsSuccessStatusCode)
+                    return Json(new { success = true });
+
+                var error = await response.Content.ReadAsStringAsync();
+                return Json(new { success = false, message = "No se pudo actualizar: " + error });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUnreadCount()
+        {
+            try
+            {
+                var token = HttpContext.Session.GetString("JwtToken");
+                if (string.IsNullOrWhiteSpace(token)) return Json(new { count = 0 });
+
+                var usuarioId = HttpContext.Session.GetString("UsuarioId");
+                if (string.IsNullOrWhiteSpace(usuarioId)) return Json(new { count = 0 });
+
+                var client = _httpClientFactory.CreateClient("SIGEBIAPI");
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                var response = await client.GetAsync($"api/Notificaciones/usuario/{usuarioId}/count");
+                if (response.IsSuccessStatusCode)
+                {
+                    var countStr = await response.Content.ReadAsStringAsync();
+                    return Json(new { count = int.Parse(countStr) });
+                }
+            }
+            catch { }
+            return Json(new { count = 0 });
         }
     }
 }

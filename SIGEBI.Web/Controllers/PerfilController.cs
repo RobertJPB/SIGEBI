@@ -21,6 +21,7 @@ namespace SIGEBI.Web.Controllers
         public string Rol { get; set; } = string.Empty;
         public string Estado { get; set; } = string.Empty;
         public string? ImagenUrl { get; set; }
+        public string ApiBaseUrl { get; set; } = string.Empty;
     }
 
     public class PerfilController : Controller
@@ -45,7 +46,8 @@ namespace SIGEBI.Web.Controllers
             if (string.IsNullOrWhiteSpace(usuarioId))
                 return RedirectToAction("Login", "Auth");
 
-            var model = new PerfilIndexViewModel();
+            var apiBaseUrl = _config["ApiSettings:BaseUrl"] ?? "https://localhost:7047/";
+            var model = new PerfilIndexViewModel { ApiBaseUrl = apiBaseUrl };
 
             try
             {
@@ -58,7 +60,7 @@ namespace SIGEBI.Web.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-                    var usuario = JsonSerializer.Deserialize<UsuarioPerfilViewModel>(
+                    var usuario = JsonSerializer.Deserialize<SIGEBI.Business.DTOs.UsuarioDTO>(
                         json,
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
@@ -66,9 +68,27 @@ namespace SIGEBI.Web.Controllers
                     {
                         model.Nombre = usuario.Nombre;
                         model.Correo = usuario.Correo;
-                        model.Rol = usuario.Rol ?? "Estudiante";
-                        model.Estado = usuario.Estado ?? "Activo";
                         model.ImagenUrl = usuario.ImagenUrl;
+
+                        // Mapeo manual de Rol (basado en SIGEBI.Domain.Enums.Seguridad.RolUsuario)
+                        model.Rol = usuario.IdRol switch
+                        {
+                            1 => "Administrador",
+                            2 => "Bibliotecario",
+                            3 => "Estudiante",
+                            4 => "Docente",
+                            _ => "Usuario"
+                        };
+
+                        // Mapeo manual de Estado (basado en SIGEBI.Domain.Enums.Seguridad.EstadoUsuario)
+                        model.Estado = usuario.Estado switch
+                        {
+                            1 => "Activo",
+                            2 => "Inactivo",
+                            3 => "Suspendido",
+                            4 => "Bloqueado",
+                            _ => "Desconocido"
+                        };
                     }
                 }
             }
@@ -110,6 +130,44 @@ namespace SIGEBI.Web.Controllers
                 {
                     TempData["Error"] = "Error de comunicación con el servidor.";
                 }
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ActualizarDatos(string nombre, string correo)
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrWhiteSpace(token)) return RedirectToAction("Login", "Auth");
+
+            try
+            {
+                var client = _httpClientFactory.CreateClient("SIGEBIAPI");
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                // Reutilizamos el DTO de la API o mandamos un objeto anónimo que coincida con ActualizarPerfilRequest
+                var requestBody = new { Nombre = nombre, Correo = correo };
+                var json = JsonSerializer.Serialize(requestBody);
+                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await client.PutAsync("api/Usuarios/perfil", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    TempData["Success"] = "Perfil actualizado correctamente.";
+                    // Si cambió el nombre, lo actualizamos también en la sesión para que se vea bien en el Layout si se usa allí
+                    HttpContext.Session.SetString("NombreUsuario", nombre);
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    TempData["Error"] = "No se pudo actualizar: " + error;
+                }
+            }
+            catch
+            {
+                TempData["Error"] = "Error de comunicación con el servidor.";
             }
 
             return RedirectToAction("Index");

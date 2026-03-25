@@ -257,7 +257,8 @@ namespace SIGEBI.Services
             form.Add(new StringContent(request.Stock.ToString()), "Stock");
             form.Add(new StringContent(request.ISSN ?? ""), "ISSN");
             form.Add(new StringContent(request.NumeroEdicion.ToString()), "NumeroEdicion");
-            form.Add(new StringContent(request.FechaPublicacion?.ToString("yyyy-MM-dd") ?? ""), "FechaPublicacion");
+            form.Add(new StringContent(request.Anio.ToString()), "Anio");
+            form.Add(new StringContent(request.Editorial ?? ""), "Editorial");
             if (request.Descripcion != null)
                 form.Add(new StringContent(request.Descripcion), "Descripcion");
             if (request.ImagenBytes != null && request.ImagenNombre != null)

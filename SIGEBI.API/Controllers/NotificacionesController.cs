@@ -48,6 +48,16 @@ namespace SIGEBI.API.Controllers
             return Ok(notificaciones);
         }
 
+        [HttpGet("usuario/{usuarioId}/count")]
+        public async Task<IActionResult> ObtenerCantPendientes(Guid usuarioId)
+        {
+            var rol = ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver conteo de notificaciones");
+
+            var count = await _notificacionesUseCase.ObtenerCantPendientesAsync(usuarioId);
+            return Ok(count);
+        }
+
         [HttpPut("{notificacionId}/leida")]
         public async Task<IActionResult> MarcarComoLeida(Guid notificacionId)
         {

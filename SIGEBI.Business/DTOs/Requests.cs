@@ -28,7 +28,8 @@ namespace SIGEBI.Business.DTOs
         public string? Descripcion { get; set; }
         public int NumeroEdicion { get; set; }
         public string? ISSN { get; set; }
-        public DateTime? FechaPublicacion { get; set; }
+        public int Anio { get; set; }
+        public string? Editorial { get; set; }
         public byte[]? ImagenBytes { get; set; }
         public string? ImagenNombre { get; set; }
     }
@@ -45,5 +46,11 @@ namespace SIGEBI.Business.DTOs
         public int? Anio { get; set; }
         public byte[]? ImagenBytes { get; set; }
         public string? ImagenNombre { get; set; }
+    }
+
+    public class ActualizarPerfilRequest
+    {
+        public string Nombre { get; set; } = string.Empty;
+        public string Correo { get; set; } = string.Empty;
     }
 }

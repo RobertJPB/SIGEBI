@@ -41,12 +41,12 @@ namespace SIGEBI.Business.UseCases.Catalogo
         }
 
         public async Task<RecursoDetalleDTO> AgregarRevistaAsync(string titulo, string autor,
-            int categoriaId, int stock, string? descripcion, int numeroEdicion, string issn, DateTime fechaPublicacion,
+            int categoriaId, int stock, string? descripcion, int numeroEdicion, string issn, int anio, string? editorial,
             string? imagenUrl = null)
         {
             var categoria = await _categoriaRepository.GetByIdAsync(categoriaId)
                 ?? throw new InvalidOperationException("Categoría no encontrada.");
-            var revista = new Revista(titulo, autor, categoriaId, stock, descripcion, numeroEdicion, issn, fechaPublicacion);
+            var revista = new Revista(titulo, autor, categoriaId, stock, descripcion, numeroEdicion, issn, anio, editorial);
             if (imagenUrl != null) revista.ActualizarImagen(imagenUrl);
             await _recursoRepository.AddAsync(revista);
             await _unitOfWork.SaveChangesAsync();
@@ -85,14 +85,14 @@ namespace SIGEBI.Business.UseCases.Catalogo
         }
 
         public async Task<RecursoDetalleDTO> EditarRevistaAsync(Guid id, string titulo, string autor,
-            int categoriaId, int stock, string? descripcion, int numeroEdicion, string issn, DateTime fechaPublicacion,
+            int categoriaId, int stock, string? descripcion, int numeroEdicion, string issn, int anio, string? editorial,
             string? imagenUrl = null)
         {
             var revista = await _recursoRepository.GetByIdAsync(id) as Revista
                 ?? throw new InvalidOperationException("Revista no encontrada.");
             var categoria = await _categoriaRepository.GetByIdAsync(categoriaId)
                 ?? throw new InvalidOperationException("Categoría no encontrada.");
-            revista.Actualizar(titulo, autor, categoriaId, stock, descripcion, numeroEdicion, issn, fechaPublicacion);
+            revista.Actualizar(titulo, autor, categoriaId, stock, descripcion, numeroEdicion, issn, anio, editorial);
             if (imagenUrl != null) revista.ActualizarImagen(imagenUrl);
             _recursoRepository.Update(revista);
             await _unitOfWork.SaveChangesAsync();

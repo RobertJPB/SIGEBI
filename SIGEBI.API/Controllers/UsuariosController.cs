@@ -143,7 +143,6 @@ namespace SIGEBI.API.Controllers
             return Ok("Usuario eliminado correctamente.");
         }
 
-        // Permite al usuario actuar sobre su propia foto de perfil.
         [HttpPost("perfil/foto")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> ActualizarFotoPerfil(IFormFile foto)
@@ -159,6 +158,24 @@ namespace SIGEBI.API.Controllers
             return Ok(new { Mensaje = "Foto de perfil actualizada.", Url = imagenUrl });
         }
 
+        [HttpPut("perfil")]
+        public async Task<IActionResult> ActualizarPerfil([FromBody] ActualizarPerfilRequest request)
+        {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+                return Unauthorized("No se pudo identificar al usuario desde el token.");
+
+            try
+            {
+                await _gestionarUsuario.ActualizarPerfilAsync(userId, request.Nombre, request.Correo);
+                return Ok(new { Mensaje = "Perfil actualizado correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         private async Task<string?> GuardarImagenAsync(IFormFile? imagen)
         {
             if (imagen == null || imagen.Length == 0) return null;
@@ -166,7 +183,7 @@ namespace SIGEBI.API.Controllers
             var extension = Path.GetExtension(imagen.FileName).ToLowerInvariant();
             if (!extensionesPermitidas.Contains(extension)) return null;
 
-            var carpeta = Path.Combine(_env.WebRootPath ?? _env.ContentRootPath, "imagenes", "usuarios");
+            var carpeta = Path.Combine(_env.ContentRootPath, "imagenes", "usuarios");
             Directory.CreateDirectory(carpeta);
             var nombreArchivo = $"{Guid.NewGuid()}{extension}";
             var rutaCompleta = Path.Combine(carpeta, nombreArchivo);

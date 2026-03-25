@@ -32,6 +32,11 @@ namespace SIGEBI.Business.UseCases.Usuarios
             return notificaciones.Select(NotificacionMapper.ToDTO);
         }
 
+        public async Task<int> ObtenerCantPendientesAsync(Guid usuarioId)
+        {
+            return await _notificacionRepository.GetCantPendientesAsync(usuarioId);
+        }
+
         public async Task MarcarComoLeidaAsync(Guid notificacionId)
         {
             var notificacion = await _notificacionRepository.GetByIdAsync(notificacionId)

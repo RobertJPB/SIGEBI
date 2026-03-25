@@ -1,4 +1,4 @@
-﻿using SIGEBI.Business.DTOs;
+using SIGEBI.Business.DTOs;
 using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Business.Mappers
@@ -14,7 +14,8 @@ namespace SIGEBI.Business.Mappers
                 NombreUsuario = valoracion.Usuario?.Nombre ?? string.Empty,
                 RecursoId = valoracion.RecursoId,
                 Calificacion = valoracion.Calificacion,
-                Comentario = valoracion.Comentario
+                Comentario = valoracion.Comentario,
+                ImagenUrl = valoracion.Usuario?.ImagenUrl
             };
         }
     }

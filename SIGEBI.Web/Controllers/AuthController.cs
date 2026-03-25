@@ -89,6 +89,12 @@ namespace SIGEBI.Web.Controllers
                     HttpContext.Session.SetString("UsuarioId", usuarioIdClaim);
                 }
 
+                var usuarioRolClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+                if (!string.IsNullOrEmpty(usuarioRolClaim))
+                {
+                    HttpContext.Session.SetString("UsuarioRol", usuarioRolClaim);
+                }
+
                 var usuarioNombreClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
                 if (!string.IsNullOrEmpty(usuarioNombreClaim))
                 {
@@ -98,7 +104,9 @@ namespace SIGEBI.Web.Controllers
                 // Crear cookie de autenticación
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, model.Correo),
+                    new Claim(ClaimTypes.Name, usuarioNombreClaim ?? model.Correo),
+                    new Claim(ClaimTypes.NameIdentifier, usuarioIdClaim ?? ""),
+                    new Claim(ClaimTypes.Role, usuarioRolClaim ?? ""),
                     new Claim("JwtToken", token)
                 };
 

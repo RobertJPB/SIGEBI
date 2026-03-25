@@ -1,4 +1,4 @@
-﻿@model SIGEBI.Web.Controllers.NotificacionesIndexViewModel
+@model SIGEBI.Web.Controllers.NotificacionesIndexViewModel
 @{
     ViewData["Title"] = "Notificaciones";
     Layout = null;
@@ -30,6 +30,19 @@
         .nav-link:hover, .nav-link.active { color: white; background: rgba(255,255,255,0.1); }
         .nav-divider { width: 1px; height: 20px; background: rgba(255,255,255,0.15); margin: 0 6px; }
 
+        .notification-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background-color: #ff4d4f;
+            border-radius: 50%;
+            border: 1.5px solid #0d2e18;
+            display: none;
+            box-shadow: 0 0 0 2px rgba(255,77,79,0.2);
+        }
+
         .page-header { background: linear-gradient(160deg, rgba(15,61,32,0.92) 0%, rgba(26,92,46,0.88) 60%, rgba(46,139,74,0.85) 100%); padding: 3rem 2.5rem 4rem; }
         .header-content { max-width: 900px; margin: 0 auto; }
         .header-eyebrow { font-size: 0.72rem; letter-spacing: 3px; text-transform: uppercase; color: var(--green-400); font-weight: 600; margin-bottom: 10px; }
@@ -45,19 +58,68 @@
             border: 1px solid var(--border);
             padding: 18px 20px;
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             gap: 16px;
-            transition: box-shadow 0.2s;
-            animation: fadeUp 0.3s ease both;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeUp 0.35s ease both;
+            position: relative;
         }
-        .notif-card:hover { box-shadow: 0 4px 16px rgba(15,61,32,0.09); }
-        .notif-card.no-leida { border-left: 4px solid var(--green-400); background: #f7fdf9; }
-        .notif-icon { width: 42px; height: 42px; border-radius: 50%; background: var(--green-100); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--green-600); flex-shrink: 0; }
+        .notif-card:hover { 
+            box-shadow: 0 10px 25px rgba(15,61,32,0.08); 
+            transform: translateY(-2px);
+            border-color: var(--green-400);
+        }
+        .notif-card.no-leida { 
+            border-left: 5px solid var(--green-400); 
+            background: linear-gradient(to right, #f7fdf9, white); 
+        }
+        .notif-card.leida { opacity: 0.85; filter: grayscale(0.2); }
+        
+        .notif-icon { 
+            width: 46px; height: 46px; border-radius: 12px; 
+            background: var(--green-100); display: flex; align-items: center; 
+            justify-content: center; font-size: 1.2rem; color: var(--green-600); 
+            flex-shrink: 0; transition: transform 0.2s;
+        }
+        .notif-card:hover .notif-icon { transform: scale(1.1) rotate(5deg); }
+        .notif-card.leida .notif-icon { background: #f0f0f0; color: #888; }
+
         .notif-body { flex: 1; }
-        .notif-mensaje { font-size: 0.92rem; color: var(--ink); font-weight: 500; margin-bottom: 4px; }
-        .notif-fecha { font-size: 0.78rem; color: var(--muted); }
-        .notif-badge-leida { font-size: 0.72rem; color: var(--muted); font-weight: 500; padding: 3px 10px; border-radius: 20px; background: #f0f0f0; }
-        .notif-badge-nueva { font-size: 0.72rem; color: var(--green-800); font-weight: 600; padding: 3px 10px; border-radius: 20px; background: var(--green-100); }
+        .notif-mensaje { font-size: 0.95rem; color: var(--ink); font-weight: 500; margin-bottom: 5px; line-height: 1.4; }
+        .notif-fecha { font-size: 0.8rem; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+        
+        .notif-actions { display: flex; align-items: center; gap: 10px; }
+        
+        .btn-action-read {
+            background: white;
+            border: 1.5px solid var(--green-400);
+            color: var(--green-600);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-action-read:hover {
+            background: var(--green-400);
+            color: white;
+            box-shadow: 0 4px 12px rgba(76,175,125,0.3);
+        }
+        
+        .notif-badge-status {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+        .badge-new { background: #d1fae5; color: #065f46; }
+        .badge-read { background: #f3f4f6; color: #6b7280; }
 
         .empty-state { text-align: center; padding: 80px 20px; color: var(--muted); }
         .empty-icon { width: 72px; height: 72px; background: var(--green-100); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.2rem; font-size: 1.8rem; color: var(--green-600); }
@@ -76,10 +138,16 @@
             </div>
         </a>
         <div class="nav-links">
-            <a class="nav-link" href="/Catalogo/Index"><i class="bi bi-grid"></i> CatÃ¡logo</a>
+            <a class="nav-link" href="/Catalogo/Index"><i class="bi bi-grid"></i> Catálogo</a>
             <a class="nav-link" href="/ListaDeseos/Index"><i class="bi bi-heart"></i> Lista de Deseos</a>
-            <a class="nav-link" href="/Prestamos/Index"><i class="bi bi-book"></i> Mis PrÃ©stamos</a>
-            <a class="nav-link active" href="/Notificaciones/Index"><i class="bi bi-bell"></i> Notificaciones</a>
+            <a class="nav-link" href="/Prestamos/Index"><i class="bi bi-book"></i> Mis Préstamos</a>
+            <a class="nav-link active" href="/Notificaciones/Index">
+                <span style="position: relative; display: inline-flex;">
+                    <i class="bi bi-bell"></i>
+                    <span id="unread-dot" class="notification-dot"></span>
+                </span>
+                Notificaciones
+            </a>
             <div class="nav-divider"></div>
             <a class="nav-link" href="/Perfil/Index"><i class="bi bi-person-circle"></i> Perfil</a>
         </div>
@@ -89,7 +157,7 @@
         <div class="header-content">
             <p class="header-eyebrow">Centro de mensajes</p>
             <h1 class="header-title">Notificaciones</h1>
-            <p class="header-subtitle">Avisos sobre prÃ©stamos, devoluciones y penalizaciones</p>
+            <p class="header-subtitle">Avisos sobre préstamos, devoluciones y penalizaciones</p>
         </div>
     </div>
 
@@ -98,8 +166,8 @@
         {
             <div class="empty-state">
                 <div class="empty-icon"><i class="bi bi-bell-slash"></i></div>
-                <h4>No tenÃ©s notificaciones</h4>
-                <p>Cuando haya novedades sobre tus prÃ©stamos, aparecerÃ¡n aquÃ­.</p>
+                <h4>No tienes notificaciones</h4>
+                <p>Cuando haya novedades sobre tus préstamos o disponibilidad, aparecerán aquí.</p>
             </div>
         }
         else
@@ -107,22 +175,70 @@
             <div class="notif-list">
                 @foreach (var n in Model.Notificaciones)
                 {
-                    <div class="notif-card @(!n.Leida ? "no-leida" : "")">
+                    var iconClass = "bi-bell";
+                    if (n.Mensaje.Contains("vence", StringComparison.OrdinalIgnoreCase)) iconClass = "bi-calendar-event";
+                    if (n.Mensaje.Contains("disponible", StringComparison.OrdinalIgnoreCase)) iconClass = "bi-bookmark-check-fill";
+                    if (n.Mensaje.Contains("Préstamo", StringComparison.OrdinalIgnoreCase)) iconClass = "bi-book";
+
+                    <div class="notif-card @(n.Leida ? "leida" : "no-leida")">
                         <div class="notif-icon">
-                            <i class="bi bi-bell"></i>
+                            <i class="bi @iconClass"></i>
                         </div>
                         <div class="notif-body">
                             <p class="notif-mensaje">@n.Mensaje</p>
-                            <p class="notif-fecha"><i class="bi bi-clock me-1"></i>@n.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</p>
+                            <p class="notif-fecha">
+                                <i class="bi bi-clock-history"></i>
+                                @n.Fecha.ToLocalTime().ToString("dd/MM/yyyy") a las @n.Fecha.ToLocalTime().ToString("HH:mm")
+                            </p>
                         </div>
-                        <span class="@(n.Leida ? "notif-badge-leida" : "notif-badge-nueva")">
-                            @(n.Leida ? "LeÃ­da" : "Nueva")
-                        </span>
+                        <div class="notif-actions">
+                            @if (!n.Leida)
+                            {
+                                <button class="btn-action-read" onclick="marcarLeida('@n.Id')">
+                                    <i class="bi bi-check2-all"></i> Marcar leída
+                                </button>
+                                <span class="notif-badge-status badge-new">Nueva</span>
+                            }
+                            else
+                            {
+                                <span class="notif-badge-status badge-read">Leída</span>
+                            }
+                        </div>
                     </div>
                 }
             </div>
         }
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function marcarLeida(id) {
+            const btn = event.currentTarget;
+            $(btn).prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
+
+            $.post('/Notificaciones/MarcarLeida', { id: id }, function(data) {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error al actualizar: ' + data.message);
+                    $(btn).prop('disabled', false).html('<i class="bi bi-check2-all"></i> Marcar leída');
+                }
+            });
+        }
+
+        // Script para el punto rojo de notificaciones
+        (function() {
+            fetch('/Notificaciones/GetUnreadCount')
+                .then(response => response.json())
+                .then(data => {
+                    const dot = document.getElementById('unread-dot');
+                    if (data.count > 0 && dot) {
+                        dot.style.display = 'block';
+                    }
+                })
+                .catch(err => console.error('Error fetching unread count:', err));
+        })();
+    </script>
 
 </body>
 </html>

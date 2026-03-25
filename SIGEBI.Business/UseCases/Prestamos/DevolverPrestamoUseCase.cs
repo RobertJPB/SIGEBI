@@ -12,6 +12,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
         private readonly IRecursoRepository _recursoRepository;
         private readonly IPenalizacionRepository _penalizacionRepository;
         private readonly INotificacionRepository _notificacionRepository;
+        private readonly IListaDeseosRepository _listaDeseosRepository;
         private readonly IUnitOfWork _unitOfWork;
 
         public DevolverPrestamoUseCase(
@@ -19,12 +20,14 @@ namespace SIGEBI.Business.UseCases.Prestamos
             IRecursoRepository recursoRepository,
             IPenalizacionRepository penalizacionRepository,
             INotificacionRepository notificacionRepository,
+            IListaDeseosRepository listaDeseosRepository,
             IUnitOfWork unitOfWork)
         {
             _prestamoRepository = prestamoRepository;
             _recursoRepository = recursoRepository;
             _penalizacionRepository = penalizacionRepository;
             _notificacionRepository = notificacionRepository;
+            _listaDeseosRepository = listaDeseosRepository;
             _unitOfWork = unitOfWork;
         }
 
@@ -37,8 +40,24 @@ namespace SIGEBI.Business.UseCases.Prestamos
             var recurso = await _recursoRepository.GetByIdAsync(prestamo.RecursoId)
                 ?? throw new InvalidOperationException("Recurso no encontrado.");
 
+            bool estabaAgotado = recurso.Stock == 0;
+            
             prestamo.Devolver(DateTime.UtcNow);
             recurso.AumentarStock(); // el libro vuelve a estar disponible
+
+            // Si estaba agotado y ahora hay stock, avisamos a los interesados de la lista de deseos
+            if (estabaAgotado && recurso.Stock > 0)
+            {
+                var usuariosInteresados = await _listaDeseosRepository.GetUsuariosInteresadosAsync(recurso.Id);
+                foreach (var usuarioId in usuariosInteresados)
+                {
+                    // No avisamos al que lo acaba de devolver (innecesario)
+                    if (usuarioId == prestamo.UsuarioId) continue;
+
+                    var notiDisponibilidad = NotificacionFactory.CrearNotificacionDisponibilidad(usuarioId, recurso.Titulo);
+                    await _notificacionRepository.AddAsync(notiDisponibilidad);
+                }
+            }
 
             // Notificación de devolución exitosa
             var notiDevolucion = NotificacionFactory.CrearNotificacionDevolucion(prestamo.UsuarioId);

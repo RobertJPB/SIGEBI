@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Enums.Operacion;
 
@@ -28,6 +28,12 @@ namespace SIGEBI.Domain.DomainServices
         {
             var mensaje = "Tienes un préstamo atrasado. Por favor devuelve el recurso lo antes posible.";
             return new Notificacion(usuarioId, TipoNotificacion.Atraso, mensaje, DateTime.UtcNow);
+        }
+
+        public static Notificacion CrearNotificacionDisponibilidad(Guid usuarioId, string tituloRecurso)
+        {
+            var mensaje = $"¡Buenas noticias! El recurso '{tituloRecurso}' que tienes en tu lista de deseos ya está disponible.";
+            return new Notificacion(usuarioId, TipoNotificacion.Recordatorio, mensaje, DateTime.UtcNow);
         }
     }
 }

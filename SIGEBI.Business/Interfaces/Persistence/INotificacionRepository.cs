@@ -7,6 +7,7 @@ namespace SIGEBI.Business.Interfaces.Persistence
         Task<IEnumerable<Notificacion>> GetAllAsync();
         Task<Notificacion?> GetByIdAsync(Guid id);
         Task<IEnumerable<Notificacion>> GetByUsuarioIdAsync(Guid usuarioId);
+        Task<int> GetCantPendientesAsync(Guid usuarioId);
         Task AddAsync(Notificacion entity);
         void Update(Notificacion entity);
         void Delete(Notificacion entity);

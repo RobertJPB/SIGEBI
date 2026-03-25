@@ -7,12 +7,13 @@ namespace SIGEBI.Domain.Entities.Recursos
     {
         public int NumeroEdicion { get; private set; }
         public string ISSN { get; private set; } = null!;
-        public DateTime FechaPublicacion { get; private set; }
+        public string? Editorial { get; private set; }
+        public int Anio { get; private set; }
 
         private Revista() { }
 
         public Revista(string titulo, string autor, int idCategoria, int stockInicial, string? descripcion,
-                       int numeroEdicion, string issn, DateTime fechaPublicacion)
+                       int numeroEdicion, string issn, int anio, string? editorial = null)
             : base(titulo, autor, idCategoria, stockInicial, descripcion)
         {
             // Validaciones especificas de la revista
@@ -20,14 +21,17 @@ namespace SIGEBI.Domain.Entities.Recursos
                 throw new ArgumentException("El número de edición es inválido.", nameof(numeroEdicion));
             if (string.IsNullOrWhiteSpace(issn))
                 throw new ArgumentException("El ISSN es obligatorio.", nameof(issn));
+            if (anio <= 0)
+                throw new ArgumentException("El año es inválido.", nameof(anio));
 
             NumeroEdicion = numeroEdicion;
             ISSN = issn.Trim();
-            FechaPublicacion = fechaPublicacion;
+            Anio = anio;
+            Editorial = editorial?.Trim();
         }
 
         public void Actualizar(string titulo, string autor, int idCategoria, int stock, string? descripcion,
-                               int numeroEdicion, string issn, DateTime fechaPublicacion)
+                               int numeroEdicion, string issn, int anio, string? editorial = null)
         {
             ActualizarDatosBase(titulo, autor, idCategoria, stock, descripcion);
 
@@ -35,10 +39,13 @@ namespace SIGEBI.Domain.Entities.Recursos
                 throw new ArgumentException("El número de edición es inválido.", nameof(numeroEdicion));
             if (string.IsNullOrWhiteSpace(issn))
                 throw new ArgumentException("El ISSN es obligatorio.", nameof(issn));
+            if (anio <= 0)
+                throw new ArgumentException("El año es inválido.", nameof(anio));
 
             NumeroEdicion = numeroEdicion;
             ISSN = issn.Trim();
-            FechaPublicacion = fechaPublicacion;
+            Anio = anio;
+            Editorial = editorial?.Trim();
         }
     }
 }

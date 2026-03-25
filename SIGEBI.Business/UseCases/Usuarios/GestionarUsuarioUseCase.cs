@@ -89,5 +89,17 @@ namespace SIGEBI.Business.UseCases.Usuarios
             _usuarioRepository.Update(usuario);
             await _unitOfWork.SaveChangesAsync();
         }
+
+        public async Task ActualizarPerfilAsync(Guid id, string nuevoNombre, string nuevoCorreo)
+        {
+            var usuario = await _usuarioRepository.GetByIdAsync(id)
+                ?? throw new InvalidOperationException("Usuario no encontrado.");
+            
+            usuario.CambiarNombre(nuevoNombre);
+            usuario.CambiarCorreo(nuevoCorreo);
+            
+            _usuarioRepository.Update(usuario);
+            await _unitOfWork.SaveChangesAsync();
+        }
     }
 }

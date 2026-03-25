@@ -94,6 +94,19 @@ body {
     margin: 0 6px;
 }
 
+.notification-dot {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    background-color: #ff4d4f;
+    border-radius: 50%;
+    border: 1.5px solid #0d2e18;
+    display: none;
+    box-shadow: 0 0 0 2px rgba(255,77,79,0.2);
+}
+
 /* ── HERO ── */
 .page-header {
     background: linear-gradient(160deg, rgba(15,61,32,0.92) 0%, rgba(26,92,46,0.88) 60%, rgba(46,139,74,0.85) 100%), url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=1400&q=80');

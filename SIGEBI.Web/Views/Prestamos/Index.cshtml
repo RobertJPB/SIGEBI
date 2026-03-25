@@ -47,6 +47,19 @@
         .nav-link:hover, .nav-link.active { color: white; background: rgba(255,255,255,0.1); }
         .nav-divider { width: 1px; height: 20px; background: rgba(255,255,255,0.15); margin: 0 6px; }
 
+        .notification-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background-color: #ff4d4f;
+            border-radius: 50%;
+            border: 1.5px solid #0d2e18;
+            display: none;
+            box-shadow: 0 0 0 2px rgba(255,77,79,0.2);
+        }
+
         .page-header {
             background: linear-gradient(160deg, rgba(15,61,32,0.92) 0%, rgba(26,92,46,0.88) 60%, rgba(46,139,74,0.85) 100%);
             padding: 3rem 2.5rem 4rem;
@@ -82,6 +95,17 @@
         .empty-state h4 { font-size: 1.3rem; color: var(--ink); margin-bottom: 6px; font-weight: 600; }
 
         .alert-error { background: #fdecea; border: 1px solid #f5c6cb; color: #c62828; padding: 12px 18px; border-radius: 10px; margin-bottom: 1.5rem; font-size: 0.9rem; }
+
+        /* Alineación de columnas */
+        table th:nth-child(n+2), 
+        table td:nth-child(n+2) {
+            text-align: center;
+        }
+        
+        .badge-activo, .badge-devuelto, .badge-atrasado {
+            display: inline-block;
+            min-width: 90px;
+        }
     </style>
 </head>
 <body>
@@ -97,7 +121,13 @@
             <a class="nav-link" href="/Catalogo/Index"><i class="bi bi-grid"></i> Catálogo</a>
             <a class="nav-link" href="/ListaDeseos/Index"><i class="bi bi-heart"></i> Lista de Deseos</a>
             <a class="nav-link active" href="/Prestamos/Index"><i class="bi bi-book"></i> Mis Préstamos</a>
-            <a class="nav-link" href="/Notificaciones/Index"><i class="bi bi-bell"></i> Notificaciones</a>
+            <a class="nav-link" href="/Notificaciones/Index">
+                <span style="position: relative; display: inline-flex;">
+                    <i class="bi bi-bell"></i>
+                    <span id="unread-dot" class="notification-dot"></span>
+                </span>
+                Notificaciones
+            </a>
             <div class="nav-divider"></div>
             <a class="nav-link" href="/Perfil/Index"><i class="bi bi-person-circle"></i> Perfil</a>
         </div>
@@ -182,5 +212,21 @@
         }
     </div>
 
+    </div>
+
+    <script>
+        // Script para el punto rojo de notificaciones
+        (function() {
+            fetch('/Notificaciones/GetUnreadCount')
+                .then(response => response.json())
+                .then(data => {
+                    const dot = document.getElementById('unread-dot');
+                    if (data.count > 0 && dot) {
+                        dot.style.display = 'block';
+                    }
+                })
+                .catch(err => console.error('Error fetching unread count:', err));
+        })();
+    </script>
 </body>
 </html>

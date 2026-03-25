@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 namespace SIGEBI.Business.DTOs
 {
     public class ValoracionDTO
@@ -9,5 +9,6 @@ namespace SIGEBI.Business.DTOs
         public Guid RecursoId { get; set; }
         public int Calificacion { get; set; }
         public string? Comentario { get; set; }
+        public string? ImagenUrl { get; set; }
     }
 }

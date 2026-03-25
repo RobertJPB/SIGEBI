@@ -9,5 +9,6 @@ namespace SIGEBI.Business.Interfaces.Persistence
         Task AddAsync(ListaDeseos entity);
         void Update(ListaDeseos entity);
         Task<bool> ExistsAsync(Guid id);
+        Task<IEnumerable<Guid>> GetUsuariosInteresadosAsync(Guid recursoId);
     }
 }

@@ -51,7 +51,8 @@
             text-decoration: none;
         }
 
-        .nav-link { color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-left: 1.5rem; text-decoration: none; }
+        .nav-link { color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-left: 1.5rem; text-decoration: none; transition: color 0.2s; }
+        .nav-link:hover { color: white; }
 
         .container-custom {
             max-width: 1100px;
@@ -124,15 +125,59 @@
         .availability.out-stock { color: #c62828; }
 
         .action-buttons { display: flex; flex-direction: column; gap: 12px; }
-        .btn-main { background: var(--green-600); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 600; transition: all 0.2s; }
-        .btn-main:hover { background: var(--green-800); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(46,139,74,0.3); }
+        .btn-main { background: var(--green-600); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 600; transition: all 0.2s; text-decoration: none; cursor: pointer; }
+        .btn-main:hover { background: var(--green-800); color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(46,139,74,0.3); }
         .btn-main:disabled { background: #ccc; transform: none; box-shadow: none; cursor: not-allowed; }
 
-        .btn-wishlist { background: transparent; color: var(--green-800); border: 1.5px solid var(--green-800); padding: 14px; border-radius: 12px; font-weight: 600; transition: all 0.2s; }
-        .btn-wishlist:hover { background: var(--green-100); }
+        .btn-wishlist { background: transparent; color: var(--green-800); border: 1.5px solid var(--green-800); padding: 14px; border-radius: 12px; font-weight: 600; transition: all 0.2s; cursor: pointer; }
+        .btn-wishlist:hover { background: var(--green-100); color: var(--green-900); }
 
         .availability.in-stock span { color: var(--ink); }
         .availability.in-stock strong { color: var(--green-600); }
+
+        .btn-submit-review {
+            background: var(--green-600);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-submit-review:hover {
+            background: var(--green-800);
+            color: white;
+            box-shadow: 0 4px 12px rgba(46,139,74,0.2);
+        }
+
+        .btn-confirm-action {
+            background: var(--green-600);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-confirm-action:hover {
+            background: var(--green-800);
+            color: white;
+            box-shadow: 0 4px 12px rgba(46,139,74,0.2);
+        }
+
+        .btn-cancel-action {
+            background: #f8f9fa;
+            color: #555;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-cancel-action:hover {
+            background: #e9ecef;
+            color: #333;
+        }
 
         /* Reviews Section */
         .reviews-section { background: white; border-radius: 24px; border: 1px solid var(--border); padding: 3rem; margin-top: 2.5rem; }
@@ -144,11 +189,34 @@
         .comment-area { width: 100%; border: 1px solid var(--border); border-radius: 12px; padding: 1rem; margin-top: 1rem; font-family: inherit; resize: none; outline: none; }
         .comment-area:focus { border-color: var(--green-600); box-shadow: 0 0 0 3px rgba(46,139,74,0.1); }
 
-        .review-item { border-bottom: 1px solid #f0f0f0; padding: 1.5rem 0; position: relative; }
+        .review-item { 
+            border-bottom: 1px solid #f0f0f0; 
+            padding: 1.5rem 0; 
+            position: relative; 
+            display: flex;
+            gap: 16px;
+        }
         .review-item:last-child { border-bottom: none; }
-        .review-user { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
-        .review-stars { color: #ffca28; font-size: 0.85rem; margin-bottom: 8px; }
-        .review-text { color: #444; line-height: 1.5; }
+        
+        .review-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--green-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--green-800);
+            flex-shrink: 0;
+            object-fit: cover;
+            border: 1px solid var(--border);
+        }
+
+        .review-content { flex: 1; }
+        .review-user { font-weight: 700; font-size: 1rem; margin-bottom: 2px; }
+        .review-stars { color: #ffca28; font-size: 0.8rem; margin-bottom: 6px; }
+        .review-text { color: #444; line-height: 1.5; font-size: 0.95rem; }
         .review-delete { position: absolute; right: 0; top: 1.5rem; color: #ff5252; cursor: pointer; padding: 5px; opacity: 0.5; transition: opacity 0.2s; }
         .review-delete:hover { opacity: 1; }
 
@@ -158,6 +226,19 @@
         .modal-body { padding: 0.5rem 2rem 2rem; }
         .modal-footer { border-top: none; padding: 0 2rem 2rem; justify-content: space-between; }
         .confirm-date-badge { background: var(--green-100); color: var(--green-800); padding: 8px 16px; border-radius: 10px; font-weight: 700; display: inline-block; margin: 1rem 0; }
+
+        .notification-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background-color: #ff4d4f;
+            border-radius: 50%;
+            border: 1.5px solid #0d2e18;
+            display: none;
+            box-shadow: 0 0 0 2px rgba(255,77,79,0.2);
+        }
     </style>
 </head>
 <body>
@@ -167,9 +248,16 @@
             <a class="navbar-brand" href="/Catalogo/Index">SIGEBI <span style="font-weight:300; font-size: 0.8rem; opacity: 0.6; display: block; line-height: 1;">Biblioteca</span></a>
             <div class="d-flex align-items-center">
                 <a href="/Catalogo/Index" class="nav-link"><i class="bi bi-grid"></i> Catálogo</a>
-                <a href="/ListaDeseos" class="nav-link"><i class="bi bi-heart"></i> Lista Deseos</a>
-                <a href="/Prestamos" class="nav-link"><i class="bi bi-book"></i> Mis Préstamos</a>
-                <a href="/Perfil" class="nav-link d-flex align-items-center gap-2">
+                <a href="/ListaDeseos/Index" class="nav-link"><i class="bi bi-heart"></i> Lista de Deseos</a>
+                <a href="/Prestamos/Index" class="nav-link"><i class="bi bi-book"></i> Mis Préstamos</a>
+                <a href="/Notificaciones/Index" class="nav-link">
+                    <span style="position: relative; display: inline-flex;">
+                        <i class="bi bi-bell"></i>
+                        <span id="unread-dot" class="notification-dot"></span>
+                    </span>
+                    Notificaciones
+                </a>
+                <a href="/Perfil/Index" class="nav-link d-flex align-items-center gap-2">
                     <i class="bi bi-person-circle" style="font-size: 1.2rem;"></i>
                     <span>@Context.Session.GetString("UsuarioNombre")</span>
                 </a>
@@ -230,6 +318,18 @@
                             <span>@Model.ISBN</span>
                         </div>
                     }
+                    @if (!string.IsNullOrEmpty(Model.ISSN)) {
+                        <div class="meta-item">
+                            <label>ISSN</label>
+                            <span>@Model.ISSN</span>
+                        </div>
+                    }
+                    @if (Model.NumeroEdicion > 0) {
+                        <div class="meta-item">
+                            <label>Edición</label>
+                            <span>@Model.NumeroEdicion</span>
+                        </div>
+                    }
                     <div class="meta-item">
                         <label>Editorial</label>
                         <span>@(Model.Editorial ?? "N/A")</span>
@@ -242,14 +342,14 @@
 
                 <div class="availability @(Model.Stock > 0 ? "in-stock" : "out-stock")">
                     @if (Model.Stock > 0) {
-                        <i class="bi bi-check-circle-fill" style="color: var(--green-600)"></i> <span>Disponibles: <strong>@Model.Stock unidades</strong></span>
+                        <span>Disponibles: <strong>@Model.Stock unidades</strong></span>
                     } else {
                         <i class="bi bi-x-circle-fill"></i> <span>Actualmente agotado</span>
                     }
                 </div>
 
                 <div style="font-size: 0.85rem; color: var(--muted); margin-bottom: 2rem;">
-                    <i class="bi bi-info-circle"></i> Nota: Plazo de devolución de 15 días para tu perfil.
+                    Nota: Plazo de devolución de 15 días.
                 </div>
 
                 <div class="action-buttons">
@@ -259,6 +359,7 @@
                     <button id="btnWishlist" class="btn-wishlist">
                         <i class="bi bi-heart"></i> Añadir a Lista de Deseos
                     </button>
+                    <div id="loanStatusMessage" class="alert mt-3 d-none" style="border-radius: 12px; font-weight: 500;"></div>
                 </div>
             </div>
         </div>
@@ -283,7 +384,7 @@
 
                     <textarea name="comentario" class="comment-area" rows="3" placeholder="Escribe tu opinión aquí..."></textarea>
                     
-                    <button type="submit" class="btn btn-success mt-3" style="border-radius: 8px; padding: 10px 20px; font-weight:600;">
+                    <button type="submit" class="btn btn-success mt-3 btn-submit-review">
                         Enviar Valoración
                     </button>
                 </form>
@@ -296,18 +397,37 @@
                     @foreach (var val in Model.Valoraciones.OrderByDescending(v => v.Id))
                     {
                         <div class="review-item">
-                            <div class="review-user">@(string.IsNullOrEmpty(val.NombreUsuario) ? "Usuario de SIGEBI" : val.NombreUsuario)</div>
-                            <div class="review-stars">
-                                @for (int i = 0; i < val.Calificacion; i++) { <i class="bi bi-star-fill"></i> }
-                            </div>
-                            <div class="review-text">@val.Comentario</div>
-                            
-                            @if (currentUserId != null && val.UsuarioId == Guid.Parse(currentUserId))
+                            @if (!string.IsNullOrEmpty(val.ImagenUrl))
                             {
-                                <button class="review-delete border-0 bg-transparent" onclick="eliminarValoracion('@val.Id')">
-                                    <i class="bi bi-trash"></i>
-                                </button>
+                                <img src="@(apiBase.TrimEnd('/') + "/" + val.ImagenUrl.TrimStart('/'))" class="review-avatar" alt="@val.NombreUsuario" />
                             }
+                            else
+                            {
+                                <div class="review-avatar">
+                                    @(val.NombreUsuario?.Length > 0 ? val.NombreUsuario[0].ToString().ToUpper() : "?")
+                                </div>
+                            }
+
+                            <div class="review-content">
+                                <div class="review-user">@(string.IsNullOrEmpty(val.NombreUsuario) ? "Usuario de SIGEBI" : val.NombreUsuario)</div>
+                                <div class="review-stars">
+                                    @for (int i = 0; i < val.Calificacion; i++) { <i class="bi bi-star-fill"></i> }
+                                </div>
+                                <div class="review-text">@val.Comentario</div>
+                                
+                                @{
+                                    var isAuthor = currentUserId != null && val.UsuarioId == Guid.Parse(currentUserId);
+                                    var sessRol = Context.Session.GetString("UsuarioRol");
+                                    var isAdmin = User.IsInRole("Administrador") || User.IsInRole("Bibliotecario") || sessRol == "Administrador" || sessRol == "Bibliotecario";
+                                }
+
+                                @if (isAuthor || isAdmin)
+                                {
+                                    <button class="review-delete border-0 bg-transparent" onclick="eliminarValoracion('@val.Id')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                }
+                            </div>
                         </div>
                     }
                 }
@@ -335,8 +455,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius:10px; padding:10px 20px;">Cancelar</button>
-                    <button type="button" id="confirmLoanBtn" class="btn btn-success" style="background:var(--green-900); border:none; border-radius:10px; padding:10px 20px;">Confirmar Préstamo</button>
+                    <button type="button" class="btn-cancel-action" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" id="confirmLoanBtn" class="btn-confirm-action">Confirmar Préstamo</button>
                 </div>
             </div>
         </div>
@@ -362,14 +482,18 @@
             // Wishlist Action
             $('#btnWishlist').click(function() {
                 const btn = $(this);
+                const statusMsg = $('#loanStatusMessage');
                 btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Guardando...');
                 
                 $.post('/Catalogo/AgregarAListaDeseos', { recursoId: '@Model.Id' }, function(data) {
                     if (data.success) {
-                        alert('¡Agregado a tu lista de deseos!');
-                        btn.html('<i class="bi bi-check-circle"></i> En tu lista').addClass('btn-outline-success');
+                        statusMsg.removeClass('d-none alert-danger').addClass('alert-success')
+                                 .html('<i class="bi bi-check-circle-fill me-2"></i> ¡Agregado a tu lista de deseos!');
+                        btn.html('<i class="bi bi-check-circle"></i> En tu lista');
+                        // No habilitamos el boton denuevo porque ya esta en la lista
                     } else {
-                        alert('Error: ' + data.message);
+                        statusMsg.removeClass('d-none alert-success').addClass('alert-danger')
+                                 .html('<i class="bi bi-exclamation-triangle-fill me-2"></i> ' + data.message);
                         btn.prop('disabled', false).html('<i class="bi bi-heart"></i> Añadir a Lista de Deseos');
                     }
                 });
@@ -378,14 +502,18 @@
             // Loan Confirmation
             $('#confirmLoanBtn').click(function() {
                 const btn = $(this);
+                const statusMsg = $('#loanStatusMessage');
                 btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Procesando...');
                 
                 $.post('/Catalogo/SolicitarPrestamo', { recursoId: '@Model.Id' }, function(data) {
+                    $('#loanModal').modal('hide');
                     if (data.success) {
-                        alert('¡Préstamo solicitado con éxito!');
-                        location.reload();
+                        statusMsg.removeClass('d-none alert-danger').addClass('alert-success')
+                                 .html('<i class="bi bi-check-circle-fill me-2"></i> ¡Préstamo solicitado con éxito! Revisa "Mis Préstamos".');
+                        $('.btn-main').prop('disabled', true).text('Solicitud Enviada');
                     } else {
-                        alert('Error: ' + data.message);
+                        statusMsg.removeClass('d-none alert-success').addClass('alert-danger')
+                                 .html('<i class="bi bi-exclamation-triangle-fill me-2"></i> Error: ' + data.message);
                         btn.prop('disabled', false).text('Confirmar Préstamo');
                     }
                 });
@@ -403,6 +531,19 @@
                 });
             }
         }
+
+        // Script para el punto rojo de notificaciones
+        (function() {
+            fetch('/Notificaciones/GetUnreadCount')
+                .then(response => response.json())
+                .then(data => {
+                    const dot = document.getElementById('unread-dot');
+                    if (data.count > 0 && dot) {
+                        dot.style.display = 'block';
+                    }
+                })
+                .catch(err => console.error('Error fetching unread count:', err));
+        })();
     </script>
 </body>
 </html>

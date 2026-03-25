@@ -33,7 +33,8 @@ namespace SIGEBI.Business.Mappers
             {
                 dto.ISSN = revista.ISSN;
                 dto.NumeroEdicion = revista.NumeroEdicion;
-                dto.FechaPublicacion = revista.FechaPublicacion;
+                dto.Anio = revista.Anio;
+                dto.Editorial = revista.Editorial;
             }
             else if (recurso is Documento documento)
             {

@@ -24,7 +24,6 @@ namespace SIGEBI.Business.DTOs
         // Revista
         public string? ISSN { get; set; }
         public int? NumeroEdicion { get; set; }
-        public DateTime? FechaPublicacion { get; set; }
         // Documento
         public string? Formato { get; set; }
         public string? Institucion { get; set; }

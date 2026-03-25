@@ -17,8 +17,13 @@ namespace SIGEBI.Infrastructure.Persistence.Configurations
                 .HasMaxLength(20)
                 .IsRequired(false);
 
-            builder.Property(r => r.FechaPublicacion)
-                .HasColumnName("FechaPublicacion")
+            builder.Property(r => r.Editorial)
+                .HasColumnName("Editorial")
+                .HasMaxLength(100)
+                .IsRequired(false);
+
+            builder.Property(r => r.Anio)
+                .HasColumnName("Anio")
                 .IsRequired();
         }
     }

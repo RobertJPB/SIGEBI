@@ -120,7 +120,7 @@ namespace SIGEBI.API.Controllers
             var imagenUrl = await GuardarImagenAsync(request.Imagen);
             var resultado = await _gestionarUseCase.AgregarRevistaAsync(
                 request.Titulo, request.Autor, request.CategoriaId, request.Stock, request.Descripcion,
-                request.NumeroEdicion, request.ISSN, request.FechaPublicacion, imagenUrl);
+                request.NumeroEdicion, request.ISSN, request.Anio, request.Editorial, imagenUrl);
             return Ok(resultado);
         }
 
@@ -167,7 +167,7 @@ namespace SIGEBI.API.Controllers
             var imagenUrl = await GuardarImagenAsync(request.Imagen);
             var resultado = await _gestionarUseCase.EditarRevistaAsync(
                 id, request.Titulo, request.Autor, request.CategoriaId, request.Stock, request.Descripcion,
-                request.NumeroEdicion, request.ISSN, request.FechaPublicacion, imagenUrl);
+                request.NumeroEdicion, request.ISSN, request.Anio, request.Editorial, imagenUrl);
             return Ok(resultado);
         }
 
@@ -250,7 +250,8 @@ namespace SIGEBI.API.Controllers
         public int Stock { get; set; }
         public int NumeroEdicion { get; set; }
         public string ISSN { get; set; } = string.Empty;
-        public DateTime FechaPublicacion { get; set; }
+        public int Anio { get; set; }
+        public string? Editorial { get; set; }
         public string? Descripcion { get; set; }
         public IFormFile? Imagen { get; set; }
     }
