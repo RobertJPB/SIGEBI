@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 
-// ── CONFIGURACIÓN DE LA APLICACIÓN WEB (MVC) ──
+// Configuracion de la aplicacion web (MVC)
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
@@ -20,7 +21,7 @@ builder.Services.AddSession(options =>
 });
 
 
-// Configuración de Autenticación basada en Cookies para el sitio web
+// Configuración de Autenticación basada en cookies para el sitio web
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -32,7 +33,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization();
 
-// ── PIPELINE DE LA PETICIÓN ──
+// Pipeline de la peticion
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
