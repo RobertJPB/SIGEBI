@@ -258,7 +258,7 @@ body {
 
 .recurso-card {
     background: var(--card-bg);
-    border-radius: 14px;
+    border-radius: 6px;
     overflow: hidden;
     border: 1px solid var(--border);
     transition: transform 0.25s, box-shadow 0.25s;
