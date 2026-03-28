@@ -1,11 +1,9 @@
 using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.API.Extensions;
 using SIGEBI.Business.UseCases.Catalogo;
 using SIGEBI.Domain.DomainServices;
-using SIGEBI.Domain.Enums.Seguridad;
 
 // Gestiona las categorías en las que se clasifican los recursos de la biblioteca.
 // Permite organizar el catálogo por temas para facilitar la búsqueda.
@@ -77,17 +75,20 @@ namespace SIGEBI.API.Controllers
         }
     }
 
+ 
+    // Estas clases definen la estructura de los datos que el cliente debe enviar en las peticiones POST/PUT.
+
     public class CrearCategoriaRequest
     {
         [Required(ErrorMessage = "El nombre de la categoría es obligatorio.")]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 50 caracteres.")]
-        public string Nombre { get; set; }
+        public string Nombre { get; set; } = string.Empty;
     }
 
     public class ActualizarCategoriaRequest
     {
         [Required(ErrorMessage = "El nombre de la categoría es obligatorio.")]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 50 caracteres.")]
-        public string Nombre { get; set; }
+        public string Nombre { get; set; } = string.Empty;
     }
 }

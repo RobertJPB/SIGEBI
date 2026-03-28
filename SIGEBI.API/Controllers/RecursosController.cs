@@ -38,7 +38,7 @@ namespace SIGEBI.API.Controllers
         // ── GET ──
         /// Obtiene todos los recursos disponibles en el catálogo.
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> ObtenerTodos()
         {
             var rol = User.ObtenerRolActual();
             // Validación de permisos centralizada en la capa de Dominio (AccesoPolicy)
@@ -59,7 +59,7 @@ namespace SIGEBI.API.Controllers
         }
 
         [HttpGet("categoria/{categoriaId}")]
-        public async Task<IActionResult> GetPorCategoria(int categoriaId)
+        public async Task<IActionResult> ObtenerPorCategoria(int categoriaId)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver por categoría");
@@ -69,7 +69,7 @@ namespace SIGEBI.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(Guid id)
+        public async Task<IActionResult> ObtenerPorId(Guid id)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver detalle de recurso");
@@ -219,6 +219,8 @@ namespace SIGEBI.API.Controllers
             return $"/imagenes/recursos/{nombreArchivo}";
         }
     }
+
+    // Estas clases definen la estructura de los datos que el cliente debe enviar en las peticiones POST/PUT.
 
     public class AgregarLibroRequest
     {

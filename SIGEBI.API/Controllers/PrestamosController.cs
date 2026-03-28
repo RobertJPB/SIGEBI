@@ -28,7 +28,7 @@ namespace SIGEBI.API.Controllers
 
         // Recupera el historial completo de préstamos (requiere permisos administrativos).
         [HttpGet]
-        public async Task<IActionResult> GetTodos()
+        public async Task<IActionResult> ObtenerTodos()
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerTodosLosPrestamos(rol), "ver todos los préstamos");
@@ -39,7 +39,7 @@ namespace SIGEBI.API.Controllers
 
         // Lista todos los préstamos vinculados a un usuario específico.
         [HttpGet("usuario/{usuarioId}")]
-        public async Task<IActionResult> GetPorUsuario(Guid usuarioId)
+        public async Task<IActionResult> ObtenerPorUsuario(Guid usuarioId)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver préstamos por usuario");
@@ -50,7 +50,7 @@ namespace SIGEBI.API.Controllers
 
         // Consulta únicamente los préstamos que el usuario tiene actualmente en su posesión (sin devolver).
         [HttpGet("activos/{usuarioId}")]
-        public async Task<IActionResult> GetActivosPorUsuario(Guid usuarioId)
+        public async Task<IActionResult> ObtenerActivosPorUsuario(Guid usuarioId)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver préstamos activos");
@@ -61,7 +61,7 @@ namespace SIGEBI.API.Controllers
 
         // Identifica aquellos préstamos cuya fecha límite de devolución ya ha expirado.
         [HttpGet("atrasados")]
-        public async Task<IActionResult> GetAtrasados()
+        public async Task<IActionResult> ObtenerAtrasados()
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerTodosLosPrestamos(rol), "ver préstamos atrasados");

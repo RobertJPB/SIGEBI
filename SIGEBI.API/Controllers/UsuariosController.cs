@@ -30,8 +30,6 @@ namespace SIGEBI.API.Controllers
             _env = env;
         }
 
-
-
         // Lista todos los usuarios registrados en la base de datos para supervisión.
         [HttpGet]
         public async Task<IActionResult> ObtenerTodos()
@@ -159,15 +157,8 @@ namespace SIGEBI.API.Controllers
             if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
                 return Unauthorized("No se pudo identificar al usuario desde el token.");
 
-            try
-            {
-                await _gestionarUsuario.ActualizarPerfilAsync(userId, request.Nombre, request.Correo);
-                return Ok(new { Mensaje = "Perfil actualizado correctamente." });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            await _gestionarUsuario.ActualizarPerfilAsync(userId, request.Nombre, request.Correo);
+            return Ok(new { Mensaje = "Perfil actualizado correctamente." });
         }
 
         private async Task<string?> GuardarImagenAsync(IFormFile? imagen)
