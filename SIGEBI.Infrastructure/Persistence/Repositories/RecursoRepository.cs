@@ -6,25 +6,23 @@ using SIGEBI.Infrastructure.Persistence.Base;
 
 namespace SIGEBI.Infrastructure.Persistence.Repositories
 {
-    // El repo devuelve IEnumerable<RecursoBibliografico>, pero por detras Entity Framework nos puede 
-    // devolver Libros, Revistas o Documentos mezclados, y el sistema sigue funcionando igual.
-    public class RecursoRepository : BaseRepository<RecursoBibliografico>, IRecursoRepository
+ 
+    public class RecursoRepository : BaseRepository<RecursoBibliografico, Guid>, IRecursoRepository
     {
         public RecursoRepository(SIGEBIDbContext context) : base(context) { }
 
-        public override async Task<IEnumerable<RecursoBibliografico>> GetAllAsync()
+        public override async Task<IEnumerable<RecursoBibliografico>> GetAllAsync() // Obtener todos con categorías
             => await _dbSet.Include(r => r.Categoria).AsNoTracking().ToListAsync();
 
-        public async Task<IEnumerable<RecursoBibliografico>> GetByCategoriaAsync(int categoriaId)
+        public async Task<IEnumerable<RecursoBibliografico>> GetByCategoriaAsync(int categoriaId) // Filtrar por categoría
             => await _dbSet
                 .AsNoTracking()
                 .Include(r => r.Categoria)
                 .Where(r => r.IdCategoria == categoriaId)
                 .ToListAsync();
 
-        public async Task<IEnumerable<RecursoBibliografico>> GetDisponiblesAsync()
+        public async Task<IEnumerable<RecursoBibliografico>> GetDisponiblesAsync() // Solo disponibles
         {
-            // Solo trae los recursos que todavia tienen stock y no estan inactivos
             return await _dbSet
                 .AsNoTracking()
                 .Include(r => r.Categoria)
@@ -32,20 +30,20 @@ namespace SIGEBI.Infrastructure.Persistence.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<RecursoBibliografico>> BuscarPorTituloAsync(string titulo)
+        public async Task<IEnumerable<RecursoBibliografico>> BuscarPorTituloAsync(string titulo) // Buscar por título
             => await _dbSet
                 .AsNoTracking()
                 .Include(r => r.Categoria)
                 .Where(r => r.Titulo.Contains(titulo))
                 .ToListAsync();
 
-        public async Task<IEnumerable<Libro>> GetLibrosAsync()
+        public async Task<IEnumerable<Libro>> GetLibrosAsync() // Solo libros
             => await _context.Set<Libro>().Include(r => r.Categoria).AsNoTracking().ToListAsync();
 
-        public async Task<IEnumerable<Revista>> GetRevistasAsync()
+        public async Task<IEnumerable<Revista>> GetRevistasAsync() // Solo revistas
             => await _context.Set<Revista>().Include(r => r.Categoria).AsNoTracking().ToListAsync();
 
-        public async Task<IEnumerable<Documento>> GetDocumentosAsync()
+        public async Task<IEnumerable<Documento>> GetDocumentosAsync() // Solo documentos
             => await _context.Set<Documento>().Include(r => r.Categoria).AsNoTracking().ToListAsync();
     }
 }

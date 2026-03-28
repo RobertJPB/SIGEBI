@@ -7,13 +7,13 @@ namespace SIGEBI.Domain.Entities
 {
     public class ListaDeseos
     {
-        public Guid Id { get; private set; }
-        public Guid UsuarioId { get; private set; }
-        public DateTime FechaCreacion { get; private set; }
-        public Usuario Usuario { get; private set; } = null!;
+        public Guid Id { get; private set; } // ID único
+        public Guid UsuarioId { get; private set; } // ID del usuario dueño
+        public DateTime FechaCreacion { get; private set; } // Fecha de creación
+        public Usuario Usuario { get; private set; } = null!; // Navegación al usuario
 
         private readonly List<RecursoBibliografico> _recursos = new();
-        public IReadOnlyCollection<RecursoBibliografico> Recursos => _recursos.AsReadOnly();
+        public IReadOnlyCollection<RecursoBibliografico> Recursos => _recursos.AsReadOnly(); // Items guardados
 
         private ListaDeseos() { }
 

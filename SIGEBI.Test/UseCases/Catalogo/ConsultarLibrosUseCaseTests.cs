@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Memory;
 using FluentAssertions;
 using Moq;
 using SIGEBI.Business.Interfaces.Persistence;
@@ -11,16 +12,19 @@ namespace SIGEBI.Test.UseCases.Catalogo
     {
         private readonly Mock<IRecursoRepository> _recursoRepo;
         private readonly Mock<IValoracionRepository> _valoracionRepo;
+        private readonly IMemoryCache _cache;
         private readonly ConsultarLibrosUseCase _useCase;
 
         public ConsultarLibrosUseCaseTests()
         {
             _recursoRepo = new Mock<IRecursoRepository>();
             _valoracionRepo = new Mock<IValoracionRepository>();
+            _cache = new MemoryCache(new MemoryCacheOptions());
 
             _useCase = new ConsultarLibrosUseCase(
                 _recursoRepo.Object,
-                _valoracionRepo.Object);
+                _valoracionRepo.Object,
+                _cache);
         }
 
         // -- EJECUTAR --

@@ -2,13 +2,9 @@ using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Business.Interfaces.Persistence
 {
-    public interface IListaDeseosRepository
+    public interface IListaDeseosRepository : IBaseRepository<ListaDeseos, Guid>
     {
         Task<ListaDeseos?> GetByUsuarioIdAsync(Guid usuarioId);
-        Task<ListaDeseos?> GetByIdAsync(Guid id);
-        Task AddAsync(ListaDeseos entity);
-        void Update(ListaDeseos entity);
-        Task<bool> ExistsAsync(Guid id);
         Task<IEnumerable<Guid>> GetUsuariosInteresadosAsync(Guid recursoId);
     }
 }

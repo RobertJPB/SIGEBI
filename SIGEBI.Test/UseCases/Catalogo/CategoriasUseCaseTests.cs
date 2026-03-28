@@ -1,4 +1,5 @@
 using Moq;
+using Microsoft.Extensions.Caching.Memory;
 using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.UseCases.Catalogo;
@@ -12,13 +13,15 @@ namespace SIGEBI.Test.UseCases.Catalogo
     {
         private readonly Mock<ICategoriaRepository> _mockRepo;
         private readonly Mock<IUnitOfWork> _mockUow;
+        private readonly IMemoryCache _cache;
         private readonly CategoriasUseCase _useCase;
 
         public CategoriasUseCaseTests()
         {
             _mockRepo = new Mock<ICategoriaRepository>();
             _mockUow = new Mock<IUnitOfWork>();
-            _useCase = new CategoriasUseCase(_mockRepo.Object, _mockUow.Object);
+            _cache = new MemoryCache(new MemoryCacheOptions());
+            _useCase = new CategoriasUseCase(_mockRepo.Object, _mockUow.Object, _cache);
         }
 
         [Fact]

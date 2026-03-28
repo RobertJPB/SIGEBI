@@ -10,16 +10,16 @@ namespace SIGEBI.Business.Interfaces
     // una única transacción atómica (o se guarda todo, o no se guarda nada si hay error).
     public interface IUnitOfWork : IDisposable
     {
-        IUsuarioRepository Usuarios { get; }
-        IPrestamoRepository Prestamos { get; }
-        IRecursoRepository Recursos { get; }
-        ICategoriaRepository Categorias { get; }
-        IPenalizacionRepository Penalizaciones { get; }
-        IValoracionRepository Valoraciones { get; }
-        INotificacionRepository Notificaciones { get; }
-        IAuditoriaRepository Auditorias { get; }
-        IListaDeseosRepository ListasDeseos { get; }
+        IUsuarioRepository Usuarios { get; } // Repositorio de Usuarios
+        IPrestamoRepository Prestamos { get; } // Repositorio de Préstamos
+        IRecursoRepository Recursos { get; } // Repositorio de Recursos
+        ICategoriaRepository Categorias { get; } // Repositorio de Categorías
+        IPenalizacionRepository Penalizaciones { get; } // Repositorio de Penalizaciones
+        IValoracionRepository Valoraciones { get; } // Repositorio de Valoraciones
+        INotificacionRepository Notificaciones { get; } // Repositorio de Notificaciones
+        IAuditoriaRepository Auditorias { get; } // Repositorio de Auditoría
+        IListaDeseosRepository ListasDeseos { get; } // Repositorio de Listas de Deseos
 
-        Task<int> SaveChangesAsync();
+        Task<int> SaveChangesAsync(); // Confirmar transacción
     }
 }

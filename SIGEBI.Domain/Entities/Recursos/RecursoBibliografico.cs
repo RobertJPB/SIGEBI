@@ -5,15 +5,15 @@ namespace SIGEBI.Domain.Entities.Recursos
 {
     public abstract class RecursoBibliografico
     {
-        public Guid Id { get; private set; }
-        public string Titulo { get; private set; } = null!;
-        public string Autor { get; private set; } = null!;
-        public int IdCategoria { get; private set; }
-        public int Stock { get; private set; }
-        public string? Descripcion { get; private set; }
-        public string? ImagenUrl { get; private set; }
-        public Enums.Biblioteca.EstadoRecurso Estado { get; private set; }
-        public Categoria Categoria { get; private set; } = null!;
+        public Guid Id { get; private set; } // ID único
+        public string Titulo { get; private set; } = null!; // Título del material
+        public string Autor { get; private set; } = null!; // Autor principal
+        public int IdCategoria { get; private set; } // ID de categoría
+        public int Stock { get; private set; } // Ejemplares disponibles
+        public string? Descripcion { get; private set; } // Resumen/Descripción
+        public string? ImagenUrl { get; private set; } // URL de la carátula
+        public Enums.Biblioteca.EstadoRecurso Estado { get; private set; } // Estado (Disponible/Inactivo)
+        public Categoria Categoria { get; private set; } = null!; // Navegación a categoría
 
         protected RecursoBibliografico() { }
 

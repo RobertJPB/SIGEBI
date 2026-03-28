@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Infrastructure.Persistence;
 
 namespace SIGEBI.Infrastructure.Persistence.Base
 {
-    // Esta clase base tiene todo el CRUD basico. Esta cerrada a modificaciones (no hace falta tocarla)
-    // pero abierta a extension (creamos un UsuarioRepository que hereda de aca y le suma metodos extra).
-    public class BaseRepository<T> where T : class
+    // Esta clase base tiene todo el CRUD basico. 
+    public class BaseRepository<T, TId> : IBaseRepository<T, TId> where T : class
     {
         protected readonly SIGEBIDbContext _context;
         protected readonly DbSet<T> _dbSet;
@@ -16,25 +16,24 @@ namespace SIGEBI.Infrastructure.Persistence.Base
             _dbSet = context.Set<T>();
         }
 
-        public virtual async Task<IEnumerable<T>> GetAllAsync()
+        public virtual async Task<IEnumerable<T>> GetAllAsync() // Obtener todo
         {
-            // Trae todo de la tabla, ojo con tablas gigantes!
             return await _dbSet.ToListAsync();
         }
 
-        public virtual async Task<T?> GetByIdAsync(Guid id)
+        public virtual async Task<T?> GetByIdAsync(TId id) // Obtener por ID
             => await _dbSet.FindAsync(id);
 
-        public async Task AddAsync(T entity)
+        public async Task AddAsync(T entity) // Agregar nuevo
             => await _dbSet.AddAsync(entity);
 
-        public void Update(T entity)
+        public void Update(T entity) // Actualizar existente
             => _dbSet.Update(entity);
 
-        public void Delete(T entity)
+        public void Delete(T entity) // Eliminar
             => _dbSet.Remove(entity);
 
-        public async Task<bool> ExistsAsync(Guid id)
+        public async Task<bool> ExistsAsync(TId id) // Verificar existencia
             => await _dbSet.FindAsync(id) != null;
     }
 }

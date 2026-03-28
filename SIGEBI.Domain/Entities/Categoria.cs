@@ -6,9 +6,9 @@ namespace SIGEBI.Domain.Entities
 {
     public class Categoria
     {
-        public int Id { get; private set; }
-        public string Nombre { get; private set; } = null!;
-        public Enums.Biblioteca.EstadoCategoria Estado { get; private set; }
+        public int Id { get; private set; } // ID numérico
+        public string Nombre { get; private set; } = null!; // Nombre (Ej: Informatica)
+        public Enums.Biblioteca.EstadoCategoria Estado { get; private set; } // Activa/Inactiva
         public ICollection<RecursoBibliografico> Recursos { get; private set; } = new List<RecursoBibliografico>();
 
         private Categoria() { }

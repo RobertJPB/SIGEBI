@@ -5,20 +5,23 @@ using SIGEBI.Infrastructure.Persistence.Base;
 
 namespace SIGEBI.Infrastructure.Persistence.Repositories
 {
-    public class NotificacionRepository : BaseRepository<Notificacion>, INotificacionRepository
+    public class NotificacionRepository : BaseRepository<Notificacion, Guid>, INotificacionRepository
     {
         public NotificacionRepository(SIGEBIDbContext context) : base(context) { }
 
-        public async Task<IEnumerable<Notificacion>> GetByUsuarioIdAsync(Guid usuarioId)
-            => await _dbSet.Where(n => n.UsuarioId == usuarioId).ToListAsync();
+        public async Task<IEnumerable<Notificacion>> GetByUsuarioIdAsync(Guid usuarioId) // Notificaciones del usuario
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .Where(n => n.UsuarioId == usuarioId)
+                .OrderByDescending(n => n.Fecha)
+                .ToListAsync();
+        }
 
-        public async Task<int> GetCantPendientesAsync(Guid usuarioId)
-            => await _dbSet.CountAsync(n => n.UsuarioId == usuarioId && n.Estado == SIGEBI.Domain.Enums.Operacion.EstadoNotificacion.NoLeida);
-
-        public new async Task<Notificacion?> GetByIdAsync(Guid id)
-            => await _dbSet.FirstOrDefaultAsync(n => n.Id == id);
-
-        public new async Task<bool> ExistsAsync(Guid id)
-            => await _dbSet.AnyAsync(n => n.Id == id);
+        public async Task<int> GetCantPendientesAsync(Guid usuarioId) // Cantidad de no leídas
+        {
+            return await _dbSet
+                .CountAsync(n => n.UsuarioId == usuarioId && n.Estado == SIGEBI.Domain.Enums.Operacion.EstadoNotificacion.NoLeida);
+        }
     }
 }

@@ -4,13 +4,13 @@ namespace SIGEBI.Domain.Entities
 {
     public class Notificacion
     {
-        public Guid Id { get; private set; }
-        public Enums.Operacion.TipoNotificacion Tipo { get; private set; }
-        public string Mensaje { get; private set; } = null!;
-        public DateTime Fecha { get; private set; }
-        public Enums.Operacion.EstadoNotificacion Estado { get; private set; }
-        public Guid UsuarioId { get; private set; }
-        public Usuario Usuario { get; private set; } = null!;
+        public Guid Id { get; private set; } // ID único
+        public Enums.Operacion.TipoNotificacion Tipo { get; private set; } // Tipo (Info, Alerta, etc.)
+        public string Mensaje { get; private set; } = null!; // Contenido del aviso
+        public DateTime Fecha { get; private set; } // Fecha de emisión
+        public Enums.Operacion.EstadoNotificacion Estado { get; private set; } // Estado (Leída/No Leída)
+        public Guid UsuarioId { get; private set; } // Usuario destino
+        public Usuario Usuario { get; private set; } = null!; // Navegación al usuario
 
         private Notificacion() { }
 

@@ -6,29 +6,25 @@ using SIGEBI.Infrastructure.Persistence.Base;
 
 namespace SIGEBI.Infrastructure.Persistence.Repositories
 {
-    public class PenalizacionRepository : BaseRepository<Penalizacion>, IPenalizacionRepository
+    public class PenalizacionRepository : BaseRepository<Penalizacion, Guid>, IPenalizacionRepository
     {
         public PenalizacionRepository(SIGEBIDbContext context) : base(context) { }
 
-        public override async Task<IEnumerable<Penalizacion>> GetAllAsync()
+        public override async Task<IEnumerable<Penalizacion>> GetAllAsync() // Todas con Usuario
             => await _dbSet.Include(p => p.Usuario).ToListAsync();
 
-        public async Task<IEnumerable<Penalizacion>> GetByUsuarioIdAsync(Guid usuarioId)
+        public async Task<IEnumerable<Penalizacion>> GetByUsuarioIdAsync(Guid usuarioId) // Penalizaciones de un usuario
             => await _dbSet.Include(p => p.Usuario).Where(p => p.UsuarioId == usuarioId).ToListAsync();
 
-        public async Task<IEnumerable<Penalizacion>> GetActivasAsync()
+        public async Task<IEnumerable<Penalizacion>> GetActivasAsync() // Solo activas
         {
-            // Trae todas las multas que todavia no se vencieron
             return await _dbSet.Include(p => p.Usuario).Where(p => p.Estado == EstadoPenalizacion.Activa).ToListAsync();
         }
 
-        public new async Task<Penalizacion?> GetByIdAsync(Guid id)
+        public override async Task<Penalizacion?> GetByIdAsync(Guid id) // Obtener por ID con Usuario
             => await _dbSet.Include(p => p.Usuario).FirstOrDefaultAsync(p => p.Id == id);
 
-        public new async Task<bool> ExistsAsync(Guid id)
-            => await _dbSet.AnyAsync(p => p.Id == id);
-
-        public async Task<Penalizacion?> GetByPrestamoIdAsync(Guid prestamoId)
+        public async Task<Penalizacion?> GetByPrestamoIdAsync(Guid prestamoId) // Buscar por préstamo
             => await _dbSet.FirstOrDefaultAsync(p => p.PrestamoId == prestamoId && p.Estado == EstadoPenalizacion.Activa);
     }
 }

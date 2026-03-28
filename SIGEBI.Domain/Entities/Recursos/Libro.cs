@@ -5,10 +5,10 @@ namespace SIGEBI.Domain.Entities.Recursos
     // Extiende de RecursoBibliografico (OCP) y puede usarse donde se espere la base (LSP).
     public class Libro : RecursoBibliografico
     {
-        public string ISBN { get; private set; } = null!;
-        public string Editorial { get; private set; } = null!;
-        public int Anio { get; private set; }
-        public string? Genero { get; private set; }
+        public string ISBN { get; private set; } = null!; // Identificador internacional
+        public string Editorial { get; private set; } = null!; // Casa editorial
+        public int Anio { get; private set; } // Año de publicación
+        public string? Genero { get; private set; } // Género literario
 
         private Libro() { }
 

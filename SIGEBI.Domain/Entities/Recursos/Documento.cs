@@ -5,9 +5,9 @@ namespace SIGEBI.Domain.Entities.Recursos
     // El documento hereda la logica base pero tiene sus propios datos especificos (Institucion).
     public class Documento : RecursoBibliografico
     {
-        public string Formato { get; private set; } = null!;
-        public string Institucion { get; private set; } = null!;
-        public int Anio { get; private set; }
+        public string Formato { get; private set; } = null!; // Formato (Ej: PDF, Tesis)
+        public string Institucion { get; private set; } = null!; // Institución emisora
+        public int Anio { get; private set; } // Año del documento
 
         private Documento() { }
 

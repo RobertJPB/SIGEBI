@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Memory;
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistence;
@@ -12,15 +13,23 @@ namespace SIGEBI.Business.UseCases.Catalogo
         private readonly IRecursoRepository _recursoRepository;
         private readonly ICategoriaRepository _categoriaRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMemoryCache _cache;
 
         public GestionarRecursosUseCase(
             IRecursoRepository recursoRepository,
             ICategoriaRepository categoriaRepository,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IMemoryCache cache)
         {
             _recursoRepository = recursoRepository;
             _categoriaRepository = categoriaRepository;
             _unitOfWork = unitOfWork;
+            _cache = cache;
+        }
+
+        private void InvalidateCache()
+        {
+            _cache.Remove("RecursosDisponibles");
         }
 
         // ── AGREGAR ──
@@ -37,6 +46,8 @@ namespace SIGEBI.Business.UseCases.Catalogo
             if (imagenUrl != null) libro.ActualizarImagen(imagenUrl);
             await _recursoRepository.AddAsync(libro);
             await _unitOfWork.SaveChangesAsync();
+            
+            InvalidateCache();
             return RecursoMapper.ToDTO(libro);
         }
 
@@ -50,6 +61,8 @@ namespace SIGEBI.Business.UseCases.Catalogo
             if (imagenUrl != null) revista.ActualizarImagen(imagenUrl);
             await _recursoRepository.AddAsync(revista);
             await _unitOfWork.SaveChangesAsync();
+            
+            InvalidateCache();
             return RecursoMapper.ToDTO(revista);
         }
 
@@ -63,6 +76,8 @@ namespace SIGEBI.Business.UseCases.Catalogo
             if (imagenUrl != null) documento.ActualizarImagen(imagenUrl);
             await _recursoRepository.AddAsync(documento);
             await _unitOfWork.SaveChangesAsync();
+            
+            InvalidateCache();
             return RecursoMapper.ToDTO(documento);
         }
 
@@ -81,6 +96,8 @@ namespace SIGEBI.Business.UseCases.Catalogo
             if (imagenUrl != null) libro.ActualizarImagen(imagenUrl);
             _recursoRepository.Update(libro);
             await _unitOfWork.SaveChangesAsync();
+            
+            InvalidateCache();
             return RecursoMapper.ToDTO(libro);
         }
 
@@ -96,6 +113,8 @@ namespace SIGEBI.Business.UseCases.Catalogo
             if (imagenUrl != null) revista.ActualizarImagen(imagenUrl);
             _recursoRepository.Update(revista);
             await _unitOfWork.SaveChangesAsync();
+            
+            InvalidateCache();
             return RecursoMapper.ToDTO(revista);
         }
 
@@ -111,6 +130,8 @@ namespace SIGEBI.Business.UseCases.Catalogo
             if (imagenUrl != null) documento.ActualizarImagen(imagenUrl);
             _recursoRepository.Update(documento);
             await _unitOfWork.SaveChangesAsync();
+            
+            InvalidateCache();
             return RecursoMapper.ToDTO(documento);
         }
 
@@ -123,6 +144,8 @@ namespace SIGEBI.Business.UseCases.Catalogo
             recurso.ActualizarImagen(imagenUrl);
             _recursoRepository.Update(recurso);
             await _unitOfWork.SaveChangesAsync();
+            
+            InvalidateCache();
         }
 
         // Elimina permanentemente el recurso del sistema (hard delete).
@@ -132,6 +155,8 @@ namespace SIGEBI.Business.UseCases.Catalogo
                 ?? throw new InvalidOperationException("Recurso no encontrado.");
             _recursoRepository.Delete(recurso);
             await _unitOfWork.SaveChangesAsync();
+            
+            InvalidateCache();
         }
     }
 }

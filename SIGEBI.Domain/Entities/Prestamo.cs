@@ -7,13 +7,13 @@ namespace SIGEBI.Domain.Entities
 {
     public class Prestamo
     {
-        public Guid Id { get; private set; }
-        public Guid UsuarioId { get; private set; }
-        public Guid RecursoId { get; private set; }
-        public DateTime FechaInicio { get; private set; }
-        public DateTime FechaDevolucionEstimada { get; private set; }
-        public DateTime? FechaDevolucionReal { get; private set; }
-        public EstadoPrestamo EstadoActual { get; private set; }
+        public Guid Id { get; private set; } // ID único
+        public Guid UsuarioId { get; private set; } // ID del solicitante
+        public Guid RecursoId { get; private set; } // ID del material
+        public DateTime FechaInicio { get; private set; } // Fecha de salida
+        public DateTime FechaDevolucionEstimada { get; private set; } // Fecha límite
+        public DateTime? FechaDevolucionReal { get; private set; } // Fecha de entrega real
+        public EstadoPrestamo EstadoActual { get; private set; } // Estado (Activo, Atrasado, etc.)
         public Usuario Usuario { get; private set; } = null!;
         public RecursoBibliografico Recurso { get; private set; } = null!;
 

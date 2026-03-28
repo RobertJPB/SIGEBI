@@ -5,14 +5,14 @@ using SIGEBI.Domain.Entities.Recursos;
 
 public class Valoracion
 {
-    public Guid Id { get; private set; }
-    public Guid UsuarioId { get; private set; }
-    public Guid RecursoId { get; private set; }
-    public int Calificacion { get; private set; }
-    public string? Comentario { get; private set; }
+    public Guid Id { get; private set; } // ID único
+    public Guid UsuarioId { get; private set; } // ID del autor
+    public Guid RecursoId { get; private set; } // ID del recurso valorado
+    public int Calificacion { get; private set; } // Puntaje (1-5)
+    public string? Comentario { get; private set; } // Reseña opcional
 
-    public Usuario Usuario { get; private set; } = null!;
-    public RecursoBibliografico Recurso { get; private set; } = null!;
+    public Usuario Usuario { get; private set; } = null!; // Navegación al autor
+    public RecursoBibliografico Recurso { get; private set; } = null!; // Material valorado
 
     private Valoracion() { }
 

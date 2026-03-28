@@ -4,6 +4,7 @@ using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.Interfaces.Services;
 using SIGEBI.Infrastructure.Persistence;
 using SIGEBI.Infrastructure.Persistence.Repositories;
+using SIGEBI.Infrastructure.Persistence.Interceptors;
 using SIGEBI.Infrastructure.Services;
 
 namespace SIGEBI.Infrastructure.IoC
@@ -31,6 +32,7 @@ namespace SIGEBI.Infrastructure.IoC
             services.AddScoped<IHashService, HashService>();
             services.AddScoped<IEmailAdapter, EmailAdapter>();
             services.AddScoped<IJwtService, JwtService>();
+            services.AddScoped<AuditoriaInterceptor>();
 
             return services;
         }

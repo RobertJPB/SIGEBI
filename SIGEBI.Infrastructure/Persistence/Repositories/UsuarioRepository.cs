@@ -6,19 +6,18 @@ using SIGEBI.Infrastructure.Persistence.Base;
 
 namespace SIGEBI.Infrastructure.Persistence.Repositories
 {
-    public class UsuarioRepository : BaseRepository<Usuario>, IUsuarioRepository
+    public class UsuarioRepository : BaseRepository<Usuario, Guid>, IUsuarioRepository
     {
         public UsuarioRepository(SIGEBIDbContext context) : base(context) { }
 
-        public async Task<Usuario?> GetByCorreoAsync(string correo)
+        public async Task<Usuario?> GetByCorreoAsync(string correo) // Buscar por correo
             => await _dbSet.FirstOrDefaultAsync(u => u.Correo == correo);
 
-        public async Task<IEnumerable<Usuario>> GetByRolAsync(RolUsuario rol)
+        public async Task<IEnumerable<Usuario>> GetByRolAsync(RolUsuario rol) // Filtrar por rol
             => await _dbSet.Where(u => u.Rol == rol).ToListAsync();
 
-        public async Task<IEnumerable<Usuario>> GetActivosAsync()
+        public async Task<IEnumerable<Usuario>> GetActivosAsync() // Solo activos
         {
-            // Ojo: Solo trae los que no estan bloqueados ni dados de baja
             return await _dbSet.Where(u => u.Estado == EstadoUsuario.Activo).ToListAsync();
         }
     }

@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using SIGEBI.API.Middleware;
 using SIGEBI.Business.Interfaces.Services;
 using SIGEBI.Infrastructure.Persistence;
+using SIGEBI.Infrastructure.Persistence.Interceptors;
 using SIGEBI.Business.IoC;
 using SIGEBI.Infrastructure.IoC;
 using SIGEBI.Infrastructure.Services;
@@ -56,10 +57,11 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // Configuración del Contexto de Base de Datos (Entity Framework Core con SQL Server)
-builder.Services.AddDbContext<SIGEBIDbContext>(options =>
+builder.Services.AddDbContext<SIGEBIDbContext>((sp, options) =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        sqlOptions => sqlOptions.EnableRetryOnFailure()));
+        sqlOptions => sqlOptions.EnableRetryOnFailure())
+    .AddInterceptors(sp.GetRequiredService<AuditoriaInterceptor>()));
  
 
 // Configuración de Autenticación basada en JWT

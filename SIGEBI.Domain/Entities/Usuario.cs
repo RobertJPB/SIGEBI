@@ -4,16 +4,14 @@ using SIGEBI.Domain.Enums.Seguridad;
 
 namespace SIGEBI.Domain.Entities
 {
-    // La entidad Usuario solo es responsable de gestionar sus propios datos y su estado.
-    // No sabe como guardarse en la BD ni como mandarse por mail.
     public class Usuario
     {
-        public Guid Id { get; private set; }
-        public string Nombre { get; private set; } = null!;
-        public string Correo { get; private set; } = null!;
-        public string ContrasenaHash { get; private set; } = null!;
-        public RolUsuario Rol { get; private set; }
-        public EstadoUsuario Estado { get; private set; }
+        public Guid Id { get; private set; } // ID único
+        public string Nombre { get; private set; } = null!; // Nombre completo
+        public string Correo { get; private set; } = null!; // Email institucional
+        public string ContrasenaHash { get; private set; } = null!; // Password cifrada
+        public RolUsuario Rol { get; private set; } // Nivel de acceso
+        public EstadoUsuario Estado { get; private set; } // Estado actual
 
         public ICollection<Prestamo> Prestamos { get; private set; } = new List<Prestamo>();
         public ICollection<Penalizacion> Penalizaciones { get; private set; } = new List<Penalizacion>();
@@ -27,7 +25,7 @@ namespace SIGEBI.Domain.Entities
 
         public Usuario(string nombre, string correo, string contrasenaHash, RolUsuario rol)
         {
-            // Validaciones re basicas antes de crear el usuario
+            // Validaciones basicas antes de crear el usuario
             if (string.IsNullOrWhiteSpace(nombre))
                 throw new ArgumentException("El nombre es requerido.", nameof(nombre));
             

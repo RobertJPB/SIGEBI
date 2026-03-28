@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Memory;
 using FluentAssertions;
 using Moq;
 using SIGEBI.Business.Interfaces;
@@ -15,6 +16,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
         private readonly Mock<IRecursoRepository> _recursoRepo;
         private readonly Mock<ICategoriaRepository> _categoriaRepo;
         private readonly Mock<IUnitOfWork> _unitOfWork;
+        private readonly IMemoryCache _cache;
         private readonly GestionarRecursosUseCase _useCase;
 
         public GestionarRecursosUseCaseTests()
@@ -22,11 +24,13 @@ namespace SIGEBI.Test.UseCases.Catalogo
             _recursoRepo = new Mock<IRecursoRepository>();
             _categoriaRepo = new Mock<ICategoriaRepository>();
             _unitOfWork = new Mock<IUnitOfWork>();
+            _cache = new MemoryCache(new MemoryCacheOptions());
 
             _useCase = new GestionarRecursosUseCase(
                 _recursoRepo.Object,
                 _categoriaRepo.Object,
-                _unitOfWork.Object);
+                _unitOfWork.Object,
+                _cache);
         }
 
         // ── AGREGAR LIBRO ──

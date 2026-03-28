@@ -1,6 +1,8 @@
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SIGEBI.API.Extensions;
 using SIGEBI.Business.UseCases.Catalogo;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
@@ -21,20 +23,11 @@ namespace SIGEBI.API.Controllers
             _categoriasUseCase = categoriasUseCase;
         }
 
-        // Obtiene el rol del usuario conectado para validar sus permisos de acceso.
-        private RolUsuario ObtenerRolActual()
-        {
-            var rolClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            if (Enum.TryParse<RolUsuario>(rolClaim, out var rol))
-                return rol;
-            throw new UnauthorizedAccessException("Rol no identificado en el token.");
-        }
-
         // Lista todas las categorías disponibles para mostrar en el catálogo o filtros de búsqueda.
         [HttpGet]
         public async Task<IActionResult> ObtenerTodas()
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver categorías");
 
             var categorias = await _categoriasUseCase.ObtenerTodasAsync();
@@ -45,7 +38,7 @@ namespace SIGEBI.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> ObtenerPorId(int id)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver categoría");
 
             var categoria = await _categoriasUseCase.ObtenerPorIdAsync(id);
@@ -53,25 +46,48 @@ namespace SIGEBI.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Crear([FromBody] string nombre)
+        public async Task<IActionResult> Crear([FromBody] CrearCategoriaRequest request)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "crear categoría");
 
-            var categoria = await _categoriasUseCase.CrearAsync(nombre);
-            return Ok(categoria);
+            var categoria = await _categoriasUseCase.CrearAsync(request.Nombre);
+            return CreatedAtAction(nameof(ObtenerPorId), new { id = categoria.Id }, categoria);
         }
-
 
         // Elimina permanentemente la categoría del sistema.
         [HttpDelete("{id}")]
         public async Task<IActionResult> Eliminar(int id)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "eliminar categoría");
 
             await _categoriasUseCase.EliminarAsync(id);
-            return Ok("Categoría eliminada correctamente.");
+            return NoContent();
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Actualizar(int id, [FromBody] ActualizarCategoriaRequest request)
+        {
+            var rol = User.ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "actualizar categoría");
+
+            var categoria = await _categoriasUseCase.ActualizarAsync(id, request.Nombre);
+            return Ok(categoria);
+        }
+    }
+
+    public class CrearCategoriaRequest
+    {
+        [Required(ErrorMessage = "El nombre de la categoría es obligatorio.")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 50 caracteres.")]
+        public string Nombre { get; set; }
+    }
+
+    public class ActualizarCategoriaRequest
+    {
+        [Required(ErrorMessage = "El nombre de la categoría es obligatorio.")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 50 caracteres.")]
+        public string Nombre { get; set; }
     }
 }

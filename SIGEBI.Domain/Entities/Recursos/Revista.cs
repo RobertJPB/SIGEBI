@@ -5,10 +5,10 @@ namespace SIGEBI.Domain.Entities.Recursos
     // Una revista es un tipo de recurso mas. Cumple el contrato base de RecursoBibliografico.
     public class Revista : RecursoBibliografico
     {
-        public int NumeroEdicion { get; private set; }
-        public string ISSN { get; private set; } = null!;
-        public string? Editorial { get; private set; }
-        public int Anio { get; private set; }
+        public int NumeroEdicion { get; private set; } // Número de entrega/volumen
+        public string ISSN { get; private set; } = null!; // Identificador internacional de revistas
+        public string? Editorial { get; private set; } // Casa editora
+        public int Anio { get; private set; } // Año de publicación
 
         private Revista() { }
 

@@ -4,15 +4,15 @@ namespace SIGEBI.Domain.Entities
 {
     public class Penalizacion
     {
-        public Guid Id { get; private set; }
-        public Guid UsuarioId { get; private set; }
-        public string Motivo { get; private set; } = null!;
-        public DateTime FechaInicio { get; private set; }
-        public DateTime? FechaFin { get; private set; }
-        public Enums.Operacion.EstadoPenalizacion Estado { get; private set; }
-        public Guid? PrestamoId { get; private set; }
-        public Usuario Usuario { get; private set; } = null!;
-        public Prestamo? Prestamo { get; private set; }
+        public Guid Id { get; private set; } // ID único
+        public Guid UsuarioId { get; private set; } // ID del sancionado
+        public string Motivo { get; private set; } = null!; // Razón de la sanción
+        public DateTime FechaInicio { get; private set; } // Fecha de inicio
+        public DateTime? FechaFin { get; private set; } // Fecha estimada de fin
+        public Enums.Operacion.EstadoPenalizacion Estado { get; private set; } // Estado (Activa, Finalizada)
+        public Guid? PrestamoId { get; private set; } // Préstamo asociado
+        public Usuario Usuario { get; private set; } = null!; // Navegación al usuario
+        public Prestamo? Prestamo { get; private set; } // Navegación al préstamo
 
         private Penalizacion() { }
 
