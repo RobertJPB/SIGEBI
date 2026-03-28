@@ -22,7 +22,7 @@ namespace SIGEBI.Domain.Entities
             if (string.IsNullOrWhiteSpace(motivo)) throw new ArgumentException("El motivo es obligatorio.", nameof(motivo));
             if (diasPenalizacion <= 0) throw new ArgumentException("Los días deben ser mayores que 0.", nameof(diasPenalizacion));
 
-            Id = Guid.NewGuid();
+            Id = DomainServices.SequentialGuidGenerator.NewGuid();
             UsuarioId = usuarioId;
             PrestamoId = prestamoId;
             Motivo = motivo.Trim();

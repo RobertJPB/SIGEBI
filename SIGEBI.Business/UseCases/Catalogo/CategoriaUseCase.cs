@@ -102,9 +102,7 @@ namespace SIGEBI.Business.UseCases.Catalogo
             var categoria = await _categoriaRepository.GetByIdAsync(id)
                 ?? throw new KeyNotFoundException("Categoria no encontrada.");
             
-            categoria.Desactivar();
-            _categoriaRepository.Update(categoria);
-            
+            _categoriaRepository.Delete(categoria);
             await _unitOfWork.SaveChangesAsync();
             
             InvalidateCache();

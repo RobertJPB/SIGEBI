@@ -4,7 +4,7 @@ using SIGEBI.Domain.Enums.Seguridad;
 
 namespace SIGEBI.Domain.Entities
 {
-    public class Usuario
+    public class Usuario : IDesactivable
     {
         public Guid Id { get; private set; } // ID único
         public string Nombre { get; private set; } = null!; // Nombre completo
@@ -35,7 +35,7 @@ namespace SIGEBI.Domain.Entities
             if (string.IsNullOrWhiteSpace(contrasenaHash))
                 throw new ArgumentException("La contraseña es requerida.", nameof(contrasenaHash));
 
-            Id = Guid.NewGuid();
+            Id = DomainServices.SequentialGuidGenerator.NewGuid();
             Nombre = nombre.Trim();
             Correo = correo.Trim();
             ContrasenaHash = contrasenaHash;

@@ -3,7 +3,7 @@ using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Domain.Entities.Recursos
 {
-    public abstract class RecursoBibliografico
+    public abstract class RecursoBibliografico : IDesactivable
     {
         public Guid Id { get; private set; } // ID único
         public string Titulo { get; private set; } = null!; // Título del material
@@ -28,7 +28,7 @@ namespace SIGEBI.Domain.Entities.Recursos
             if (stockInicial < 0)
                 throw new ArgumentOutOfRangeException(nameof(stockInicial), "El stock no puede ser negativo.");
 
-            Id = Guid.NewGuid();
+            Id = DomainServices.SequentialGuidGenerator.NewGuid();
             Titulo = titulo.Trim();
             Autor = autor.Trim();
             IdCategoria = idCategoria;

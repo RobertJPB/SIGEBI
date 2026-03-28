@@ -23,5 +23,14 @@ namespace SIGEBI.Infrastructure.Persistence.Repositories
             
             return valoraciones.Average(v => (double)v.Calificacion);
         }
+
+        public async Task<Dictionary<Guid, double>> GetPromediosBatchAsync(IEnumerable<Guid> recursoIds)
+        {
+            return await _dbSet
+                .Where(v => recursoIds.Contains(v.RecursoId))
+                .GroupBy(v => v.RecursoId)
+                .Select(g => new { RecursoId = g.Key, Promedio = g.Average(v => (double)v.Calificacion) })
+                .ToDictionaryAsync(x => x.RecursoId, x => x.Promedio);
+        }
     }
-}
+}

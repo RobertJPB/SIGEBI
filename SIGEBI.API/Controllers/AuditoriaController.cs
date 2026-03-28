@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.UseCases.Usuarios;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
+using SIGEBI.API.Extensions;
 
 // Controlador para visualizar los registros de auditoría del sistema.
 // Permite rastrear qué usuarios han realizado qué acciones en qué objetos.
@@ -21,22 +22,14 @@ namespace SIGEBI.API.Controllers
             _auditoriaUseCase = auditoriaUseCase;
         }
 
-        // Método auxiliar para extraer el rol del usuario autenticado desde el token JWT.
-        // Lanza una excepción si el rol no es válido o no está presente.
-        private RolUsuario ObtenerRolActual()
-        {
-            var rolClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            if (Enum.TryParse<RolUsuario>(rolClaim, out var rol))
-                return rol;
-            throw new UnauthorizedAccessException("Rol no identificado en el token.");
-        }
+
 
         // Obtiene la lista completa de todas las auditorías registradas.
         // Solo accesible para usuarios con permisos elevados (validado por AccesoPolicy).
         [HttpGet]
         public async Task<IActionResult> ObtenerTodas()
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerAuditoria(rol), "ver auditoría");
 
             var auditorias = await _auditoriaUseCase.ObtenerTodasAsync();
@@ -48,7 +41,7 @@ namespace SIGEBI.API.Controllers
         [HttpGet("usuario/{usuarioId}")]
         public async Task<IActionResult> ObtenerPorUsuario(Guid usuarioId)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerAuditoria(rol), "ver auditoría por usuario");
 
             var auditorias = await _auditoriaUseCase.ObtenerPorUsuarioAsync(usuarioId);

@@ -21,7 +21,7 @@ namespace SIGEBI.Domain.Entities
         {
             if (usuarioId == Guid.Empty)
                 throw new ArgumentException("UsuarioId inválido.", nameof(usuarioId));
-            Id = Guid.NewGuid();
+            Id = DomainServices.SequentialGuidGenerator.NewGuid();
             UsuarioId = usuarioId;
             FechaCreacion = fechaCreacionUtc;
         }

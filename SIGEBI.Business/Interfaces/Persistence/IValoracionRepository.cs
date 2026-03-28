@@ -7,5 +7,6 @@ namespace SIGEBI.Business.Interfaces.Persistence
         Task<IEnumerable<Valoracion>> GetByRecursoIdAsync(Guid recursoId);
         Task<IEnumerable<Valoracion>> GetByUsuarioIdAsync(Guid usuarioId);
         Task<double> GetPromedioCalificacionAsync(Guid recursoId);
+        Task<Dictionary<Guid, double>> GetPromediosBatchAsync(IEnumerable<Guid> recursoIds);
     }
-}
+}

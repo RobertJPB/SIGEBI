@@ -4,7 +4,7 @@ using SIGEBI.Domain.Entities.Recursos;
 
 namespace SIGEBI.Domain.Entities
 {
-    public class Categoria
+    public class Categoria : IDesactivable
     {
         public int Id { get; private set; } // ID numérico
         public string Nombre { get; private set; } = null!; // Nombre (Ej: Informatica)

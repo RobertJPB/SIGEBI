@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Infrastructure.Persistence;
-
+using SIGEBI.Domain.Entities;
 namespace SIGEBI.Infrastructure.Persistence.Base
 {
     // Esta clase base tiene todo el CRUD basico. 
@@ -30,8 +30,18 @@ namespace SIGEBI.Infrastructure.Persistence.Base
         public void Update(T entity) // Actualizar existente
             => _dbSet.Update(entity);
 
-        public void Delete(T entity) // Eliminar
-            => _dbSet.Remove(entity);
+        public void Delete(T entity) // Eliminar o Borrado Logico
+        {
+            if (entity is IDesactivable desactivableEntity)
+            {
+                desactivableEntity.Desactivar();
+                _dbSet.Update(entity);
+            }
+            else
+            {
+                _dbSet.Remove(entity);
+            }
+        }
 
         public async Task<bool> ExistsAsync(TId id) // Verificar existencia
             => await _dbSet.FindAsync(id) != null;

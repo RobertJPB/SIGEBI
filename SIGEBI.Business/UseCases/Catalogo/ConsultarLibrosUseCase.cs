@@ -27,14 +27,19 @@ namespace SIGEBI.Business.UseCases.Catalogo
         {
             if (!_cache.TryGetValue("RecursosDisponibles", out IEnumerable<RecursoDetalleDTO>? dtos))
             {
-                // Solo traemos los que estan disponibles para mostrar en la vista
                 var recursos = await _recursoRepository.GetDisponiblesAsync();
+                var recursoIds = recursos.Select(r => r.Id).ToList();
+                
+                // Traemos todos los promedios en una sola consulta batch (Optimizado)
+                var promediosMap = await _valoracionRepository.GetPromediosBatchAsync(recursoIds);
+                
                 var list = new List<RecursoDetalleDTO>();
 
                 foreach (var recurso in recursos)
                 {
                     var dto = RecursoMapper.ToDTO(recurso);
-                    dto.PromedioValoraciones = await _valoracionRepository.GetPromedioCalificacionAsync(recurso.Id);
+                    // Buscamos el promedio ya cargado en el diccionario en memoria
+                    dto.PromedioValoraciones = promediosMap.ContainsKey(recurso.Id) ? promediosMap[recurso.Id] : 0;
                     list.Add(dto);
                 }
                 dtos = list;
@@ -43,6 +48,7 @@ namespace SIGEBI.Business.UseCases.Catalogo
 
             return dtos!;
         }
+
 
         // Filtra los recursos por coincidencia parcial en el título.
         public async Task<IEnumerable<RecursoDetalleDTO>> BuscarPorTituloAsync(string titulo)

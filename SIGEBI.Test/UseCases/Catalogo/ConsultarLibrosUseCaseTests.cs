@@ -44,8 +44,12 @@ namespace SIGEBI.Test.UseCases.Catalogo
                 .ReturnsAsync(recursos);
 
             _valoracionRepo
-                .Setup(v => v.GetPromedioCalificacionAsync(It.IsAny<Guid>()))
-                .ReturnsAsync(4.5);
+                .Setup(v => v.GetPromediosBatchAsync(It.IsAny<List<Guid>>()))
+                .ReturnsAsync(new Dictionary<Guid, double>
+                {
+                    { recursos[0].Id, 4.5 },
+                    { recursos[1].Id, 4.5 }
+                });
 
             // Act
             var resultado = await _useCase.EjecutarAsync();
@@ -81,8 +85,11 @@ namespace SIGEBI.Test.UseCases.Catalogo
                 .ReturnsAsync(new List<RecursoBibliografico> { libro });
 
             _valoracionRepo
-                .Setup(v => v.GetPromedioCalificacionAsync(libro.Id))
-                .ReturnsAsync(4.8);
+                .Setup(v => v.GetPromediosBatchAsync(It.IsAny<List<Guid>>()))
+                .ReturnsAsync(new Dictionary<Guid, double>
+                {
+                    { libro.Id, 4.8 }
+                });
 
             // Act
             var resultado = await _useCase.EjecutarAsync();

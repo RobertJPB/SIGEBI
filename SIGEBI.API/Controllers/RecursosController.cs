@@ -5,6 +5,7 @@ using SIGEBI.Business.DTOs;
 using SIGEBI.Business.UseCases.Catalogo;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
+using SIGEBI.API.Extensions;
 
 namespace SIGEBI.API.Controllers
 {
@@ -32,23 +33,14 @@ namespace SIGEBI.API.Controllers
             _env = env;
         }
 
-        // ── HELPER — extrae el rol del token JWT ──
-        /// Helper para recuperar el rol del usuario actual desde los Claims del token JWT.
 
-        private RolUsuario ObtenerRolActual()
-        {
-            var rolClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            if (Enum.TryParse<RolUsuario>(rolClaim, out var rol))
-                return rol;
-            throw new UnauthorizedAccessException("Rol no identificado en el token.");
-        }
 
         // ── GET ──
         /// Obtiene todos los recursos disponibles en el catálogo.
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             // Validación de permisos centralizada en la capa de Dominio (AccesoPolicy)
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver catálogo");
 
@@ -59,7 +51,7 @@ namespace SIGEBI.API.Controllers
         [HttpGet("buscar")]
         public async Task<IActionResult> BuscarPorTitulo([FromQuery] string titulo)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "buscar recursos");
 
             var recursos = await _consultarUseCase.BuscarPorTituloAsync(titulo);
@@ -69,7 +61,7 @@ namespace SIGEBI.API.Controllers
         [HttpGet("categoria/{categoriaId}")]
         public async Task<IActionResult> GetPorCategoria(int categoriaId)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver por categoría");
 
             var recursos = await _consultarUseCase.BuscarPorCategoriaAsync(categoriaId);
@@ -79,7 +71,7 @@ namespace SIGEBI.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver detalle de recurso");
 
             var recurso = await _consultarUseCase.GetByIdAsync(id);
@@ -95,7 +87,7 @@ namespace SIGEBI.API.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> AgregarLibro([FromForm] AgregarLibroRequest request)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "agregar libro");
 
             if (request == null) return BadRequest("Datos inválidos.");
@@ -113,7 +105,7 @@ namespace SIGEBI.API.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> AgregarRevista([FromForm] AgregarRevistaRequest request)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "agregar revista");
 
             if (request == null) return BadRequest("Datos inválidos.");
@@ -128,7 +120,7 @@ namespace SIGEBI.API.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> AgregarDocumento([FromForm] AgregarDocumentoRequest request)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "agregar documento");
 
             if (request == null) return BadRequest("Datos inválidos.");
@@ -145,7 +137,7 @@ namespace SIGEBI.API.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> EditarLibro(Guid id, [FromForm] AgregarLibroRequest request)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "editar libro");
 
             if (request == null) return BadRequest("Datos inválidos.");
@@ -160,7 +152,7 @@ namespace SIGEBI.API.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> EditarRevista(Guid id, [FromForm] AgregarRevistaRequest request)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "editar revista");
 
             if (request == null) return BadRequest("Datos inválidos.");
@@ -175,7 +167,7 @@ namespace SIGEBI.API.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> EditarDocumento(Guid id, [FromForm] AgregarDocumentoRequest request)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "editar documento");
 
             if (request == null) return BadRequest("Datos inválidos.");
@@ -191,7 +183,7 @@ namespace SIGEBI.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Eliminar(Guid id)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "eliminar recurso");
 
             await _gestionarUseCase.EliminarRecursoAsync(id);

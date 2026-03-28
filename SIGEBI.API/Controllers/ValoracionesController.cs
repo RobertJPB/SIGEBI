@@ -5,6 +5,7 @@ using SIGEBI.Business.DTOs;
 using SIGEBI.Business.UseCases.Catalogo;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
+using SIGEBI.API.Extensions;
 
 // Permite a los usuarios calificar y dejar comentarios sobre los recursos de la biblioteca.
 // Ayuda a otros usuarios a conocer la calidad y utilidad de la bibliografía disponible.
@@ -22,14 +23,7 @@ namespace SIGEBI.API.Controllers
             _valoracionesUseCase = valoracionesUseCase;
         }
 
-        // Recupera el rol para aplicar las políticas de acceso al catálogo y sus interacciones.
-        private RolUsuario ObtenerRolActual()
-        {
-            var rolClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            if (Enum.TryParse<RolUsuario>(rolClaim, out var rol))
-                return rol;
-            throw new UnauthorizedAccessException("Rol no identificado en el token.");
-        }
+
 
         // Recupera el ID del usuario del token JWT.
         private Guid ObtenerUsuarioIdActual()
@@ -44,7 +38,7 @@ namespace SIGEBI.API.Controllers
         [HttpGet("recurso/{recursoId}")]
         public async Task<IActionResult> ObtenerPorRecurso(Guid recursoId)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver valoraciones");
 
             var valoraciones = await _valoracionesUseCase.ObtenerValoracionesPorRecursoAsync(recursoId);
@@ -55,7 +49,7 @@ namespace SIGEBI.API.Controllers
         [HttpGet("recurso/{recursoId}/promedio")]
         public async Task<IActionResult> ObtenerPromedio(Guid recursoId)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver promedio de valoraciones");
 
             var promedio = await _valoracionesUseCase.ObtenerPromedioAsync(recursoId);
@@ -65,7 +59,7 @@ namespace SIGEBI.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Agregar([FromBody] ValoracionDTO dto)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "agregar valoración");
 
             var valoracion = await _valoracionesUseCase.AgregarValoracionAsync(
@@ -77,7 +71,7 @@ namespace SIGEBI.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Eliminar(Guid id)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             var usuarioId = ObtenerUsuarioIdActual();
             
             // Primero obtenemos la valoración para verificar autoría

@@ -22,7 +22,7 @@ public class Valoracion
         if (recursoId == Guid.Empty) throw new ArgumentException("Recurso inválido.", nameof(recursoId));
         ValidarCalificacion(calificacion);
 
-        Id = Guid.NewGuid();
+            Id = DomainServices.SequentialGuidGenerator.NewGuid();
         UsuarioId = usuarioId;
         RecursoId = recursoId;
         Calificacion = calificacion;

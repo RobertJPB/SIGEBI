@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.UseCases.Usuarios;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
+using SIGEBI.API.Extensions;
 
 // Se encarga del sistema de alertas y avisos para los usuarios.
 // Notifica sobre devoluciones próximas, multas aplicadas u otras novedades.
@@ -21,13 +22,7 @@ namespace SIGEBI.API.Controllers
             _notificacionesUseCase = notificacionesUseCase;
         }
 
-        private RolUsuario ObtenerRolActual()
-        {
-            var rolClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            if (Enum.TryParse<RolUsuario>(rolClaim, out var rol))
-                return rol;
-            throw new UnauthorizedAccessException("Rol no identificado en el token.");
-        }
+
 
         private Guid ObtenerUsuarioIdActual()
         {
@@ -41,7 +36,7 @@ namespace SIGEBI.API.Controllers
         [HttpGet("usuario/{usuarioId}")]
         public async Task<IActionResult> ObtenerPorUsuario(Guid usuarioId)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver notificaciones");
 
             var notificaciones = await _notificacionesUseCase.ObtenerPorUsuarioAsync(usuarioId);
@@ -51,7 +46,7 @@ namespace SIGEBI.API.Controllers
         [HttpGet("usuario/{usuarioId}/count")]
         public async Task<IActionResult> ObtenerCantPendientes(Guid usuarioId)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver conteo de notificaciones");
 
             var count = await _notificacionesUseCase.ObtenerCantPendientesAsync(usuarioId);
@@ -61,7 +56,7 @@ namespace SIGEBI.API.Controllers
         [HttpPut("{notificacionId}/leida")]
         public async Task<IActionResult> MarcarComoLeida(Guid notificacionId)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "marcar notificación como leída");
 
             await _notificacionesUseCase.MarcarComoLeidaAsync(notificacionId);
@@ -72,7 +67,7 @@ namespace SIGEBI.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Eliminar(Guid id)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             var usuarioId = ObtenerUsuarioIdActual();
 
             var notificacion = await _notificacionesUseCase.ObtenerPorIdAsync(id);

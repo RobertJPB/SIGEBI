@@ -19,7 +19,7 @@ namespace SIGEBI.Domain.Entities
             if (usuarioId == Guid.Empty) throw new ArgumentException("Usuario inválido.", nameof(usuarioId));
             if (string.IsNullOrWhiteSpace(mensaje)) throw new ArgumentException("El mensaje es obligatorio.", nameof(mensaje));
 
-            Id = Guid.NewGuid();
+            Id = DomainServices.SequentialGuidGenerator.NewGuid();
             UsuarioId = usuarioId;
             Tipo = tipo;
             Mensaje = mensaje.Trim();

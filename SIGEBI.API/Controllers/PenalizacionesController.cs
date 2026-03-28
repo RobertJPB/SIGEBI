@@ -5,6 +5,7 @@ using SIGEBI.Business.DTOs;
 using SIGEBI.Business.UseCases.Usuarios;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
+using SIGEBI.API.Extensions;
 
 // Controlador encargado de la gestión de multas y sanciones por retrasos en devoluciones.
 // Ayuda a mantener la disciplina en el uso de los recursos bibliotecarios.
@@ -22,20 +23,13 @@ namespace SIGEBI.API.Controllers
             _penalizacionesUseCase = penalizacionesUseCase;
         }
 
-        // Recupera el rol para verificar permisos de visualización o aplicación de sanciones.
-        private RolUsuario ObtenerRolActual()
-        {
-            var rolClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            if (Enum.TryParse<RolUsuario>(rolClaim, out var rol))
-                return rol;
-            throw new UnauthorizedAccessException("Rol no identificado en el token.");
-        }
+
 
         // Muestra todas las penalizaciones del sistema (Admin/Bibliotecario).
         [HttpGet]
         public async Task<IActionResult> ObtenerTodas()
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPenalizaciones(rol), "ver todas las penalizaciones");
 
             var penalizaciones = await _penalizacionesUseCase.ObtenerTodasLasPenalizacionesAsync();
@@ -46,7 +40,7 @@ namespace SIGEBI.API.Controllers
         [HttpGet("usuario/{usuarioId}")]
         public async Task<IActionResult> ObtenerPorUsuario(Guid usuarioId)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             // Cambiamos el permiso para que sea ver usuarios o gestionar penalizaciones
             bool puedeVer = AccesoPolicy.PuedeVerUsuarios(rol) || AccesoPolicy.PuedeGestionarPenalizaciones(rol);
             AccesoPolicy.ValidarAcceso(rol, puedeVer, "ver penalizaciones de un usuario");
@@ -59,7 +53,7 @@ namespace SIGEBI.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Aplicar([FromBody] AplicarPenalizacionManualDTO dto)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPenalizaciones(rol), "aplicar penalización manual");
 
             await _penalizacionesUseCase.AplicarPenalizacionManualAsync(dto);
@@ -70,7 +64,7 @@ namespace SIGEBI.API.Controllers
         [HttpPost("usuario/{usuarioId}")]
         public async Task<IActionResult> AplicarManual(Guid usuarioId, [FromBody] AplicarPenalizacionManualDTO dto)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPenalizaciones(rol), "aplicar penalización manual");
 
             dto.UsuarioId = usuarioId;
@@ -83,7 +77,7 @@ namespace SIGEBI.API.Controllers
         [HttpPost("aplicar")]
         public async Task<IActionResult> AplicarPenalizaciones()
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPenalizaciones(rol), "aplicar penalizaciones");
 
             await _penalizacionesUseCase.AplicarPenalizacionesAsync();
@@ -94,7 +88,7 @@ namespace SIGEBI.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Eliminar(Guid id)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPenalizaciones(rol), "eliminar penalización");
 
             await _penalizacionesUseCase.EliminarPenalizacionAsync(id);
@@ -105,7 +99,7 @@ namespace SIGEBI.API.Controllers
         [HttpPatch("{id}/finalizar")]
         public async Task<IActionResult> Finalizar(Guid id)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPenalizaciones(rol), "finalizar penalización");
 
             await _penalizacionesUseCase.FinalizarPenalizacionAsync(id);

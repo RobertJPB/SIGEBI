@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.Services;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
+using SIGEBI.API.Extensions;
 
 // Provee herramientas de análisis y reporte sobre el estado de la biblioteca.
 // Permite exportar datos consolidados para la toma de decisiones administrativa.
@@ -21,15 +22,7 @@ namespace SIGEBI.API.Controllers
             _reportesService = reportesService;
         }
 
-        // ── HELPER ──
-        // Obtiene el rol para asegurar que solo personal autorizado pueda generar informes de gestión.
-        private RolUsuario ObtenerRolActual()
-        {
-            var rolClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            if (Enum.TryParse<RolUsuario>(rolClaim, out var rol))
-                return rol;
-            throw new UnauthorizedAccessException("Rol no identificado en el token.");
-        }
+
 
         // ── GET ──
 
@@ -37,7 +30,7 @@ namespace SIGEBI.API.Controllers
         [HttpGet("general")]
         public async Task<IActionResult> ObtenerReporteGeneral()
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGenerarReportes(rol), "generar reporte general");
 
             // TODO: Agregar filtros por fecha de ser necesario mas adelante
@@ -51,7 +44,7 @@ namespace SIGEBI.API.Controllers
             [FromQuery] DateTime fechaInicio,
             [FromQuery] DateTime fechaFin)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGenerarReportes(rol), "generar reporte de préstamos");
 
             var prestamos = await _reportesService.ObtenerPrestamosPorPeriodoAsync(fechaInicio, fechaFin);
@@ -62,7 +55,7 @@ namespace SIGEBI.API.Controllers
         [HttpGet("usuarios-morosos")]
         public async Task<IActionResult> ObtenerUsuariosMasPenalizados([FromQuery] int top = 5)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGenerarReportes(rol), "ver reporte de usuarios morosos");
 
             var usuarios = await _reportesService.ObtenerUsuariosMasPenalizadosAsync(top);
@@ -73,7 +66,7 @@ namespace SIGEBI.API.Controllers
         [HttpGet("penalizaciones-activas")]
         public async Task<IActionResult> ObtenerPenalizacionesActivas()
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGenerarReportes(rol), "ver reporte de penalizaciones activas");
 
             var penalizaciones = await _reportesService.ObtenerPenalizacionesActivasAsync();

@@ -6,6 +6,7 @@ using SIGEBI.Business.Services;
 using SIGEBI.Business.UseCases.Prestamos;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
+using SIGEBI.API.Extensions;
 
 // Este controlador orquesta todas las solicitudes relacionadas con el préstamo y devolución de libros.
 // Actúa como el puente entre las peticiones HTTP y los servicios de lógica de negocio de préstamos.
@@ -23,20 +24,13 @@ namespace SIGEBI.API.Controllers
             _prestamoService = prestamoService;
         }
 
-        // Helper para obtener el nivel de acceso del usuario a partir de sus credenciales JWT.
-        private RolUsuario ObtenerRolActual()
-        {
-            var rolClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            if (Enum.TryParse<RolUsuario>(rolClaim, out var rol))
-                return rol;
-            throw new UnauthorizedAccessException("Rol no identificado en el token.");
-        }
+
 
         // Recupera el historial completo de préstamos (requiere permisos administrativos).
         [HttpGet]
         public async Task<IActionResult> GetTodos()
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerTodosLosPrestamos(rol), "ver todos los préstamos");
 
             var prestamos = await _prestamoService.ObtenerTodosAsync();
@@ -47,7 +41,7 @@ namespace SIGEBI.API.Controllers
         [HttpGet("usuario/{usuarioId}")]
         public async Task<IActionResult> GetPorUsuario(Guid usuarioId)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver préstamos por usuario");
 
             var prestamos = await _prestamoService.ObtenerPorUsuarioAsync(usuarioId);
@@ -58,7 +52,7 @@ namespace SIGEBI.API.Controllers
         [HttpGet("activos/{usuarioId}")]
         public async Task<IActionResult> GetActivosPorUsuario(Guid usuarioId)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver préstamos activos");
 
             var prestamos = await _prestamoService.ObtenerActivosPorUsuarioAsync(usuarioId);
@@ -69,7 +63,7 @@ namespace SIGEBI.API.Controllers
         [HttpGet("atrasados")]
         public async Task<IActionResult> GetAtrasados()
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerTodosLosPrestamos(rol), "ver préstamos atrasados");
 
             var prestamos = await _prestamoService.ObtenerAtrasadosAsync();
@@ -81,7 +75,7 @@ namespace SIGEBI.API.Controllers
         [HttpPost]
         public async Task<IActionResult> SolicitarPrestamo([FromBody] PrestamoRequestDTO dto)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeSolicitarPrestamo(rol), "solicitar préstamo");
 
             var resultado = await _prestamoService.SolicitarPrestamoAsync(dto.UsuarioId, dto.RecursoId, dto.FechaDevolucionEstimada);
@@ -92,7 +86,7 @@ namespace SIGEBI.API.Controllers
         [HttpPut("devolver/{prestamoId}")]
         public async Task<IActionResult> DevolverPrestamo(Guid prestamoId)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPrestamos(rol), "devolver préstamo");
 
             await _prestamoService.DevolverPrestamoAsync(prestamoId);
@@ -103,7 +97,7 @@ namespace SIGEBI.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Eliminar(Guid id)
         {
-            var rol = ObtenerRolActual();
+            var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPrestamos(rol), "eliminar préstamo");
 
             await _prestamoService.EliminarPrestamoAsync(id);
