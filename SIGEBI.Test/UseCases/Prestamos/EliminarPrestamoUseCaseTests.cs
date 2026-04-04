@@ -32,7 +32,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
         {
             // Arrange
             var prestamoId = Guid.NewGuid();
-            var prestamo = new Prestamo(Guid.NewGuid(), Guid.NewGuid(), 7, DateTime.UtcNow);
+            var prestamo = new Prestamo(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 7, DateTime.UtcNow);
             _prestamoRepo.Setup(r => r.GetByIdAsync(prestamoId)).ReturnsAsync(prestamo);
             _unitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
 

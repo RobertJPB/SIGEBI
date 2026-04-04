@@ -2,28 +2,33 @@ using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.Mappers;
+using SIGEBI.Business.Interfaces.Common;
+using SIGEBI.Business.Interfaces.UseCases.Catalogo;
 using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Business.UseCases.Catalogo
 {
     // Maneja las calificaciones y comentarios sociales de los usuarios sobre el material bibliográfico.
-    public class ValoracionesUseCase
+    public class ValoracionesUseCase : IValoracionesUseCase
     {
         private readonly IValoracionRepository _valoracionRepository;
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IRecursoRepository _recursoRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IGuidGenerator _guidGenerator;
 
         public ValoracionesUseCase(
             IValoracionRepository valoracionRepository,
             IUsuarioRepository usuarioRepository,
             IRecursoRepository recursoRepository,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IGuidGenerator guidGenerator)
         {
             _valoracionRepository = valoracionRepository;
             _usuarioRepository = usuarioRepository;
             _recursoRepository = recursoRepository;
             _unitOfWork = unitOfWork;
+            _guidGenerator = guidGenerator;
         }
 
         // Crea una nueva valoración validando la existencia del usuario y el recurso.
@@ -32,13 +37,19 @@ namespace SIGEBI.Business.UseCases.Catalogo
         {
             // Validaciones iniciales
             var usuario = await _usuarioRepository.GetByIdAsync(usuarioId)
-                ?? throw new InvalidOperationException("Usuario no encontrado.");
+                ?? throw new KeyNotFoundException("Usuario no encontrado.");
 
             var recurso = await _recursoRepository.GetByIdAsync(recursoId)
-                ?? throw new InvalidOperationException("Recurso no encontrado.");
+                ?? throw new KeyNotFoundException("Recurso no encontrado.");
 
             // Guardamos la calificacion (estrellas) que puso el usuario
-            var valoracion = new Valoracion(usuarioId, recursoId, calificacion, comentario);
+            var valoracion = new Valoracion(
+                _guidGenerator.Create(),
+                usuarioId,
+                recursoId,
+                calificacion,
+                comentario
+            );
             
             await _valoracionRepository.AddAsync(valoracion);
             await _unitOfWork.SaveChangesAsync();

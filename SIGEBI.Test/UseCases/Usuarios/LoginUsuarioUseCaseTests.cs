@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Moq;
 using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.Interfaces.Services;
@@ -28,7 +28,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
         // -- HELPER --
 
         private Usuario CrearUsuario()
-            => new Usuario("Juan Perez", "juan@test.com", "hash123", RolUsuario.Estudiante);
+            => new Usuario(Guid.NewGuid(), "Juan Perez", "juan@test.com", "hash123", RolUsuario.Estudiante);
 
         // -- PRUEBAS --
 

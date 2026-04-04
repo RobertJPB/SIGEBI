@@ -7,6 +7,7 @@ using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Entities.Recursos;
 using SIGEBI.Domain.Enums.Biblioteca;
 using SIGEBI.Domain.Enums.Seguridad;
+using SIGEBI.Business.Interfaces.Common;
 using Xunit;
 
 namespace SIGEBI.Test.UseCases.Prestamos
@@ -36,22 +37,23 @@ namespace SIGEBI.Test.UseCases.Prestamos
                 _penalizacionRepo.Object,
                 _notificacionRepo.Object,
                 _listaDeseosRepo.Object,
-                _unitOfWork.Object);
+                _unitOfWork.Object,
+                new Mock<IGuidGenerator>().Object);
         }
 
-        // ── HELPERS ──
+        // â”€â”€ HELPERS â”€â”€
 
         private Libro CrearLibroDisponible()
-            => new Libro("El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943);
+            => new Libro(Guid.NewGuid(), "El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943);
 
         private Prestamo CrearPrestamoActivo(Guid? usuarioId = null, Guid? recursoId = null)
-            => new Prestamo(
+            => new Prestamo(Guid.NewGuid(), 
                 usuarioId ?? Guid.NewGuid(),
                 recursoId ?? Guid.NewGuid(),
                 7,
                 DateTime.UtcNow.AddDays(-3));
 
-        // ── PRUEBAS ──
+        // â”€â”€ PRUEBAS â”€â”€
 
         [Fact]
         public async Task Ejecutar_PrestamoExistente_DevuelveCorrectamente()
@@ -108,7 +110,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
         {
             // Arrange
             var libro = CrearLibroDisponible();
-            var prestamo = new Prestamo(Guid.NewGuid(), libro.Id, 1, DateTime.UtcNow.AddDays(-10));
+            var prestamo = new Prestamo(Guid.NewGuid(), Guid.NewGuid(), libro.Id, 1, DateTime.UtcNow.AddDays(-10));
 
             _prestamoRepo.Setup(r => r.GetByIdAsync(prestamo.Id)).ReturnsAsync(prestamo);
             _recursoRepo.Setup(r => r.GetByIdAsync(prestamo.RecursoId)).ReturnsAsync(libro);
@@ -127,7 +129,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
         {
             // Arrange
             var libro = CrearLibroDisponible();
-            var prestamo = new Prestamo(Guid.NewGuid(), libro.Id, 30, DateTime.UtcNow.AddDays(-1));
+            var prestamo = new Prestamo(Guid.NewGuid(), Guid.NewGuid(), libro.Id, 30, DateTime.UtcNow.AddDays(-1));
 
             _prestamoRepo.Setup(r => r.GetByIdAsync(prestamo.Id)).ReturnsAsync(prestamo);
             _recursoRepo.Setup(r => r.GetByIdAsync(prestamo.RecursoId)).ReturnsAsync(libro);

@@ -2,7 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.DTOs;
-using SIGEBI.Business.UseCases.Usuarios;
+using SIGEBI.Business.Interfaces.UseCases.Usuarios;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
 using SIGEBI.API.Extensions;
@@ -16,13 +16,13 @@ namespace SIGEBI.API.Controllers
     [Authorize]
     public class UsuariosController : ControllerBase
     {
-        private readonly GestionarUsuarioUseCase _gestionarUsuario;
-        private readonly RegistrarUsuarioUseCase _registrarUsuario;
+        private readonly IGestionarUsuarioUseCase _gestionarUsuario;
+        private readonly IRegistrarUsuarioUseCase _registrarUsuario;
         private readonly IWebHostEnvironment _env;
 
         public UsuariosController(
-            GestionarUsuarioUseCase gestionarUsuario,
-            RegistrarUsuarioUseCase registrarUsuario,
+            IGestionarUsuarioUseCase gestionarUsuario,
+            IRegistrarUsuarioUseCase registrarUsuario,
             IWebHostEnvironment env)
         {
             _gestionarUsuario = gestionarUsuario;
@@ -31,6 +31,11 @@ namespace SIGEBI.API.Controllers
         }
 
         // Lista todos los usuarios registrados en la base de datos para supervisión.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet]
         public async Task<IActionResult> ObtenerTodos()
         {
@@ -42,6 +47,11 @@ namespace SIGEBI.API.Controllers
         }
 
         // Retorna la información del usuario autenticado actualmente (perfil personal).
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("perfil")]
         public async Task<IActionResult> ObtenerPerfil()
         {
@@ -57,6 +67,11 @@ namespace SIGEBI.API.Controllers
         }
 
         // Consulta la ficha detallada de un usuario específico mediante su ID.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("{id}")]
         public async Task<IActionResult> ObtenerPorId(Guid id)
         {
@@ -70,6 +85,11 @@ namespace SIGEBI.API.Controllers
         }
 
         // Registra manualmente un nuevo usuario, útil para dar de alta personal interno por parte de administradores.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
         public async Task<IActionResult> Registrar([FromBody] UsuarioDTO dto)
         {
@@ -81,6 +101,11 @@ namespace SIGEBI.API.Controllers
         }
 
         // Restablece el acceso a un usuario que estaba previamente desactivado o bloqueado.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("{id}/activar")]
         public async Task<IActionResult> Activar(Guid id)
         {
@@ -92,6 +117,11 @@ namespace SIGEBI.API.Controllers
         }
 
         // Suspende temporalmente el acceso de un usuario al sistema.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("{id}/desactivar")]
         public async Task<IActionResult> Desactivar(Guid id)
         {
@@ -103,6 +133,11 @@ namespace SIGEBI.API.Controllers
         }
 
         // Bloquea definitivamente a un usuario (por ejemplo, por acumulación de multas o infracciones graves).
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("{id}/bloquear")]
         public async Task<IActionResult> Bloquear(Guid id)
         {
@@ -114,6 +149,11 @@ namespace SIGEBI.API.Controllers
         }
 
         // Modifica el nivel de privilegios (rol) asignado a un usuario específico.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("{id}/rol")]
         public async Task<IActionResult> CambiarRol(Guid id, [FromBody] int nuevoRol)
         {
@@ -125,6 +165,11 @@ namespace SIGEBI.API.Controllers
         }
 
         // Elimina definitivamente a un usuario del sistema (hard delete).
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Eliminar(Guid id)
         {
@@ -135,6 +180,11 @@ namespace SIGEBI.API.Controllers
             return Ok("Usuario eliminado correctamente.");
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("perfil/foto")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> ActualizarFotoPerfil(IFormFile foto)
@@ -150,6 +200,11 @@ namespace SIGEBI.API.Controllers
             return Ok(new { Mensaje = "Foto de perfil actualizada.", Url = imagenUrl });
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("perfil")]
         public async Task<IActionResult> ActualizarPerfil([FromBody] ActualizarPerfilRequest request)
         {

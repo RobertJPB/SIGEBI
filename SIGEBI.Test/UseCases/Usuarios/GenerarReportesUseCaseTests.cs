@@ -31,17 +31,17 @@ namespace SIGEBI.Test.UseCases.Usuarios
                 _penalizacionRepo.Object);
         }
 
-        // ── GENERAR REPORTE GENERAL ──
+        // â”€â”€ GENERAR REPORTE GENERAL â”€â”€
 
-        // Caso de Uso: Generar Reportes - Proceso: Generar un resumen ejecutivo con métricas de todas las entidades.
+        // Caso de Uso: Generar Reportes - Proceso: Generar un resumen ejecutivo con mÃ©tricas de todas las entidades.
         [Fact]
         public async Task GenerarReporteGeneral_CalculaTotalesCorrectamente()
         {
             // Arrange
-            _prestamoRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Prestamo> { new Prestamo(Guid.NewGuid(), Guid.NewGuid(), 7, DateTime.UtcNow) });
-            _usuarioRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Usuario> { new Usuario("Test", "t@t.com", "h", RolUsuario.Estudiante) });
-            _recursoRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<RecursoBibliografico> { new Libro("T", "A", 1, 1, null, "I", "E", 2020) });
-            _penalizacionRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Penalizacion> { new Penalizacion(Guid.NewGuid(), "M", 3, DateTime.UtcNow, Guid.NewGuid()) });
+            _prestamoRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Prestamo> { new Prestamo(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 7, DateTime.UtcNow) });
+            _usuarioRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Usuario> { new Usuario(Guid.NewGuid(), "Test", "t@t.com", "h", RolUsuario.Estudiante) });
+            _recursoRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<RecursoBibliografico> { new Libro(Guid.NewGuid(), "T", "A", 1, 1, null, "I", "E", 2020) });
+            _penalizacionRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Penalizacion> { new Penalizacion(Guid.NewGuid(), Guid.NewGuid(), "M", 3, DateTime.UtcNow, Guid.NewGuid()) });
 
             // Act
             var resultado = await _useCase.GenerarReporteGeneralAsync();
@@ -53,9 +53,9 @@ namespace SIGEBI.Test.UseCases.Usuarios
             resultado.TotalPenalizaciones.Should().Be(1);
         }
 
-        // ── OBTENER PRESTAMOS POR PERIODO ──
+        // â”€â”€ OBTENER PRESTAMOS POR PERIODO â”€â”€
 
-        // Caso de Uso: Generar Reportes - Proceso: Filtrar préstamos realizados dentro de un intervalo de fechas.
+        // Caso de Uso: Generar Reportes - Proceso: Filtrar prÃ©stamos realizados dentro de un intervalo de fechas.
         [Fact]
         public async Task ObtenerPrestamosPorPeriodo_FiltraPorFechas()
         {
@@ -64,8 +64,8 @@ namespace SIGEBI.Test.UseCases.Usuarios
             var fechaFin = DateTime.UtcNow;
             var prestamos = new List<Prestamo>
             {
-                new Prestamo(Guid.NewGuid(), Guid.NewGuid(), 7, DateTime.UtcNow.AddDays(-5)), // Dentro
-                new Prestamo(Guid.NewGuid(), Guid.NewGuid(), 7, DateTime.UtcNow.AddDays(-15)) // Fuera
+                new Prestamo(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 7, DateTime.UtcNow.AddDays(-5)), // Dentro
+                new Prestamo(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 7, DateTime.UtcNow.AddDays(-15)) // Fuera
             };
             _prestamoRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(prestamos);
 
@@ -76,7 +76,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
             resultado.Should().HaveCount(1);
         }
 
-        // ── USUARIOS MAS PENALIZADOS ──
+        // â”€â”€ USUARIOS MAS PENALIZADOS â”€â”€
 
         // Caso de Uso: Generar Reportes - Proceso: Identificar a los usuarios con mayor cantidad de sanciones.
         [Fact]
@@ -87,9 +87,9 @@ namespace SIGEBI.Test.UseCases.Usuarios
             var user2 = Guid.NewGuid();
             var penalizaciones = new List<Penalizacion>
             {
-                new Penalizacion(user1, "M", 1, DateTime.UtcNow, Guid.NewGuid()),
-                new Penalizacion(user1, "M", 2, DateTime.UtcNow, Guid.NewGuid()),
-                new Penalizacion(user2, "M", 1, DateTime.UtcNow, Guid.NewGuid())
+                new Penalizacion(Guid.NewGuid(), user1, "M", 1, DateTime.UtcNow, Guid.NewGuid()),
+                new Penalizacion(Guid.NewGuid(), user1, "M", 2, DateTime.UtcNow, Guid.NewGuid()),
+                new Penalizacion(Guid.NewGuid(), user2, "M", 1, DateTime.UtcNow, Guid.NewGuid())
             };
             _penalizacionRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(penalizaciones);
 
@@ -98,12 +98,12 @@ namespace SIGEBI.Test.UseCases.Usuarios
 
             // Assert
             resultado.Should().HaveCount(2);
-            // El primero debe ser user1 con 2 sanciones (dinámico porque devuelve object)
+            // El primero debe ser user1 con 2 sanciones (dinÃ¡mico porque devuelve object)
             var lista = resultado.ToList();
             lista[0].GetType().GetProperty("UsuarioId")?.GetValue(lista[0], null).Should().Be(user1);
         }
 
-        // ── PENALIZACIONES ACTIVAS ──
+        // â”€â”€ PENALIZACIONES ACTIVAS â”€â”€
 
         // Caso de Uso: Generar Reportes - Proceso: Obtener listado de sanciones vigentes en el sistema.
         [Fact]

@@ -1,11 +1,12 @@
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces.Persistence;
+using SIGEBI.Business.Interfaces.UseCases.Prestamos;
 using SIGEBI.Business.Mappers;
 
 namespace SIGEBI.Business.UseCases.Prestamos
 {
     // Provee métodos de lectura para consultar el historial y estado de los préstamos.
-    public class ConsultarPrestamoUseCase
+    public class ConsultarPrestamoUseCase : IConsultarPrestamoUseCase
     {
         private readonly IPrestamoRepository _prestamoRepository;
         private readonly IUsuarioRepository _usuarioRepository;

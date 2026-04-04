@@ -1,11 +1,12 @@
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces.Persistence;
+using SIGEBI.Business.Interfaces.UseCases.Usuarios;
 using SIGEBI.Business.Mappers;
 
 namespace SIGEBI.Business.UseCases.Usuarios
 {
     // Permite la consulta y filtrado de los registros de auditoría del sistema.
-    public class ConsultarAuditoriaUseCase
+    public class ConsultarAuditoriaUseCase : IConsultarAuditoriaUseCase
     {
         private readonly IAuditoriaRepository _auditoriaRepository;
 

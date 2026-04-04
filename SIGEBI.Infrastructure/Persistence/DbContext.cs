@@ -34,10 +34,13 @@ namespace SIGEBI.Infrastructure.Persistence
                 Id = UsuarioIdSistema,
                 Nombre = "Sistema",
                 Correo = "sistema@sigebi.com",
-                ContrasenaHash = "SYSTEM_ACCOUNT_NO_LOGIN",
+                ContrasenaHash = Usuario.SistemaHashCentinela,
                 Rol = Domain.Enums.Seguridad.RolUsuario.Bibliotecario,
                 Estado = Domain.Enums.Seguridad.EstadoUsuario.Activo
             });
+
+            // Exclusión explícita del flujo de consultas (para evitar login y visibilidad)
+            modelBuilder.Entity<Usuario>().HasQueryFilter(u => u.ContrasenaHash != Usuario.SistemaHashCentinela);
         }
 
         private static readonly Guid UsuarioIdSistema = Guid.Parse("00000000-0000-0000-0000-000000000001");

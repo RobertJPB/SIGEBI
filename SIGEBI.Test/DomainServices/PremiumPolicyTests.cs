@@ -10,15 +10,15 @@ namespace SIGEBI.Test.Domain
 {
     public class PremiumPolicyTests
     {
-        // ── HELPERS ──
+        // â”€â”€ HELPERS â”€â”€
 
         private Usuario CrearUsuarioActivo(RolUsuario rol = RolUsuario.Estudiante)
-            => new Usuario("Juan Perez", "juan@test.com", "hash123", rol);
+            => new Usuario(Guid.NewGuid(), "Juan Perez", "juan@test.com", "hash123", rol);
 
         private Penalizacion CrearPenalizacionActiva(Guid usuarioId)
-            => new Penalizacion(usuarioId, "Atraso", 5, DateTime.UtcNow);
+            => new Penalizacion(Guid.NewGuid(), usuarioId, "Atraso", 5, DateTime.UtcNow, null);
 
-        // ── PUEDE REALIZAR PRESTAMO ──
+        // â”€â”€ PUEDE REALIZAR PRESTAMO â”€â”€
 
         [Fact]
         public void PuedeRealizarPrestamo_UsuarioActivoSinPrestamos_DevuelveTrue()
@@ -39,7 +39,7 @@ namespace SIGEBI.Test.Domain
             // Arrange
             var usuario = CrearUsuarioActivo(RolUsuario.Estudiante);
             var prestamos = Enumerable.Range(0, 3)
-                .Select(_ => new Prestamo(usuario.Id, Guid.NewGuid(), 7, DateTime.UtcNow))
+                .Select(_ => new Prestamo(Guid.NewGuid(), usuario.Id, Guid.NewGuid(), 7, DateTime.UtcNow))
                 .ToList();
 
             // Act
@@ -63,7 +63,7 @@ namespace SIGEBI.Test.Domain
             resultado.Should().BeFalse();
         }
 
-        // ── TIENE PENALIZACION ACTIVA ──
+        // â”€â”€ TIENE PENALIZACION ACTIVA â”€â”€
 
         [Fact]
         public void TienePenalizacionActiva_SinPenalizaciones_DevuelveFalse()
@@ -88,35 +88,26 @@ namespace SIGEBI.Test.Domain
             resultado.Should().BeTrue();
         }
 
-        // ── OBTENER DIAS PLAZO ──
+        // â”€â”€ OBTENER DIAS PLAZO â”€â”€
 
         [Fact]
-        public void ObtenerDiasPlazo_Estudiante_DevuelteSieteDias()
+        public void ObtenerDiasPlazo_Estudiante_DevuelteQuinceDias()
         {
-            var usuario = CrearUsuarioActivo(RolUsuario.Estudiante);
-
-            var dias = PrestamoPolicy.ObtenerDiasPlazo(usuario);
-
+            var dias = PrestamoPolicy.ObtenerDiasPlazo();
             dias.Should().Be(15);
         }
 
         [Fact]
         public void ObtenerDiasPlazo_Administrador_DevuelveQuinceDias()
         {
-            var usuario = CrearUsuarioActivo(RolUsuario.Administrador);
-
-            var dias = PrestamoPolicy.ObtenerDiasPlazo(usuario);
-
+            var dias = PrestamoPolicy.ObtenerDiasPlazo();
             dias.Should().Be(15);
         }
 
         [Fact]
-        public void ObtenerDiasPlazo_Bibliotecario_DevuelteCatorceDias()
+        public void ObtenerDiasPlazo_Bibliotecario_DevuelteQuinceDias()
         {
-            var usuario = CrearUsuarioActivo(RolUsuario.Bibliotecario);
-
-            var dias = PrestamoPolicy.ObtenerDiasPlazo(usuario);
-
+            var dias = PrestamoPolicy.ObtenerDiasPlazo();
             dias.Should().Be(15);
         }
     }

@@ -16,13 +16,13 @@ public class Valoracion
 
     private Valoracion() { }
 
-    public Valoracion(Guid usuarioId, Guid recursoId, int calificacion, string? comentario)
+    public Valoracion(Guid id, Guid usuarioId, Guid recursoId, int calificacion, string? comentario)
     {
         if (usuarioId == Guid.Empty) throw new ArgumentException("Usuario inválido.", nameof(usuarioId));
         if (recursoId == Guid.Empty) throw new ArgumentException("Recurso inválido.", nameof(recursoId));
         ValidarCalificacion(calificacion);
 
-            Id = DomainServices.SequentialGuidGenerator.NewGuid();
+        Id = id;
         UsuarioId = usuarioId;
         RecursoId = recursoId;
         Calificacion = calificacion;

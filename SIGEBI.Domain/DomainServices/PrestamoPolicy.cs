@@ -33,7 +33,7 @@ namespace SIGEBI.Domain.DomainServices
                 p.Estado == EstadoPenalizacion.Activa);
         }
 
-        public static int ObtenerDiasPlazo(Usuario usuario)
+        public static int ObtenerDiasPlazo()
         {
             return DiasPlazoEstudiante;
         }

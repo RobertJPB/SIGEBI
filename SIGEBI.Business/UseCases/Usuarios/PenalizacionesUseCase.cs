@@ -2,19 +2,22 @@ using Microsoft.Extensions.Logging;
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistence;
+using SIGEBI.Business.Interfaces.UseCases.Usuarios;
 using SIGEBI.Business.Mappers;
+using SIGEBI.Business.Interfaces.Common;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Business.UseCases.Usuarios
 {
     // Identifica devoluciones tardías y aplica sanciones automáticas a los usuarios.
-    public class PenalizacionesUseCase
+    public class PenalizacionesUseCase : IPenalizacionesUseCase
     {
         private readonly IPrestamoRepository _prestamoRepository;
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IPenalizacionRepository _penalizacionRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IGuidGenerator _guidGenerator;
         private readonly ILogger<PenalizacionesUseCase> _logger;
 
         public PenalizacionesUseCase(
@@ -22,12 +25,14 @@ namespace SIGEBI.Business.UseCases.Usuarios
             IUsuarioRepository usuarioRepository,
             IPenalizacionRepository penalizacionRepository,
             IUnitOfWork unitOfWork,
+            IGuidGenerator guidGenerator,
             ILogger<PenalizacionesUseCase> logger)
         {
             _prestamoRepository = prestamoRepository;
             _usuarioRepository = usuarioRepository;
             _penalizacionRepository = penalizacionRepository;
             _unitOfWork = unitOfWork;
+            _guidGenerator = guidGenerator;
             _logger = logger;
         }
 
@@ -53,7 +58,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
                     prestamo.FechaDevolucionEstimada, DateTime.UtcNow);
                 string motivo = PenalizacionCalculator.ObtenerMotivo(diasAtraso);
 
-                var penalizacion = new Penalizacion(prestamo.UsuarioId, motivo, diasPenalizacion, DateTime.UtcNow, prestamo.Id);
+                var penalizacion = new Penalizacion(_guidGenerator.Create(), prestamo.UsuarioId, motivo, diasPenalizacion, DateTime.UtcNow, prestamo.Id);
                 await _penalizacionRepository.AddAsync(penalizacion);
                 _logger.LogInformation("Penalización aplicada al usuario {UsuarioId} por préstamo {PrestamoId} ({Dias} días de atraso).",
                     prestamo.UsuarioId, prestamo.Id, diasAtraso);
@@ -67,7 +72,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
             var usuario = await _usuarioRepository.GetByIdAsync(dto.UsuarioId)
                 ?? throw new InvalidOperationException("Usuario no encontrado.");
 
-            var penalizacion = new Penalizacion(dto.UsuarioId, dto.Motivo, dto.DiasPenalizacion, DateTime.UtcNow, dto.PrestamoId);
+            var penalizacion = new Penalizacion(_guidGenerator.Create(), dto.UsuarioId, dto.Motivo, dto.DiasPenalizacion, DateTime.UtcNow, dto.PrestamoId);
             await _penalizacionRepository.AddAsync(penalizacion);
             await _unitOfWork.SaveChangesAsync();
         }

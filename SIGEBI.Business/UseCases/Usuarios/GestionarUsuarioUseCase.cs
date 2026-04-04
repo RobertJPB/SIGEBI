@@ -1,13 +1,14 @@
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistence;
+using SIGEBI.Business.Interfaces.UseCases.Usuarios;
 using SIGEBI.Business.Mappers;
 using SIGEBI.Domain.Enums.Seguridad;
 
 namespace SIGEBI.Business.UseCases.Usuarios
 {
     // Administra el ciclo de vida y los permisos de los usuarios registrados.
-    public class GestionarUsuarioUseCase
+    public class GestionarUsuarioUseCase : IGestionarUsuarioUseCase
     {
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IUnitOfWork _unitOfWork;

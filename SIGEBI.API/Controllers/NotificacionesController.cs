@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SIGEBI.Business.UseCases.Usuarios;
+using SIGEBI.Business.Interfaces.UseCases.Usuarios;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
 using SIGEBI.API.Extensions;
@@ -15,9 +15,9 @@ namespace SIGEBI.API.Controllers
     [Authorize]
     public class NotificacionesController : ControllerBase
     {
-        private readonly NotificacionesUseCase _notificacionesUseCase;
+        private readonly INotificacionesUseCase _notificacionesUseCase;
 
-        public NotificacionesController(NotificacionesUseCase notificacionesUseCase)
+        public NotificacionesController(INotificacionesUseCase notificacionesUseCase)
         {
             _notificacionesUseCase = notificacionesUseCase;
         }
@@ -33,6 +33,11 @@ namespace SIGEBI.API.Controllers
         }
 
         // Recupera todas las notificaciones (leídas y no leídas) de un usuario.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("usuario/{usuarioId}")]
         public async Task<IActionResult> ObtenerPorUsuario(Guid usuarioId)
         {
@@ -43,6 +48,17 @@ namespace SIGEBI.API.Controllers
             return Ok(notificaciones);
         }
 
+
+
+
+
+
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("usuario/{usuarioId}/count")]
         public async Task<IActionResult> ObtenerCantPendientes(Guid usuarioId)
         {
@@ -53,6 +69,17 @@ namespace SIGEBI.API.Controllers
             return Ok(count);
         }
 
+
+
+
+
+
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("{notificacionId}/leida")]
         public async Task<IActionResult> MarcarComoLeida(Guid notificacionId)
         {
@@ -60,10 +87,15 @@ namespace SIGEBI.API.Controllers
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "marcar notificación como leída");
 
             await _notificacionesUseCase.MarcarComoLeidaAsync(notificacionId);
-            return Ok("Notificación marcada como leída.");
+            return Ok(new { message = "Notificación marcada como leída." });
         }
 
         // Elimina una notificación. El usuario solo puede borrar las suyas.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Eliminar(Guid id)
         {
@@ -78,7 +110,7 @@ namespace SIGEBI.API.Controllers
             }
 
             await _notificacionesUseCase.EliminarNotificacionAsync(id);
-            return Ok("Notificación eliminada correctamente.");
+            return Ok(new { message = "Notificación eliminada correctamente." });
         }
     }
 }

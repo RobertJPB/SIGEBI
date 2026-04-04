@@ -17,11 +17,11 @@ namespace SIGEBI.Domain.Entities
 
         private ListaDeseos() { }
 
-        public ListaDeseos(Guid usuarioId, DateTime fechaCreacionUtc)
+        public ListaDeseos(Guid id, Guid usuarioId, DateTime fechaCreacionUtc)
         {
             if (usuarioId == Guid.Empty)
                 throw new ArgumentException("UsuarioId inválido.", nameof(usuarioId));
-            Id = DomainServices.SequentialGuidGenerator.NewGuid();
+            Id = id;
             UsuarioId = usuarioId;
             FechaCreacion = fechaCreacionUtc;
         }

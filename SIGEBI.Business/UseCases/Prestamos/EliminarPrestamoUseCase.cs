@@ -1,11 +1,12 @@
 using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistence;
+using SIGEBI.Business.Interfaces.UseCases.Prestamos;
 
 namespace SIGEBI.Business.UseCases.Prestamos
 {
     // Caso de uso para eliminar físicamente un registro de préstamo.
     // Solo debe ser usado para corrección de errores administrativos.
-    public class EliminarPrestamoUseCase
+    public class EliminarPrestamoUseCase : IEliminarPrestamoUseCase
     {
         private readonly IPrestamoRepository _prestamoRepository;
         private readonly IUnitOfWork _unitOfWork;

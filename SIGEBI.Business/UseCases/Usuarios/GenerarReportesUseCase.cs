@@ -1,13 +1,12 @@
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces.Persistence;
+using SIGEBI.Business.Interfaces.UseCases.Usuarios;
 using SIGEBI.Business.Mappers;
 
 namespace SIGEBI.Business.UseCases.Usuarios
 {
-    // Solo dependemos de las interfaces estrictamente necesarias para los reportes 
-    // (IPrestamoRepository, IUsuarioRepository, etc.) en lugar de un "IGestorCentral" gigante.
     // Consolida información estadística de múltiples entidades para fines administrativos.
-    public class GenerarReportesUseCase
+    public class GenerarReportesUseCase : IGenerarReportesUseCase
     {
         private readonly IPrestamoRepository _prestamoRepository;
         private readonly IUsuarioRepository _usuarioRepository;

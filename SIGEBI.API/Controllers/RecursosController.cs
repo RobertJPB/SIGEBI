@@ -2,7 +2,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.DTOs;
-using SIGEBI.Business.UseCases.Catalogo;
+using SIGEBI.Business.Interfaces.UseCases.Catalogo;
+using SIGEBI.Business.Validators;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
 using SIGEBI.API.Extensions;
@@ -18,18 +19,20 @@ namespace SIGEBI.API.Controllers
     [Authorize]
     public class RecursosController : ControllerBase
     {
-        // Casos de uso para desacoplar la lógica de negocio
-        private readonly ConsultarLibrosUseCase _consultarUseCase;
-        private readonly GestionarRecursosUseCase _gestionarUseCase;
+        private readonly IConsultarLibrosUseCase _consultarUseCase;
+        private readonly IGestionarRecursosUseCase _gestionarUseCase;
+        private readonly AgregarRecursoValidator _validator;
         private readonly IWebHostEnvironment _env;
 
         public RecursosController(
-            ConsultarLibrosUseCase consultarUseCase,
-            GestionarRecursosUseCase gestionarUseCase,
+            IConsultarLibrosUseCase consultarUseCase,
+            IGestionarRecursosUseCase gestionarUseCase,
+            AgregarRecursoValidator validator,
             IWebHostEnvironment env)
         {
             _consultarUseCase = consultarUseCase;
             _gestionarUseCase = gestionarUseCase;
+            _validator = validator;
             _env = env;
         }
 
@@ -37,6 +40,11 @@ namespace SIGEBI.API.Controllers
 
         // ── GET ──
         /// Obtiene todos los recursos disponibles en el catálogo.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet]
         public async Task<IActionResult> ObtenerTodos()
         {
@@ -48,6 +56,11 @@ namespace SIGEBI.API.Controllers
             return Ok(recursos);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("buscar")]
         public async Task<IActionResult> BuscarPorTitulo([FromQuery] string titulo)
         {
@@ -58,6 +71,11 @@ namespace SIGEBI.API.Controllers
             return Ok(recursos);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("categoria/{categoriaId}")]
         public async Task<IActionResult> ObtenerPorCategoria(int categoriaId)
         {
@@ -68,6 +86,11 @@ namespace SIGEBI.API.Controllers
             return Ok(recursos);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("{id}")]
         public async Task<IActionResult> ObtenerPorId(Guid id)
         {
@@ -83,6 +106,11 @@ namespace SIGEBI.API.Controllers
         // ── POST ──
         /// Agrega un nuevo libro al sistema. Requiere permisos de Administrador o Bibliotecario.
         /// Soporta carga de archivos (multipart/form-data) para la portada.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("libro")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> AgregarLibro([FromForm] AgregarLibroRequest request)
@@ -90,7 +118,21 @@ namespace SIGEBI.API.Controllers
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "agregar libro");
 
-            if (request == null) return BadRequest("Datos inválidos.");
+            if (request == null) return BadRequest(new { mensaje = "Datos inválidos." });
+
+            // Validación con el validador de negocio
+            var validacionDto = new RecursoDetalleDTO
+            {
+                Titulo = request.Titulo,
+                Autor = request.Autor,
+                Stock = request.Stock,
+                TipoRecurso = "Libro",
+                ISBN = request.ISBN,
+                Editorial = request.Editorial,
+                Anio = request.Anio
+            };
+            var errores = _validator.Validar(validacionDto);
+            if (errores.Any()) return BadRequest(new { errores });
             
             // Guardado de la imagen en el servidor (si se proporciona)
             var imagenUrl = await GuardarImagenAsync(request.Imagen);
@@ -101,6 +143,11 @@ namespace SIGEBI.API.Controllers
             return Ok(resultado);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("revista")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> AgregarRevista([FromForm] AgregarRevistaRequest request)
@@ -108,7 +155,19 @@ namespace SIGEBI.API.Controllers
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "agregar revista");
 
-            if (request == null) return BadRequest("Datos inválidos.");
+            if (request == null) return BadRequest(new { mensaje = "Datos inválidos." });
+
+            var validacionDto = new RecursoDetalleDTO
+            {
+                Titulo = request.Titulo,
+                Autor = request.Autor,
+                Stock = request.Stock,
+                TipoRecurso = "Revista",
+                ISSN = request.ISSN,
+                NumeroEdicion = request.NumeroEdicion
+            };
+            var errores = _validator.Validar(validacionDto);
+            if (errores.Any()) return BadRequest(new { errores });
             var imagenUrl = await GuardarImagenAsync(request.Imagen);
             var resultado = await _gestionarUseCase.AgregarRevistaAsync(
                 request.Titulo, request.Autor, request.CategoriaId, request.Stock, request.Descripcion,
@@ -116,6 +175,11 @@ namespace SIGEBI.API.Controllers
             return Ok(resultado);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("documento")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> AgregarDocumento([FromForm] AgregarDocumentoRequest request)
@@ -123,7 +187,20 @@ namespace SIGEBI.API.Controllers
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "agregar documento");
 
-            if (request == null) return BadRequest("Datos inválidos.");
+            if (request == null) return BadRequest(new { mensaje = "Datos inválidos." });
+
+            var validacionDto = new RecursoDetalleDTO
+            {
+                Titulo = request.Titulo,
+                Autor = request.Autor,
+                Stock = request.Stock,
+                TipoRecurso = "Documento",
+                Formato = request.Formato,
+                Institucion = request.Institucion
+            };
+            var errores = _validator.Validar(validacionDto);
+            if (errores.Any()) return BadRequest(new { errores });
+
             var imagenUrl = await GuardarImagenAsync(request.Imagen);
             var resultado = await _gestionarUseCase.AgregarDocumentoAsync(
                 request.Titulo, request.Autor, request.CategoriaId, request.Stock, request.Descripcion,
@@ -133,6 +210,11 @@ namespace SIGEBI.API.Controllers
 
         // ── PUT ──
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("libro/{id}")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> EditarLibro(Guid id, [FromForm] AgregarLibroRequest request)
@@ -148,6 +230,11 @@ namespace SIGEBI.API.Controllers
             return Ok(resultado);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("revista/{id}")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> EditarRevista(Guid id, [FromForm] AgregarRevistaRequest request)
@@ -163,6 +250,11 @@ namespace SIGEBI.API.Controllers
             return Ok(resultado);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("documento/{id}")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> EditarDocumento(Guid id, [FromForm] AgregarDocumentoRequest request)
@@ -180,6 +272,11 @@ namespace SIGEBI.API.Controllers
 
         // ── DELETE ──
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Eliminar(Guid id)
         {
@@ -187,7 +284,7 @@ namespace SIGEBI.API.Controllers
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "eliminar recurso");
 
             await _gestionarUseCase.EliminarRecursoAsync(id);
-            return Ok("Recurso eliminado correctamente.");
+            return Ok(new { mensaje = "Recurso eliminado correctamente." });
         }
 
         // ── Helper ──

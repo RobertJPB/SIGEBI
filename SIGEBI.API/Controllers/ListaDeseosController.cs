@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SIGEBI.Business.UseCases.Catalogo;
+using SIGEBI.Business.Interfaces.UseCases.Catalogo;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
 using SIGEBI.API.Extensions;
@@ -15,16 +15,19 @@ namespace SIGEBI.API.Controllers
     [Authorize]
     public class ListaDeseosController : ControllerBase
     {
-        private readonly ListaDeseosUseCase _listaDeseosUseCase;
+        private readonly IListaDeseosUseCase _listaDeseosUseCase;
 
-        public ListaDeseosController(ListaDeseosUseCase listaDeseosUseCase)
+        public ListaDeseosController(IListaDeseosUseCase listaDeseosUseCase)
         {
             _listaDeseosUseCase = listaDeseosUseCase;
         }
 
-
-
         // Lista todos los recursos que un usuario específico tiene en su lista de deseos.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("usuario/{usuarioId}")]
         public async Task<IActionResult> ObtenerPorUsuario(Guid usuarioId)
         {
@@ -36,6 +39,11 @@ namespace SIGEBI.API.Controllers
         }
 
         // Añade un recurso específico a la lista de deseos del usuario.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("usuario/{usuarioId}/recurso/{recursoId}")]
         public async Task<IActionResult> AgregarRecurso(Guid usuarioId, Guid recursoId)
         {
@@ -43,10 +51,15 @@ namespace SIGEBI.API.Controllers
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "agregar a lista de deseos");
 
             await _listaDeseosUseCase.AgregarRecursoAsync(usuarioId, recursoId);
-            return Ok("Recurso agregado a la lista de deseos.");
+            return Ok(new { message = "Recurso agregado a la lista de deseos." });
         }
 
         // Elimina un recurso de la lista de deseos del usuario.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpDelete("usuario/{usuarioId}/recurso/{recursoId}")]
         public async Task<IActionResult> RemoverRecurso(Guid usuarioId, Guid recursoId)
         {
@@ -54,7 +67,7 @@ namespace SIGEBI.API.Controllers
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "remover de lista de deseos");
 
             await _listaDeseosUseCase.RemoverRecursoAsync(usuarioId, recursoId);
-            return Ok("Recurso removido de la lista de deseos.");
+            return Ok(new { message = "Recurso removido de la lista de deseos." });
         }
     }
 }

@@ -9,6 +9,7 @@ using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Entities.Recursos;
 using SIGEBI.Domain.Enums.Seguridad;
 using SIGEBI.Domain.DomainServices;
+using SIGEBI.Business.Interfaces.Common;
 using Xunit;
 
 namespace SIGEBI.Test.UseCases.Prestamos
@@ -42,18 +43,19 @@ namespace SIGEBI.Test.UseCases.Prestamos
                 _notificacionRepo.Object,
                 _emailAdapter.Object,
                 _unitOfWork.Object,
+                new Mock<IGuidGenerator>().Object,
                 Microsoft.Extensions.Logging.Abstractions.NullLogger<SolicitarPrestamoUseCase>.Instance);
         }
 
-        // ── HELPERS ──
+        // â”€â”€ HELPERS â”€â”€
 
         private Usuario CrearUsuarioActivo(RolUsuario rol = RolUsuario.Estudiante)
-            => new Usuario("Juan Perez", "juan@test.com", "hash123", rol);
+            => new Usuario(Guid.NewGuid(), "Juan Perez", "juan@test.com", "hash123", rol);
 
         private Libro CrearLibroDisponible()
-            => new Libro("El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943);
+            => new Libro(Guid.NewGuid(), "El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943);
 
-        // ── PRUEBAS ──
+        // â”€â”€ PRUEBAS â”€â”€
 
         [Fact]
         public async Task Ejecutar_UsuarioYRecursoValidos_DevuelveDTO()
@@ -108,7 +110,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
             // Arrange
             var usuario = CrearUsuarioActivo();
             var libro = CrearLibroDisponible();
-            var penalizacion = new Penalizacion(usuario.Id, "Atraso", 5, DateTime.UtcNow);
+            var penalizacion = new Penalizacion(Guid.NewGuid(), usuario.Id, "Atraso", 5, DateTime.UtcNow, null);
 
             _usuarioRepo.Setup(r => r.GetByIdAsync(usuario.Id)).ReturnsAsync(usuario);
             _recursoRepo.Setup(r => r.GetByIdAsync(libro.Id)).ReturnsAsync(libro);
@@ -125,7 +127,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
         {
             // Arrange
             var usuario = CrearUsuarioActivo();
-            var libro = new Libro("El Principito", "Antoine", 1, 0, null, "978-84-261", "Editorial X", 1943);
+            var libro = new Libro(Guid.NewGuid(), "El Principito", "Antoine", 1, 0, null, "978-84-261", "Editorial X", 1943);
 
             _usuarioRepo.Setup(r => r.GetByIdAsync(usuario.Id)).ReturnsAsync(usuario);
             _recursoRepo.Setup(r => r.GetByIdAsync(libro.Id)).ReturnsAsync(libro);

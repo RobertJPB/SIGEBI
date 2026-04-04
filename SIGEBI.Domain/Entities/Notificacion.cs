@@ -14,12 +14,12 @@ namespace SIGEBI.Domain.Entities
 
         private Notificacion() { }
 
-        public Notificacion(Guid usuarioId, Enums.Operacion.TipoNotificacion tipo, string mensaje, DateTime fechaUtc)
+        public Notificacion(Guid id, Guid usuarioId, Enums.Operacion.TipoNotificacion tipo, string mensaje, DateTime fechaUtc)
         {
             if (usuarioId == Guid.Empty) throw new ArgumentException("Usuario inválido.", nameof(usuarioId));
             if (string.IsNullOrWhiteSpace(mensaje)) throw new ArgumentException("El mensaje es obligatorio.", nameof(mensaje));
 
-            Id = DomainServices.SequentialGuidGenerator.NewGuid();
+            Id = id;
             UsuarioId = usuarioId;
             Tipo = tipo;
             Mensaje = mensaje.Trim();

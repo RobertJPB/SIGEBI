@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Moq;
 using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistence;
@@ -6,6 +6,7 @@ using SIGEBI.Business.UseCases.Usuarios;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Enums.Operacion;
 using SIGEBI.Domain.Enums.Seguridad;
+using SIGEBI.Business.Interfaces.Common;
 using Xunit;
 
 namespace SIGEBI.Test.UseCases.Usuarios
@@ -26,20 +27,21 @@ namespace SIGEBI.Test.UseCases.Usuarios
             _useCase = new NotificacionesUseCase(
                 _notificacionRepo.Object,
                 _usuarioRepo.Object,
-                _unitOfWork.Object);
+                _unitOfWork.Object,
+                new Mock<IGuidGenerator>().Object);
         }
 
-        // ── OBTENER NOTIFICACIONES ──
+        // Ã¢â€â‚¬Ã¢â€â‚¬ OBTENER NOTIFICACIONES Ã¢â€â‚¬Ã¢â€â‚¬
 
         // Caso de Uso: Notificaciones - Proceso: Consultar todas las alertas enviadas a un usuario particular.
         [Fact]
         public async Task ObtenerPorUsuario_UsuarioExistente_DevuelveLista()
         {
             // Arrange
-            var usuario = new Usuario("T", "t@t.com", "h", RolUsuario.Estudiante);
+            var usuario = new Usuario(Guid.NewGuid(), "T", "t@t.com", "h", RolUsuario.Estudiante);
             var notificaciones = new List<Notificacion>
             {
-                new Notificacion(usuario.Id, TipoNotificacion.Recordatorio, "Mensaje", DateTime.UtcNow)
+                new Notificacion(Guid.NewGuid(), usuario.Id, TipoNotificacion.Recordatorio, "Mensaje", DateTime.UtcNow)
             };
             _usuarioRepo.Setup(r => r.GetByIdAsync(usuario.Id)).ReturnsAsync(usuario);
             _notificacionRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(notificaciones);
@@ -51,14 +53,14 @@ namespace SIGEBI.Test.UseCases.Usuarios
             resultado.Should().HaveCount(1);
         }
 
-        // ── MARCAR COMO LEIDA ──
+        // Ã¢â€â‚¬Ã¢â€â‚¬ MARCAR COMO LEIDA Ã¢â€â‚¬Ã¢â€â‚¬
 
-        // Caso de Uso: Notificaciones - Proceso: Cambiar el estado de una alerta a "Leída".
+        // Caso de Uso: Notificaciones - Proceso: Cambiar el estado de una alerta a "LeÃƒÂ­da".
         [Fact]
         public async Task MarcarComoLeida_Existente_CambiaEstadoAnLeida()
         {
             // Arrange
-            var notificacion = new Notificacion(Guid.NewGuid(), TipoNotificacion.Recordatorio, "M", DateTime.UtcNow);
+            var notificacion = new Notificacion(Guid.NewGuid(), Guid.NewGuid(), TipoNotificacion.Recordatorio, "M", DateTime.UtcNow);
             _notificacionRepo.Setup(r => r.GetByIdAsync(notificacion.Id)).ReturnsAsync(notificacion);
             _unitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
 
@@ -70,14 +72,14 @@ namespace SIGEBI.Test.UseCases.Usuarios
             _notificacionRepo.Verify(r => r.Update(notificacion), Times.Once);
         }
 
-        // ── ELIMINAR ──
+        // Ã¢â€â‚¬Ã¢â€â‚¬ ELIMINAR Ã¢â€â‚¬Ã¢â€â‚¬
 
-        // Caso de Uso: Notificaciones - Proceso: Remover permanentemente una notificación del historial.
+        // Caso de Uso: Notificaciones - Proceso: Remover permanentemente una notificaciÃƒÂ³n del historial.
         [Fact]
         public async Task EliminarNotificacion_Existente_LlamarDelete()
         {
             // Arrange
-            var notificacion = new Notificacion(Guid.NewGuid(), TipoNotificacion.Recordatorio, "M", DateTime.UtcNow);
+            var notificacion = new Notificacion(Guid.NewGuid(), Guid.NewGuid(), TipoNotificacion.Recordatorio, "M", DateTime.UtcNow);
             _notificacionRepo.Setup(r => r.GetByIdAsync(notificacion.Id)).ReturnsAsync(notificacion);
             _unitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
 
@@ -88,15 +90,15 @@ namespace SIGEBI.Test.UseCases.Usuarios
             _notificacionRepo.Verify(r => r.Delete(notificacion), Times.Once);
         }
 
-        // ── ENVIAR NOTIFICACION ──
+        // Ã¢â€â‚¬Ã¢â€â‚¬ ENVIAR NOTIFICACION Ã¢â€â‚¬Ã¢â€â‚¬
 
-        // Caso de Uso: Notificaciones - Proceso: Crear y registrar automáticamente una alerta de vencimiento de préstamo.
+        // Caso de Uso: Notificaciones - Proceso: Crear y registrar automÃƒÂ¡ticamente una alerta de vencimiento de prÃƒÂ©stamo.
         [Fact]
         public async Task EnviarNotificacionPrestamo_UsuarioExistente_CreaYGuarda()
         {
             // Arrange
             var usuarioId = Guid.NewGuid();
-            var usuario = new Usuario("T", "t@t.com", "h", RolUsuario.Estudiante);
+            var usuario = new Usuario(Guid.NewGuid(), "T", "t@t.com", "h", RolUsuario.Estudiante);
             _usuarioRepo.Setup(r => r.GetByIdAsync(usuarioId)).ReturnsAsync(usuario);
             _unitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
 

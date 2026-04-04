@@ -2,7 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.DTOs;
-using SIGEBI.Business.UseCases.Catalogo;
+using SIGEBI.Business.Interfaces.UseCases.Catalogo;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
 using SIGEBI.API.Extensions;
@@ -16,9 +16,9 @@ namespace SIGEBI.API.Controllers
     [Authorize]
     public class ValoracionesController : ControllerBase
     {
-        private readonly ValoracionesUseCase _valoracionesUseCase;
+        private readonly IValoracionesUseCase _valoracionesUseCase;
 
-        public ValoracionesController(ValoracionesUseCase valoracionesUseCase)
+        public ValoracionesController(IValoracionesUseCase valoracionesUseCase)
         {
             _valoracionesUseCase = valoracionesUseCase;
         }
@@ -35,6 +35,11 @@ namespace SIGEBI.API.Controllers
         }
 
         // Lista todas las reseñas y calificaciones recibidas por un recurso específico.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("recurso/{recursoId}")]
         public async Task<IActionResult> ObtenerPorRecurso(Guid recursoId)
         {
@@ -46,6 +51,11 @@ namespace SIGEBI.API.Controllers
         }
 
         // Calcula y devuelve la puntuación media (estrellas) que los usuarios han dado a un recurso.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("recurso/{recursoId}/promedio")]
         public async Task<IActionResult> ObtenerPromedio(Guid recursoId)
         {
@@ -56,6 +66,11 @@ namespace SIGEBI.API.Controllers
             return Ok(promedio);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
         public async Task<IActionResult> Agregar([FromBody] ValoracionDTO dto)
         {
@@ -68,6 +83,11 @@ namespace SIGEBI.API.Controllers
         }
 
         // Elimina una valoración. Solo la puede borrar el autor o un administrador/bibliotecario.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Eliminar(Guid id)
         {
@@ -84,7 +104,7 @@ namespace SIGEBI.API.Controllers
             }
             
             await _valoracionesUseCase.EliminarValoracionAsync(id);
-            return Ok("Valoración eliminada correctamente.");
+            return Ok(new { message = "Valoración eliminada correctamente." });
         }
     }
 }

@@ -8,7 +8,7 @@ namespace SIGEBI.Business.Interfaces
     // Su trabajo es englobar todos los repositorios para que compartan la misma conexion/contexto de base de datos.
     // Garantiza que cuando hacemos SaveChangesAsync(), todos los cambios de todos los repositorios se guarden como
     // una única transacción atómica (o se guarda todo, o no se guarda nada si hay error).
-    public interface IUnitOfWork : IDisposable
+    public interface IUnitOfWork : IDisposable, IAsyncDisposable
     {
         IUsuarioRepository Usuarios { get; } // Repositorio de Usuarios
         IPrestamoRepository Prestamos { get; } // Repositorio de Préstamos

@@ -1,12 +1,15 @@
 using System;
+using SIGEBI.Business.Interfaces.Common;
 
-namespace SIGEBI.Domain.DomainServices
+namespace SIGEBI.Infrastructure.Common
 {
-    // Generador de Guids optimizados para Índices Agrupados de SQL Server
-    // Esto previene el Index Fragmentation causado por Guids aleatorios.
-    public static class SequentialGuidGenerator
+    /// <summary>
+    /// Generador de IDs secuenciales optimizado para SQL Server.
+    /// Reduce la fragmentación de índices al insertar registros.
+    /// </summary>
+    public class SequentialGuidGenerator : IGuidGenerator
     {
-        public static Guid NewGuid()
+        public Guid Create()
         {
             byte[] guidArray = Guid.NewGuid().ToByteArray();
 
@@ -17,7 +20,7 @@ namespace SIGEBI.Domain.DomainServices
             TimeSpan msecs = now.TimeOfDay;
 
             byte[] daysArray = BitConverter.GetBytes(days.Days);
-            byte[] msecsArray = BitConverter.GetBytes((long)(msecs.TotalMilliseconds / 3.333333)); // Sql Server Accuracy
+            byte[] msecsArray = BitConverter.GetBytes((long)(msecs.TotalMilliseconds / 3.333333)); // Precisión de SQL Server
 
             Array.Reverse(daysArray);
             Array.Reverse(msecsArray);

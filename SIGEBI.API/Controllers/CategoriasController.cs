@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.API.Extensions;
-using SIGEBI.Business.UseCases.Catalogo;
+using SIGEBI.Business.Interfaces.UseCases.Catalogo;
 using SIGEBI.Domain.DomainServices;
 
 // Gestiona las categorías en las que se clasifican los recursos de la biblioteca.
@@ -14,14 +14,19 @@ namespace SIGEBI.API.Controllers
     [Authorize]
     public class CategoriasController : ControllerBase
     {
-        private readonly CategoriasUseCase _categoriasUseCase;
+        private readonly ICategoriasUseCase _categoriasUseCase;
 
-        public CategoriasController(CategoriasUseCase categoriasUseCase)
+        public CategoriasController(ICategoriasUseCase categoriasUseCase)
         {
             _categoriasUseCase = categoriasUseCase;
         }
 
         // Lista todas las categorías disponibles para mostrar en el catálogo o filtros de búsqueda.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet]
         public async Task<IActionResult> ObtenerTodas()
         {
@@ -33,6 +38,11 @@ namespace SIGEBI.API.Controllers
         }
 
         // Recupera los detalles de una categoría específica mediante su identificador.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("{id}")]
         public async Task<IActionResult> ObtenerPorId(int id)
         {
@@ -43,6 +53,11 @@ namespace SIGEBI.API.Controllers
             return Ok(categoria);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
         public async Task<IActionResult> Crear([FromBody] CrearCategoriaRequest request)
         {
@@ -54,6 +69,11 @@ namespace SIGEBI.API.Controllers
         }
 
         // Elimina permanentemente la categoría del sistema.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Eliminar(int id)
         {
@@ -64,6 +84,11 @@ namespace SIGEBI.API.Controllers
             return NoContent();
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("{id}")]
         public async Task<IActionResult> Actualizar(int id, [FromBody] ActualizarCategoriaRequest request)
         {

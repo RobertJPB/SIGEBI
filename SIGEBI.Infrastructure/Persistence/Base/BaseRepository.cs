@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Infrastructure.Persistence;
 using SIGEBI.Domain.Entities;
+
 namespace SIGEBI.Infrastructure.Persistence.Base
 {
     // Esta clase base tiene todo el CRUD basico. 
@@ -43,7 +44,7 @@ namespace SIGEBI.Infrastructure.Persistence.Base
             }
         }
 
-        public async Task<bool> ExistsAsync(TId id) // Verificar existencia
-            => await _dbSet.FindAsync(id) != null;
+        public async Task<bool> ExistsAsync(TId id) // Verificar existencia por ID sin cargar entidad
+            => await _dbSet.AnyAsync(e => EF.Property<TId>(e, "Id")!.Equals(id));
     }
 }

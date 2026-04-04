@@ -12,9 +12,9 @@ namespace SIGEBI.Domain.Entities.Recursos
 
         private Revista() { }
 
-        public Revista(string titulo, string autor, int idCategoria, int stockInicial, string? descripcion,
+        public Revista(Guid id, string titulo, string autor, int idCategoria, int stockInicial, string? descripcion,
                        int numeroEdicion, string issn, int anio, string? editorial = null)
-            : base(titulo, autor, idCategoria, stockInicial, descripcion)
+            : base(id, titulo, autor, idCategoria, stockInicial, descripcion)
         {
             // Validaciones especificas de la revista
             if (numeroEdicion <= 0)

@@ -11,9 +11,9 @@ namespace SIGEBI.Domain.Entities.Recursos
 
         private Documento() { }
 
-        public Documento(string titulo, string autor, int idCategoria, int stockInicial, string? descripcion,
+        public Documento(Guid id, string titulo, string autor, int idCategoria, int stockInicial, string? descripcion,
                          string formato, string institucion, int anio)
-            : base(titulo, autor, idCategoria, stockInicial, descripcion)
+            : base(id, titulo, autor, idCategoria, stockInicial, descripcion)
         {
             // Validaciones para documentos (como tesis y manuales)
             if (string.IsNullOrWhiteSpace(formato))

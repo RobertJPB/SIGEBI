@@ -12,9 +12,9 @@ namespace SIGEBI.Domain.Entities.Recursos
 
         private Libro() { }
 
-        public Libro(string titulo, string autor, int idCategoria, int stockInicial, string? descripcion,
+        public Libro(Guid id, string titulo, string autor, int idCategoria, int stockInicial, string? descripcion,
                      string isbn, string editorial, int anio, string? genero = null)
-            : base(titulo, autor, idCategoria, stockInicial, descripcion)
+            : base(id, titulo, autor, idCategoria, stockInicial, descripcion)
         {
             // Validaciones especificas del libro (adicionales a las del recurso base)
             if (string.IsNullOrWhiteSpace(isbn))

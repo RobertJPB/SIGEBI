@@ -19,12 +19,12 @@ namespace SIGEBI.Domain.Entities
 
         private Prestamo() { }
 
-        public Prestamo(Guid usuarioId, Guid recursoId, int diasPlazo, DateTime fechaInicioUtc, DateTime? fechaDevolucionEstimada = null)
+        public Prestamo(Guid id, Guid usuarioId, Guid recursoId, int diasPlazo, DateTime fechaInicioUtc, DateTime? fechaDevolucionEstimada = null)
         {
             if (usuarioId == Guid.Empty) throw new ArgumentException("UsuarioId inválido.", nameof(usuarioId));
             if (recursoId == Guid.Empty) throw new ArgumentException("RecursoId inválido.", nameof(recursoId));
             
-            Id = DomainServices.SequentialGuidGenerator.NewGuid();
+            Id = id;
             UsuarioId = usuarioId;
             RecursoId = recursoId;
             FechaInicio = fechaInicioUtc;

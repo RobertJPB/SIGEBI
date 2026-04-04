@@ -7,6 +7,7 @@ using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Entities.Recursos;
 using SIGEBI.Domain.Enums.Seguridad;
 using Xunit;
+using SIGEBI.Business.Interfaces.Common;
 
 namespace SIGEBI.Test.UseCases.Catalogo
 {
@@ -29,16 +30,17 @@ namespace SIGEBI.Test.UseCases.Catalogo
                 _valoracionRepo.Object,
                 _usuarioRepo.Object,
                 _recursoRepo.Object,
-                _unitOfWork.Object);
+                _unitOfWork.Object,
+                new Mock<IGuidGenerator>().Object);
         }
 
         // ── HELPERS ──
 
         private Usuario CrearUsuario()
-            => new Usuario("Juan Perez", "juan@test.com", "hash123", RolUsuario.Estudiante);
+            => new Usuario(Guid.NewGuid(), "Juan Perez", "juan@test.com", "hash123", RolUsuario.Estudiante);
 
         private Libro CrearLibro()
-            => new Libro("El Quijote", "Cervantes", 1, 10, null, "123456", "Editorial", 1605);
+            => new Libro(Guid.NewGuid(), "El Quijote", "Cervantes", 1, 10, null, "123456", "Editorial", 1605);
 
         // ── AGREGAR VALORACION ──
 
@@ -85,8 +87,8 @@ namespace SIGEBI.Test.UseCases.Catalogo
             var recursoId = Guid.NewGuid();
             var valoraciones = new List<Valoracion>
             {
-                new Valoracion(Guid.NewGuid(), recursoId, 4, "Bueno"),
-                new Valoracion(Guid.NewGuid(), recursoId, 5, "Muy bueno")
+                new Valoracion(Guid.NewGuid(), Guid.NewGuid(), recursoId, 4, "Bueno"),
+                new Valoracion(Guid.NewGuid(), Guid.NewGuid(), recursoId, 5, "Muy bueno")
             };
 
             _valoracionRepo.Setup(r => r.GetByRecursoIdAsync(recursoId)).ReturnsAsync(valoraciones);
@@ -122,7 +124,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
         public async Task EliminarValoracion_Existente_LlamarDeleteYSave()
         {
             // Arrange
-            var valoracion = new Valoracion(Guid.NewGuid(), Guid.NewGuid(), 3, "Meh");
+            var valoracion = new Valoracion(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 3, "Meh");
             _valoracionRepo.Setup(r => r.GetByIdAsync(valoracion.Id)).ReturnsAsync(valoracion);
             _unitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
 

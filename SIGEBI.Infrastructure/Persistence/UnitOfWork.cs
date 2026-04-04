@@ -47,6 +47,12 @@ namespace SIGEBI.Infrastructure.Persistence
             _context?.Dispose();
             GC.SuppressFinalize(this);
         }
+
+        public async ValueTask DisposeAsync()
+        {
+            await _context.DisposeAsync();
+            GC.SuppressFinalize(this);
+        }
     }
 }
 

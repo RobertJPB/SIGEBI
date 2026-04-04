@@ -17,8 +17,9 @@ namespace SIGEBI.Domain.Entities.Recursos
 
         protected RecursoBibliografico() { }
 
-        public RecursoBibliografico(string titulo, string autor, int idCategoria, int stockInicial, string? descripcion)
+        public RecursoBibliografico(Guid id, string titulo, string autor, int idCategoria, int stockInicial, string? descripcion)
         {
+            Id = id;
             if (string.IsNullOrWhiteSpace(titulo))
                 throw new ArgumentException("El título es obligatorio.", nameof(titulo));
             if (string.IsNullOrWhiteSpace(autor))
@@ -28,7 +29,6 @@ namespace SIGEBI.Domain.Entities.Recursos
             if (stockInicial < 0)
                 throw new ArgumentOutOfRangeException(nameof(stockInicial), "El stock no puede ser negativo.");
 
-            Id = DomainServices.SequentialGuidGenerator.NewGuid();
             Titulo = titulo.Trim();
             Autor = autor.Trim();
             IdCategoria = idCategoria;

@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Moq;
 using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.UseCases.Prestamos;
@@ -24,15 +24,15 @@ namespace SIGEBI.Test.UseCases.Prestamos
                 _usuarioRepo.Object);
         }
 
-        // ── HELPERS ──
+        // â”€â”€ HELPERS â”€â”€
 
         private Usuario CrearUsuario()
-            => new Usuario("Juan Perez", "juan@test.com", "hash123", RolUsuario.Estudiante);
+            => new Usuario(Guid.NewGuid(), "Juan Perez", "juan@test.com", "hash123", RolUsuario.Estudiante);
 
         private Prestamo CrearPrestamo(Guid usuarioId)
-            => new Prestamo(usuarioId, Guid.NewGuid(), 7, DateTime.UtcNow);
+            => new Prestamo(Guid.NewGuid(), usuarioId, Guid.NewGuid(), 7, DateTime.UtcNow);
 
-        // ── OBTENER TODOS ──
+        // â”€â”€ OBTENER TODOS â”€â”€
 
         [Fact]
         public async Task ObtenerTodos_HayPrestamos_DevuelveLista()
@@ -67,7 +67,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
             resultado.Should().BeEmpty();
         }
 
-        // ── OBTENER POR USUARIO ──
+        // â”€â”€ OBTENER POR USUARIO â”€â”€
 
         [Fact]
         public async Task ObtenerPorUsuario_UsuarioExistente_DevuelvePrestamos()
@@ -97,7 +97,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
                 _useCase.ObtenerPorUsuarioAsync(Guid.NewGuid()));
         }
 
-        // ── OBTENER ACTIVOS POR USUARIO ──
+        // â”€â”€ OBTENER ACTIVOS POR USUARIO â”€â”€
 
         [Fact]
         public async Task ObtenerActivosPorUsuario_DevuelveSoloActivos()
@@ -115,7 +115,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
             resultado.Should().HaveCount(1);
         }
 
-        // ── OBTENER ATRASADOS ──
+        // â”€â”€ OBTENER ATRASADOS â”€â”€
 
         [Fact]
         public async Task ObtenerAtrasados_HayAtrasados_DevuelveLista()

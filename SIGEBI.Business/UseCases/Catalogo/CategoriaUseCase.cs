@@ -2,6 +2,7 @@ using Microsoft.Extensions.Caching.Memory;
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistence;
+using SIGEBI.Business.Interfaces.UseCases.Catalogo;
 using SIGEBI.Business.Mappers;
 using SIGEBI.Domain.Entities;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 namespace SIGEBI.Business.UseCases.Catalogo
 {
     // Controla todo el flujo de gestion de categorias de forma aislada.
-    public class CategoriasUseCase
+    public class CategoriasUseCase : ICategoriasUseCase
     {
         // Solo inyectamos ICategoriaRepository. No le damos acceso a IUsuarioRepository ni a metodos que no necesita.
         private readonly ICategoriaRepository _categoriaRepository;

@@ -1,30 +1,35 @@
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistence;
+using SIGEBI.Business.Interfaces.UseCases.Catalogo;
 using SIGEBI.Business.Mappers;
+using SIGEBI.Business.Interfaces.Common;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Entities.Recursos;
 
 namespace SIGEBI.Business.UseCases.Catalogo
 {
     // Gestiona la colección de recursos que el usuario desea leer o reservar a futuro.
-    public class ListaDeseosUseCase
+    public class ListaDeseosUseCase : IListaDeseosUseCase
     {
         private readonly IListaDeseosRepository _listaDeseosRepository;
         private readonly IRecursoRepository _recursoRepository;
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IGuidGenerator _guidGenerator;
 
         public ListaDeseosUseCase(
             IListaDeseosRepository listaDeseosRepository,
             IRecursoRepository recursoRepository,
             IUsuarioRepository usuarioRepository,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IGuidGenerator guidGenerator)
         {
             _listaDeseosRepository = listaDeseosRepository;
             _recursoRepository = recursoRepository;
             _usuarioRepository = usuarioRepository;
             _unitOfWork = unitOfWork;
+            _guidGenerator = guidGenerator;
         }
 
         // Obtiene la lista del usuario o crea una nueva si aún no la tiene.
@@ -38,7 +43,7 @@ namespace SIGEBI.Business.UseCases.Catalogo
             // Si el usuario no tiene lista, le creamos una en blanco por defecto
             if (lista == null)
             {
-                lista = new ListaDeseos(usuarioId, DateTime.UtcNow);
+                lista = new ListaDeseos(_guidGenerator.Create(), usuarioId, DateTime.UtcNow);
                 await _listaDeseosRepository.AddAsync(lista);
                 await _unitOfWork.SaveChangesAsync();
             }
@@ -58,7 +63,7 @@ namespace SIGEBI.Business.UseCases.Catalogo
             var lista = await _listaDeseosRepository.GetByUsuarioIdAsync(usuarioId);
             if (lista == null)
             {
-                lista = new ListaDeseos(usuarioId, DateTime.UtcNow);
+                lista = new ListaDeseos(_guidGenerator.Create(), usuarioId, DateTime.UtcNow);
                 await _listaDeseosRepository.AddAsync(lista);
                 // Guardamos primero la lista para asegurar que el registro padre exista (evita FK conflict)
                 await _unitOfWork.SaveChangesAsync();

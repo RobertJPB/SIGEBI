@@ -1,12 +1,13 @@
 using Microsoft.Extensions.Caching.Memory;
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces.Persistence;
+using SIGEBI.Business.Interfaces.UseCases.Catalogo;
 using SIGEBI.Business.Mappers;
 
 namespace SIGEBI.Business.UseCases.Catalogo
 {
     // Permite buscar y listar recursos bibliográficos disponibles en el catálogo.
-    public class ConsultarLibrosUseCase
+    public class ConsultarLibrosUseCase : IConsultarLibrosUseCase
     {
         private readonly IRecursoRepository _recursoRepository;
         private readonly IValoracionRepository _valoracionRepository;

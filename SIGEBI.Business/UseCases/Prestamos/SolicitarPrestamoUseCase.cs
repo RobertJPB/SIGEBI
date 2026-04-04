@@ -1,15 +1,17 @@
 using Microsoft.Extensions.Logging;
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces;
+using SIGEBI.Business.Interfaces.Common;
 using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.Interfaces.Services;
+using SIGEBI.Business.Interfaces.UseCases.Prestamos;
 using SIGEBI.Business.Mappers;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Business.UseCases.Prestamos
 {
-    public class SolicitarPrestamoUseCase
+    public class SolicitarPrestamoUseCase : ISolicitarPrestamoUseCase
     {
         private readonly IPrestamoRepository _prestamoRepository;
         private readonly IUsuarioRepository _usuarioRepository;
@@ -18,6 +20,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
         private readonly INotificacionRepository _notificacionRepository;
         private readonly IEmailAdapter _emailAdapter;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IGuidGenerator _guidGenerator;
         private readonly ILogger<SolicitarPrestamoUseCase> _logger;
 
         public SolicitarPrestamoUseCase(
@@ -28,6 +31,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
             INotificacionRepository notificacionRepository,
             IEmailAdapter emailAdapter,
             IUnitOfWork unitOfWork,
+            IGuidGenerator guidGenerator,
             ILogger<SolicitarPrestamoUseCase> logger)
         {
             _prestamoRepository = prestamoRepository;
@@ -37,6 +41,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
             _notificacionRepository = notificacionRepository;
             _emailAdapter = emailAdapter;
             _unitOfWork = unitOfWork;
+            _guidGenerator = guidGenerator;
             _logger = logger;
         }
 
@@ -57,15 +62,15 @@ namespace SIGEBI.Business.UseCases.Prestamos
 
             PrestamoPolicy.ValidarPrestamo(usuario, recurso, prestamosActivos, penalizaciones);
 
-            int diasPlazo = PrestamoPolicy.ObtenerDiasPlazo(usuario);
-            var prestamo = new Prestamo(usuarioId, recursoId, diasPlazo, DateTime.UtcNow, fechaDevolucionEstimada);
+            int diasPlazo = PrestamoPolicy.ObtenerDiasPlazo();
+            var prestamo = new Prestamo(_guidGenerator.Create(), usuarioId, recursoId, diasPlazo, DateTime.UtcNow, fechaDevolucionEstimada);
 
             recurso.DisminuirStock(); // bajamos el stock
             await _prestamoRepository.AddAsync(prestamo);
             _recursoRepository.Update(recurso);
 
             // También generamos una notificación persistente en la base de datos (aparte del correo)
-            var notificacion = NotificacionFactory.CrearNotificacionPrestamo(usuarioId, prestamo.FechaDevolucionEstimada);
+            var notificacion = NotificacionFactory.CrearNotificacionPrestamo(_guidGenerator.Create(), usuarioId, prestamo.FechaDevolucionEstimada);
             await _notificacionRepository.AddAsync(notificacion);
             
             await _unitOfWork.SaveChangesAsync();

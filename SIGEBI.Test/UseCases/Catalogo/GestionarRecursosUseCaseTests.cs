@@ -7,6 +7,7 @@ using SIGEBI.Business.UseCases.Catalogo;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Entities.Recursos;
 using SIGEBI.Domain.Enums.Biblioteca;
+using SIGEBI.Business.Interfaces.Common;
 using Xunit;
 
 namespace SIGEBI.Test.UseCases.Catalogo
@@ -30,10 +31,11 @@ namespace SIGEBI.Test.UseCases.Catalogo
                 _recursoRepo.Object,
                 _categoriaRepo.Object,
                 _unitOfWork.Object,
-                _cache);
+                _cache,
+                new Mock<IGuidGenerator>().Object);
         }
 
-        // ── AGREGAR LIBRO ──
+        // â”€â”€ AGREGAR LIBRO â”€â”€
 
         [Fact]
         public async Task AgregarLibro_CategoriaValida_DevuelveDTO()
@@ -41,7 +43,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
             // Arrange
             _categoriaRepo
                 .Setup(r => r.GetByIdAsync(1))
-                .ReturnsAsync(new Categoria("Ficción"));
+                .ReturnsAsync(new Categoria("FicciÃ³n"));
 
             _recursoRepo
                 .Setup(r => r.AddAsync(It.IsAny<Libro>()))
@@ -81,7 +83,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
             // Arrange
             _categoriaRepo
                 .Setup(r => r.GetByIdAsync(1))
-                .ReturnsAsync(new Categoria("Ficción"));
+                .ReturnsAsync(new Categoria("FicciÃ³n"));
 
             _recursoRepo
                 .Setup(r => r.AddAsync(It.IsAny<Libro>()))
@@ -100,13 +102,13 @@ namespace SIGEBI.Test.UseCases.Catalogo
             resultado.ImagenUrl.Should().Be("/imagenes/recursos/portada.jpg");
         }
 
-        // ── EDITAR LIBRO ──
+        // â”€â”€ EDITAR LIBRO â”€â”€
 
         [Fact]
         public async Task EditarLibro_LibroExistente_ActualizaCorrectamente()
         {
             // Arrange
-            var libro = new Libro("Titulo Viejo", "Autor Viejo", 1, 3, null,
+            var libro = new Libro(Guid.NewGuid(), "Titulo Viejo", "Autor Viejo", 1, 3, null,
                                   "000-00-000", "Editorial Vieja", 2000);
 
             _recursoRepo
@@ -115,7 +117,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
 
             _categoriaRepo
                 .Setup(r => r.GetByIdAsync(1))
-                .ReturnsAsync(new Categoria("Ficción"));
+                .ReturnsAsync(new Categoria("FicciÃ³n"));
 
             _unitOfWork
                 .Setup(u => u.SaveChangesAsync())
@@ -146,13 +148,13 @@ namespace SIGEBI.Test.UseCases.Catalogo
                     "978-84-261", "Editorial X", 1943));
         }
 
-        // ── ELIMINAR ──
+        // â”€â”€ ELIMINAR â”€â”€
 
         [Fact]
         public async Task EliminarRecurso_RecursoExistente_LlamadaBorradoFisico()
         {
             // Arrange
-            var libro = new Libro("El Principito", "Antoine", 1, 5, null,
+            var libro = new Libro(Guid.NewGuid(), "El Principito", "Antoine", 1, 5, null,
                                   "978-84-261", "Editorial X", 1943);
 
             _recursoRepo.Setup(r => r.GetByIdAsync(libro.Id)).ReturnsAsync(libro);

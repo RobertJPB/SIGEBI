@@ -2,8 +2,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.DTOs;
-using SIGEBI.Business.Services;
-using SIGEBI.Business.UseCases.Prestamos;
+using SIGEBI.Business.Interfaces.UseCases.Prestamos;
+using SIGEBI.Business.Validators;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
 using SIGEBI.API.Extensions;
@@ -17,91 +17,143 @@ namespace SIGEBI.API.Controllers
     [Authorize]
     public class PrestamosController : ControllerBase
     {
-        private readonly RegistrarPrestamoService _prestamoService;
+        private readonly ISolicitarPrestamoUseCase _solicitarUseCase;
+        private readonly IDevolverPrestamoUseCase _devolverUseCase;
+        private readonly IConsultarPrestamoUseCase _consultarUseCase;
+        private readonly IEliminarPrestamoUseCase _eliminarUseCase;
+        private readonly SolicitarPrestamoValidator _validator;
 
-        public PrestamosController(RegistrarPrestamoService prestamoService)
+        public PrestamosController(
+            ISolicitarPrestamoUseCase solicitarUseCase,
+            IDevolverPrestamoUseCase devolverUseCase,
+            IConsultarPrestamoUseCase consultarUseCase,
+            IEliminarPrestamoUseCase eliminarUseCase,
+            SolicitarPrestamoValidator validator)
         {
-            _prestamoService = prestamoService;
+            _solicitarUseCase = solicitarUseCase;
+            _devolverUseCase = devolverUseCase;
+            _consultarUseCase = consultarUseCase;
+            _eliminarUseCase = eliminarUseCase;
+            _validator = validator;
         }
 
 
 
         // Recupera el historial completo de préstamos (requiere permisos administrativos).
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet]
         public async Task<IActionResult> ObtenerTodos()
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerTodosLosPrestamos(rol), "ver todos los préstamos");
 
-            var prestamos = await _prestamoService.ObtenerTodosAsync();
+            var prestamos = await _consultarUseCase.ObtenerTodosAsync();
             return Ok(prestamos);
         }
 
         // Lista todos los préstamos vinculados a un usuario específico.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("usuario/{usuarioId}")]
         public async Task<IActionResult> ObtenerPorUsuario(Guid usuarioId)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver préstamos por usuario");
 
-            var prestamos = await _prestamoService.ObtenerPorUsuarioAsync(usuarioId);
+            var prestamos = await _consultarUseCase.ObtenerPorUsuarioAsync(usuarioId);
             return Ok(prestamos);
         }
 
         // Consulta únicamente los préstamos que el usuario tiene actualmente en su posesión (sin devolver).
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("activos/{usuarioId}")]
         public async Task<IActionResult> ObtenerActivosPorUsuario(Guid usuarioId)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver préstamos activos");
 
-            var prestamos = await _prestamoService.ObtenerActivosPorUsuarioAsync(usuarioId);
+            var prestamos = await _consultarUseCase.ObtenerActivosPorUsuarioAsync(usuarioId);
             return Ok(prestamos);
         }
 
         // Identifica aquellos préstamos cuya fecha límite de devolución ya ha expirado.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("atrasados")]
         public async Task<IActionResult> ObtenerAtrasados()
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerTodosLosPrestamos(rol), "ver préstamos atrasados");
 
-            var prestamos = await _prestamoService.ObtenerAtrasadosAsync();
+            var prestamos = await _consultarUseCase.ObtenerAtrasadosAsync();
             return Ok(prestamos);
         }
 
         // Procesa la solicitud de un nuevo préstamo de libro para un usuario.
         // Valida stock disponible, penalizaciones activas y límites de préstamos.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
         public async Task<IActionResult> SolicitarPrestamo([FromBody] PrestamoRequestDTO dto)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeSolicitarPrestamo(rol), "solicitar préstamo");
 
-            var resultado = await _prestamoService.SolicitarPrestamoAsync(dto.UsuarioId, dto.RecursoId, dto.FechaDevolucionEstimada);
+            // Validación de datos básicos de la solicitud
+            var errores = _validator.Validar(dto);
+            if (errores.Any()) return BadRequest(new { errores });
+
+            var resultado = await _solicitarUseCase.EjecutarAsync(dto.UsuarioId, dto.RecursoId, dto.FechaDevolucionEstimada);
             return Ok(resultado);
         }
 
         // Registra el retorno físico de un libro al sistema, cerrando el ciclo del préstamo.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("devolver/{prestamoId}")]
         public async Task<IActionResult> DevolverPrestamo(Guid prestamoId)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPrestamos(rol), "devolver préstamo");
 
-            await _prestamoService.DevolverPrestamoAsync(prestamoId);
-            return Ok("Préstamo devuelto correctamente.");
+            await _devolverUseCase.EjecutarAsync(prestamoId);
+            return Ok(new { mensaje = "Préstamo devuelto correctamente." });
         }
 
         // Elimina permanentemente un préstamo del historial.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Eliminar(Guid id)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPrestamos(rol), "eliminar préstamo");
 
-            await _prestamoService.EliminarPrestamoAsync(id);
-            return Ok("Préstamo eliminado correctamente.");
+            await _eliminarUseCase.EjecutarAsync(id);
+            return Ok(new { mensaje = "Préstamo eliminado correctamente." });
         }
     }
 }

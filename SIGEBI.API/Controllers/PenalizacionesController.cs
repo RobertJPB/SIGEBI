@@ -2,7 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.DTOs;
-using SIGEBI.Business.UseCases.Usuarios;
+using SIGEBI.Business.Interfaces.UseCases.Usuarios;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
 using SIGEBI.API.Extensions;
@@ -16,9 +16,9 @@ namespace SIGEBI.API.Controllers
     [Authorize]
     public class PenalizacionesController : ControllerBase
     {
-        private readonly PenalizacionesUseCase _penalizacionesUseCase;
+        private readonly IPenalizacionesUseCase _penalizacionesUseCase;
 
-        public PenalizacionesController(PenalizacionesUseCase penalizacionesUseCase)
+        public PenalizacionesController(IPenalizacionesUseCase penalizacionesUseCase)
         {
             _penalizacionesUseCase = penalizacionesUseCase;
         }
@@ -26,6 +26,11 @@ namespace SIGEBI.API.Controllers
 
 
         // Muestra todas las penalizaciones del sistema (Admin/Bibliotecario).
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet]
         public async Task<IActionResult> ObtenerTodas()
         {
@@ -37,6 +42,11 @@ namespace SIGEBI.API.Controllers
         }
 
         // Muestra el historial de sanciones aplicadas a un usuario en particular.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("usuario/{usuarioId}")]
         public async Task<IActionResult> ObtenerPorUsuario(Guid usuarioId)
         {
@@ -50,6 +60,11 @@ namespace SIGEBI.API.Controllers
         }
 
         // Aplica una penalización manual (POST general con DTO completo).
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
         public async Task<IActionResult> Aplicar([FromBody] AplicarPenalizacionManualDTO dto)
         {
@@ -57,10 +72,15 @@ namespace SIGEBI.API.Controllers
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPenalizaciones(rol), "aplicar penalización manual");
 
             await _penalizacionesUseCase.AplicarPenalizacionManualAsync(dto);
-            return Ok("Penalización aplicada correctamente.");
+            return Ok(new { message = "Penalización aplicada correctamente." });
         }
 
         // Aplica una penalización manual a un usuario específico (Legacy / URL based).
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("usuario/{usuarioId}")]
         public async Task<IActionResult> AplicarManual(Guid usuarioId, [FromBody] AplicarPenalizacionManualDTO dto)
         {
@@ -69,11 +89,16 @@ namespace SIGEBI.API.Controllers
 
             dto.UsuarioId = usuarioId;
             await _penalizacionesUseCase.AplicarPenalizacionManualAsync(dto);
-            return Ok("Penalización aplicada correctamente.");
+            return Ok(new { message = "Penalización aplicada correctamente." });
         }
 
         // Ejecuta el proceso global para detectar retrasos y aplicar sanciones a todos los usuarios morosos.
         // Solo puede ser activado por personal administrativo.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("aplicar")]
         public async Task<IActionResult> AplicarPenalizaciones()
         {
@@ -81,10 +106,15 @@ namespace SIGEBI.API.Controllers
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPenalizaciones(rol), "aplicar penalizaciones");
 
             await _penalizacionesUseCase.AplicarPenalizacionesAsync();
-            return Ok("Penalizaciones aplicadas correctamente.");
+            return Ok(new { message = "Penalizaciones aplicadas correctamente." });
         }
 
         // Elimina una penalización del sistema. Solo para casos de error administrativo.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Eliminar(Guid id)
         {
@@ -92,10 +122,15 @@ namespace SIGEBI.API.Controllers
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPenalizaciones(rol), "eliminar penalización");
 
             await _penalizacionesUseCase.EliminarPenalizacionAsync(id);
-            return Ok("Penalización eliminada correctamente.");
+            return Ok(new { message = "Penalización eliminada correctamente." });
         }
 
         // Finaliza manualmente una penalización activa (por ejemplo, tras el pago de una multa).
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPatch("{id}/finalizar")]
         public async Task<IActionResult> Finalizar(Guid id)
         {
@@ -103,7 +138,7 @@ namespace SIGEBI.API.Controllers
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarPenalizaciones(rol), "finalizar penalización");
 
             await _penalizacionesUseCase.FinalizarPenalizacionAsync(id);
-            return Ok("Penalización finalizada correctamente.");
+            return Ok(new { message = "Penalización finalizada correctamente." });
         }
     }
 }

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces.Services;
-using SIGEBI.Business.UseCases.Usuarios;
+using SIGEBI.Business.Interfaces.UseCases.Usuarios;
 using SIGEBI.Business.Validators;
 
 // Este controlador gestiona los procesos de autenticación y registro de nuevos usuarios.
@@ -12,15 +12,14 @@ namespace SIGEBI.API.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        // Servicios y casos de uso necesarios para la autenticación y validación.
-        private readonly LoginUsuarioUseCase _loginUseCase;
-        private readonly RegistrarUsuarioUseCase _registrarUseCase;
+        private readonly ILoginUsuarioUseCase _loginUseCase;
+        private readonly IRegistrarUsuarioUseCase _registrarUseCase;
         private readonly RegistrarUsuarioValidator _validator;
         private readonly IJwtService _jwtService;
 
         public AuthController(
-            LoginUsuarioUseCase loginUseCase,
-            RegistrarUsuarioUseCase registrarUseCase,
+            ILoginUsuarioUseCase loginUseCase,
+            IRegistrarUsuarioUseCase registrarUseCase,
             RegistrarUsuarioValidator validator,
             IJwtService jwtService)
         {
@@ -32,6 +31,11 @@ namespace SIGEBI.API.Controllers
 
         // Procesa el inicio de sesión del usuario.
         // Si las credenciales son válidas, genera y retorna un token JWT para autorizar futuras peticiones.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UsuarioDTO dto)
         {
@@ -53,6 +57,11 @@ namespace SIGEBI.API.Controllers
 
         // Registra un nuevo usuario aplicando las validaciones correspondientes (formato de correo, etc.).
         // Devuelve éxito una vez que los datos han sido persistidos correctamente.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("registrar")]
         public async Task<IActionResult> Registrar([FromBody] UsuarioDTO dto)
         {

@@ -6,6 +6,8 @@ using SIGEBI.Infrastructure.Persistence;
 using SIGEBI.Infrastructure.Persistence.Repositories;
 using SIGEBI.Infrastructure.Persistence.Interceptors;
 using SIGEBI.Infrastructure.Services;
+using SIGEBI.Infrastructure.Common;
+using SIGEBI.Business.Interfaces.Common;
 
 namespace SIGEBI.Infrastructure.IoC
 {
@@ -13,6 +15,7 @@ namespace SIGEBI.Infrastructure.IoC
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
+            services.AddHttpContextAccessor(); // requerido para interceptores y auditoría
             // Repositorios: cada vez que una clase pida IXRepository, se provee la implementación concreta.
             // Scoped → una instancia por petición HTTP, compartida dentro de la misma request.
             services.AddScoped<IUsuarioRepository, UsuarioRepository>();
@@ -33,6 +36,7 @@ namespace SIGEBI.Infrastructure.IoC
             services.AddScoped<IEmailAdapter, EmailAdapter>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<AuditoriaInterceptor>();
+            services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>(); // Registro del generador
 
             return services;
         }

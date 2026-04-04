@@ -16,13 +16,13 @@ namespace SIGEBI.Domain.Entities
 
         private Penalizacion() { }
 
-        public Penalizacion(Guid usuarioId, string motivo, int diasPenalizacion, DateTime fechaInicioUtc, Guid? prestamoId = null)
+        public Penalizacion(Guid id, Guid usuarioId, string motivo, int diasPenalizacion, DateTime fechaInicioUtc, Guid? prestamoId = null)
         {
             if (usuarioId == Guid.Empty) throw new ArgumentException("Usuario inválido.", nameof(usuarioId));
             if (string.IsNullOrWhiteSpace(motivo)) throw new ArgumentException("El motivo es obligatorio.", nameof(motivo));
             if (diasPenalizacion <= 0) throw new ArgumentException("Los días deben ser mayores que 0.", nameof(diasPenalizacion));
 
-            Id = DomainServices.SequentialGuidGenerator.NewGuid();
+            Id = id;
             UsuarioId = usuarioId;
             PrestamoId = prestamoId;
             Motivo = motivo.Trim();

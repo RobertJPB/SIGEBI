@@ -6,12 +6,19 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace SIGEBI.Infrastructure.Persistence.Interceptors
 {
     public class AuditoriaInterceptor : SaveChangesInterceptor
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private static readonly Guid UsuarioIdSistema = Guid.Parse("00000000-0000-0000-0000-000000000001");
+
+        public AuditoriaInterceptor(IHttpContextAccessor httpContextAccessor)
+        {
+            _httpContextAccessor = httpContextAccessor;
+        }
 
         public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
         {
@@ -51,7 +58,15 @@ namespace SIGEBI.Infrastructure.Persistence.Interceptors
                 var tableName = entry.Entity.GetType().Name;
                 var actorId = UsuarioIdSistema;
 
-                if (entry.Entity is Usuario u && entry.State == EntityState.Added)
+                // Intentar obtener el ID del usuario desde el contexto HTTP (JWT sub claim)
+                var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value 
+                                ?? _httpContextAccessor.HttpContext?.User?.FindFirst("sub")?.Value;
+
+                if (Guid.TryParse(userIdClaim, out var parsedId))
+                {
+                    actorId = parsedId;
+                }
+                else if (entry.Entity is Usuario u && entry.State == EntityState.Added)
                 {
                     actorId = u.Id;
                 }
@@ -61,7 +76,7 @@ namespace SIGEBI.Infrastructure.Persistence.Interceptors
                     accion: action,
                     tablaAfectada: tableName,
                     detalle: $"Cambio automático detectado en {tableName} (Interceptor)",
-                    ipAddress: "::1",
+                    ipAddress: _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "::1",
                     fechaRegistroUtc: DateTime.UtcNow
                 );
 

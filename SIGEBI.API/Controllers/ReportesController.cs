@@ -27,6 +27,11 @@ namespace SIGEBI.API.Controllers
         // ── GET ──
 
         // Genera un resumen estadístico global: total de libros, usuarios activos, préstamos vigentes, etc.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("general")]
         public async Task<IActionResult> ObtenerReporteGeneral()
         {
@@ -39,6 +44,11 @@ namespace SIGEBI.API.Controllers
         }
 
         // Recupera la relación detallada de préstamos realizados dentro de un intervalo de tiempo específico.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("prestamos")]
         public async Task<IActionResult> ObtenerPrestamosPorPeriodo(
             [FromQuery] DateTime fechaInicio,
@@ -52,6 +62,11 @@ namespace SIGEBI.API.Controllers
         }
 
         // Identifica usuarios con historial recurrente de incumplimiento.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("usuarios-morosos")]
         public async Task<IActionResult> ObtenerUsuariosMasPenalizados([FromQuery] int top = 5)
         {
@@ -63,6 +78,11 @@ namespace SIGEBI.API.Controllers
         }
 
         // Lista de penalizaciones vigentes en toda la biblioteca.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("penalizaciones-activas")]
         public async Task<IActionResult> ObtenerPenalizacionesActivas()
         {

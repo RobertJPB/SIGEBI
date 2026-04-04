@@ -2,26 +2,31 @@ using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.Interfaces.Services;
+using SIGEBI.Business.Interfaces.Common;
+using SIGEBI.Business.Interfaces.UseCases.Usuarios;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Enums.Seguridad;
 
 namespace SIGEBI.Business.UseCases.Usuarios
 {
     // Encargado de dar de alta nuevos usuarios asegurando la seguridad de sus credenciales.
-    public class RegistrarUsuarioUseCase
+    public class RegistrarUsuarioUseCase : IRegistrarUsuarioUseCase
     {
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IHashService _hashService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IGuidGenerator _guidGenerator;
 
         public RegistrarUsuarioUseCase(
             IUsuarioRepository usuarioRepository,
             IHashService hashService,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IGuidGenerator guidGenerator)
         {
             _usuarioRepository = usuarioRepository;
             _hashService = hashService;
             _unitOfWork = unitOfWork;
+            _guidGenerator = guidGenerator;
         }
 
         // Crea un nuevo usuario encriptando su clave y validando que el correo sea único.
@@ -36,6 +41,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
             var hash = _hashService.Hash(dto.Contrasena);
 
             var usuario = new Usuario(
+                _guidGenerator.Create(),
                 dto.Nombre,
                 dto.Correo,
                 hash,

@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Moq;
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces;
@@ -7,6 +7,7 @@ using SIGEBI.Business.Interfaces.Services;
 using SIGEBI.Business.UseCases.Usuarios;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Enums.Seguridad;
+using SIGEBI.Business.Interfaces.Common;
 using Xunit;
 
 namespace SIGEBI.Test.UseCases.Usuarios
@@ -27,10 +28,11 @@ namespace SIGEBI.Test.UseCases.Usuarios
             _useCase = new RegistrarUsuarioUseCase(
                 _usuarioRepo.Object,
                 _hashService.Object,
-                _unitOfWork.Object);
+                _unitOfWork.Object,
+                new Mock<IGuidGenerator>().Object);
         }
 
-        // ── HELPER ──
+        // â”€â”€ HELPER â”€â”€
 
         private UsuarioDTO CrearDTO(string correo = "juan@test.com")
             => new UsuarioDTO
@@ -41,7 +43,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
                 IdRol = (int)RolUsuario.Estudiante
             };
 
-        // ── PRUEBAS ──
+        // â”€â”€ PRUEBAS â”€â”€
 
         [Fact]
         public async Task Ejecutar_UsuarioNuevo_RegistraCorrectamente()
@@ -67,7 +69,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
         {
             // Arrange
             var dto = CrearDTO();
-            var existente = new Usuario("Juan Perez", "juan@test.com", "hash123", RolUsuario.Estudiante);
+            var existente = new Usuario(Guid.NewGuid(), "Juan Perez", "juan@test.com", "hash123", RolUsuario.Estudiante);
 
             _usuarioRepo.Setup(r => r.GetByCorreoAsync(dto.Correo)).ReturnsAsync(existente);
 
@@ -99,7 +101,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
         {
             // Arrange
             var dto = CrearDTO();
-            var existente = new Usuario("Juan Perez", "juan@test.com", "hash123", RolUsuario.Estudiante);
+            var existente = new Usuario(Guid.NewGuid(), "Juan Perez", "juan@test.com", "hash123", RolUsuario.Estudiante);
 
             _usuarioRepo.Setup(r => r.GetByCorreoAsync(dto.Correo)).ReturnsAsync(existente);
 

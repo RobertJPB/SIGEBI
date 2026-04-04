@@ -6,6 +6,13 @@ namespace SIGEBI.Domain.Entities
 {
     public class Usuario : IDesactivable
     {
+        /// <summary>
+        /// Hash centinela que marca la cuenta de sistema. Este valor nunca puede
+        /// ser generado por BCrypt, por lo que garantiza que la cuenta no puede
+        /// autenticarse a través del flujo normal de login.
+        /// </summary>
+        public const string SistemaHashCentinela = "SYSTEM_ACCOUNT_NO_LOGIN";
+
         public Guid Id { get; private set; } // ID único
         public string Nombre { get; private set; } = null!; // Nombre completo
         public string Correo { get; private set; } = null!; // Email institucional
@@ -23,9 +30,10 @@ namespace SIGEBI.Domain.Entities
 
         private Usuario() { }
 
-        public Usuario(string nombre, string correo, string contrasenaHash, RolUsuario rol)
+        public Usuario(Guid id, string nombre, string correo, string contrasenaHash, RolUsuario rol)
         {
             // Validaciones basicas antes de crear el usuario
+            Id = id;
             if (string.IsNullOrWhiteSpace(nombre))
                 throw new ArgumentException("El nombre es requerido.", nameof(nombre));
             
@@ -35,7 +43,6 @@ namespace SIGEBI.Domain.Entities
             if (string.IsNullOrWhiteSpace(contrasenaHash))
                 throw new ArgumentException("La contraseña es requerida.", nameof(contrasenaHash));
 
-            Id = DomainServices.SequentialGuidGenerator.NewGuid();
             Nombre = nombre.Trim();
             Correo = correo.Trim();
             ContrasenaHash = contrasenaHash;
