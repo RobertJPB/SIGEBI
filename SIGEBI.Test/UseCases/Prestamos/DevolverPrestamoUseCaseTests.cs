@@ -82,7 +82,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
             _prestamoRepo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Prestamo?)null);
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            await Assert.ThrowsAsync<KeyNotFoundException>(() =>
                 _useCase.EjecutarAsync(Guid.NewGuid()));
         }
 

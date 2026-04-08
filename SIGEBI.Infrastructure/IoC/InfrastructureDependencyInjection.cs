@@ -34,7 +34,7 @@ namespace SIGEBI.Infrastructure.IoC
 
             // Servicios técnicos de infraestructura (hashing, correo, tokens JWT).
             services.AddScoped<IHashService, HashService>();
-            services.AddScoped<IEmailAdapter, EmailAdapter>();
+            services.AddSingleton<IEmailAdapter, EmailAdapter>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddSingleton<AuditoriaInterceptor>();
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>(); // Registro del generador

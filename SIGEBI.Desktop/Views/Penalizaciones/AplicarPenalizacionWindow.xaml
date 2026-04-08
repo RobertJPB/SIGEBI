@@ -1,0 +1,51 @@
+<Window x:Class="SIGEBI.Views.Penalizaciones.AplicarPenalizacionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SIGEBI.Views.Penalizaciones"
+        mc:Ignorable="d"
+        Title="Aplicar Penalización Manual" Height="450" Width="400"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Background="#F3F4F6">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Nueva Penalización" FontSize="20" FontWeight="SemiBold" Foreground="#111827" Margin="0,0,0,20"/>
+        
+        <Border Grid.Row="1" Background="White" CornerRadius="8" Padding="20">
+            <StackPanel>
+                <Border x:Name="ErrorPanel" Background="#FEE2E2" CornerRadius="4" Padding="10" Margin="0,0,0,15" Visibility="Collapsed">
+                    <TextBlock x:Name="ErrorText" Foreground="#DC2626" TextWrapping="Wrap"/>
+                </Border>
+
+                <TextBlock Text="ID del Usuario (GUID):" Foreground="#374151" FontWeight="Medium" Margin="0,0,0,5"/>
+                <TextBox x:Name="TxtUsuarioId" Padding="8" Margin="0,0,0,15" BorderBrush="#D1D5DB" BorderThickness="1"/>
+
+                <TextBlock Text="ID del Préstamo (Opcional):" Foreground="#374151" FontWeight="Medium" Margin="0,0,0,5"/>
+                <TextBox x:Name="TxtPrestamoId" Padding="8" Margin="0,0,0,15" BorderBrush="#D1D5DB" BorderThickness="1"/>
+
+                <TextBlock Text="Motivo:" Foreground="#374151" FontWeight="Medium" Margin="0,0,0,5"/>
+                <TextBox x:Name="TxtMotivo" Padding="8" Margin="0,0,0,15" BorderBrush="#D1D5DB" BorderThickness="1" TextWrapping="Wrap" AcceptsReturn="True" Height="60"/>
+
+                <TextBlock Text="Días de Penalización:" Foreground="#374151" FontWeight="Medium" Margin="0,0,0,5"/>
+                <TextBox x:Name="TxtDias" Padding="8" Margin="0,0,0,15" BorderBrush="#D1D5DB" BorderThickness="1"/>
+            </StackPanel>
+        </Border>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button Content="Cancelar" Click="BtnCancelar_Click" Background="Transparent" Foreground="#4B5563" BorderThickness="0" Padding="15,8" Margin="0,0,10,0" Cursor="Hand"/>
+            <Button x:Name="BtnAplicar" Content="Aplicar" Click="BtnAplicar_Click" Background="#2563EB" Foreground="White" BorderThickness="0" Padding="15,8" Cursor="Hand">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="4"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -7,14 +7,21 @@ namespace SIGEBI.Business.Mappers
     {
         public static PenalizacionDTO ToDTO(Penalizacion penalizacion)
         {
+            int diasPenalizacion = 0;
+            if (penalizacion.FechaFin.HasValue)
+            {
+                diasPenalizacion = (int)(penalizacion.FechaFin.Value - penalizacion.FechaInicio).TotalDays;
+            }
+
             return new PenalizacionDTO
             {
                 Id = penalizacion.Id,
                 UsuarioId = penalizacion.UsuarioId,
                 NombreUsuario = penalizacion.Usuario?.Nombre ?? string.Empty,
                 Motivo = penalizacion.Motivo,
-                FechaInicio = penalizacion.FechaInicio,
-                FechaFin = penalizacion.FechaFin,
+                Monto = SIGEBI.Domain.DomainServices.PenalizacionCalculator.CalcularMonto(diasPenalizacion),
+                FechaDesde = penalizacion.FechaInicio,
+                FechaHasta = penalizacion.FechaFin,
                 Estado = penalizacion.Estado.ToString()
             };
         }

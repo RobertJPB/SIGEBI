@@ -73,7 +73,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
             _usuarioRepo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Usuario?)null);
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            await Assert.ThrowsAsync<KeyNotFoundException>(() =>
                 _useCase.AgregarValoracionAsync(Guid.NewGuid(), Guid.NewGuid(), 5, "Test"));
         }
 

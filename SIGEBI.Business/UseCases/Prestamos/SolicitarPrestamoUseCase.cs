@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces;
@@ -83,9 +86,23 @@ namespace SIGEBI.Business.UseCases.Prestamos
                 await _notificacionRepository.AddAsync(notificacion);
                 
                 await _unitOfWork.SaveChangesAsync();
+                
+                // Obtenemos correos de bibliotecarios ANTES de disparar el segundo plano
+                // para evitar problemas con la resolución de alcances (scope) del repositorio.
+                var bibliotecarios = await _usuarioRepository.GetByRolAsync(SIGEBI.Domain.Enums.Seguridad.RolUsuario.Bibliotecario);
+                var listaCorreosBiblio = bibliotecarios.Select(b => b.Correo).ToList();
 
-                // 6. Notificaciones Proactivas (Email)
-                await EnviarNotificacionesEmailAsync(usuario, recurso, prestamo);
+                // 6. Notificaciones Proactivas (Email en segundo plano)
+                // Usamos _ = Task.Run para no bloquear la respuesta al usuario.
+                _ = Task.Run(async () => 
+                {
+                    await EnviarNotificacionesEmailBackgroundAsync(
+                        usuario.Nombre, 
+                        usuario.Correo, 
+                        recurso.Titulo, 
+                        prestamo.FechaDevolucionEstimada, 
+                        listaCorreosBiblio);
+                });
 
                 return PrestamoMapper.ToDTO(prestamo);
             }
@@ -101,25 +118,26 @@ namespace SIGEBI.Business.UseCases.Prestamos
             }
         }
 
-        private async Task EnviarNotificacionesEmailAsync(Usuario usuario, RecursoBibliografico recurso, Prestamo prestamo)
+        private async Task EnviarNotificacionesEmailBackgroundAsync(string nombreUsuario, string correoUsuario, string tituloRecurso, DateTime fechaDevolucion, List<string> correosBibliotecarios)
         {
             try 
             {
-                await _emailAdapter.EnviarAsync(usuario.Correo, "Confirmación de Préstamo - SIGEBI", 
-                    $"Hola {usuario.Nombre}, se ha registrado tu préstamo del recurso: {recurso.Titulo}. " +
-                    $"Fecha de devolución: {prestamo.FechaDevolucionEstimada:dd/MM/yyyy}.");
+                // Notificación al estudiante
+                await _emailAdapter.EnviarAsync(correoUsuario, "Confirmación de Préstamo - SIGEBI", 
+                    $"Hola {nombreUsuario}, se ha registrado tu préstamo del recurso: {tituloRecurso}. " +
+                    $"Fecha de devolución: {fechaDevolucion:dd/MM/yyyy}.");
 
-                var bibliotecarios = await _usuarioRepository.GetByRolAsync(SIGEBI.Domain.Enums.Seguridad.RolUsuario.Bibliotecario);
-                foreach (var biblio in bibliotecarios)
+                // Notificación a bibliotecarios
+                foreach (var biblioCorreo in correosBibliotecarios)
                 {
-                    await _emailAdapter.EnviarAsync(biblio.Correo, "Nuevo Préstamo Registrado - SIGEBI",
-                        $"Se ha registrado un nuevo préstamo por el usuario {usuario.Nombre} (ID: {usuario.Id}). " +
-                        $"Recurso: {recurso.Titulo}.");
+                    await _emailAdapter.EnviarAsync(biblioCorreo, "Nuevo Préstamo Registrado - SIGEBI",
+                        $"Se ha registrado un nuevo préstamo por el usuario {nombreUsuario} ({correoUsuario}). " +
+                        $"Recurso: {tituloRecurso}.");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Error al enviar notificación de email para el préstamo {PrestamoId}.", prestamo.Id);
+                _logger.LogWarning(ex, "Error en el proceso de notificación por email en segundo plano.");
             }
         }
     }

@@ -27,6 +27,12 @@ namespace SIGEBI.Domain.DomainServices
             return fechaDevolucionReal > fechaDevolucionEstimada;
         }
 
+        public static decimal CalcularMonto(int diasPenalizacion)
+        {
+            // Regla de negocio: $5.00 por cada día de sanción.
+            return diasPenalizacion * 5.00m;
+        }
+
         public static string ObtenerMotivo(int diasAtraso)
         {
             return $"Devolución con {diasAtraso} día(s) de atraso.";

@@ -145,7 +145,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
                 .ReturnsAsync((RecursoBibliografico?)null);
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            await Assert.ThrowsAsync<KeyNotFoundException>(() =>
                 _useCase.EditarLibroAsync(
                     Guid.NewGuid(), "Titulo", "Autor", 1, 5, null,
                     "978-84-261", "Editorial X", 1943));
@@ -200,7 +200,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
                 .ReturnsAsync((RecursoBibliografico?)null);
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            await Assert.ThrowsAsync<KeyNotFoundException>(() =>
                 _useCase.EliminarRecursoAsync(Guid.NewGuid()));
         }
     }

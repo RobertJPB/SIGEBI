@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces;
@@ -70,7 +71,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
         public async Task AplicarPenalizacionManualAsync(AplicarPenalizacionManualDTO dto)
         {
             var usuario = await _usuarioRepository.GetByIdAsync(dto.UsuarioId)
-                ?? throw new InvalidOperationException("Usuario no encontrado.");
+                ?? throw new KeyNotFoundException("Usuario no encontrado.");
 
             var penalizacion = new Penalizacion(_guidGenerator.Create(), dto.UsuarioId, dto.Motivo, dto.DiasPenalizacion, DateTime.UtcNow, dto.PrestamoId);
             await _penalizacionRepository.AddAsync(penalizacion);
@@ -86,7 +87,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
         public async Task<IEnumerable<PenalizacionDTO>> ObtenerPenalizacionesPorUsuarioAsync(Guid usuarioId)
         {
             var usuario = await _usuarioRepository.GetByIdAsync(usuarioId)
-                ?? throw new InvalidOperationException("Usuario no encontrado.");
+                ?? throw new KeyNotFoundException("Usuario no encontrado.");
 
             var penalizaciones = await _penalizacionRepository.GetByUsuarioIdAsync(usuarioId);
             return penalizaciones.Select(PenalizacionMapper.ToDTO);
@@ -97,7 +98,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
         public async Task EliminarPenalizacionAsync(Guid id)
         {
             var penalizacion = await _penalizacionRepository.GetByIdAsync(id)
-                ?? throw new InvalidOperationException("La penalización no existe.");
+                ?? throw new KeyNotFoundException("La penalización no existe.");
 
             _penalizacionRepository.Delete(penalizacion);
             await _unitOfWork.SaveChangesAsync();
@@ -108,7 +109,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
         public async Task FinalizarPenalizacionAsync(Guid id)
         {
             var penalizacion = await _penalizacionRepository.GetByIdAsync(id)
-                ?? throw new InvalidOperationException("La penalización no existe.");
+                ?? throw new KeyNotFoundException("La penalización no existe.");
 
             penalizacion.Finalizar(DateTime.UtcNow);
             _penalizacionRepository.Update(penalizacion);
