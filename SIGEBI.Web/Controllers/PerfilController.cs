@@ -55,7 +55,8 @@ namespace SIGEBI.Web.Controllers
                 client.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", token);
 
-                var response = await client.GetAsync($"api/Usuarios/{usuarioId}");
+                // Llamar al endpoint de perfil validado y seguro de la API
+                var response = await client.GetAsync("api/Usuarios/perfil");
 
                 if (response.IsSuccessStatusCode)
                 {

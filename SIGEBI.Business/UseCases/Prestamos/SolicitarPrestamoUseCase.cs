@@ -8,6 +8,7 @@ using SIGEBI.Business.Interfaces.UseCases.Prestamos;
 using SIGEBI.Business.Mappers;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Entities;
+using SIGEBI.Domain.Entities.Recursos;
 
 namespace SIGEBI.Business.UseCases.Prestamos
 {
@@ -48,42 +49,66 @@ namespace SIGEBI.Business.UseCases.Prestamos
         // Ejecuta el flujo de préstamo: valida usuario/recurso, comprueba disponibilidad y persiste el registro.
         public async Task<PrestamoResponseDTO> EjecutarAsync(Guid usuarioId, Guid recursoId, DateTime? fechaDevolucionEstimada = null)
         {
-            // buscamos el usuario primero
+            var fechaActual = DateTime.UtcNow;
+
+            // 1. Obtención de datos básicos
             var usuario = await _usuarioRepository.GetByIdAsync(usuarioId)
                 ?? throw new InvalidOperationException("Usuario no encontrado.");
 
-            // Validamos que exista el recurso (Libro, Revista, etc.)
             var recurso = await _recursoRepository.GetByIdAsync(recursoId)
                 ?? throw new InvalidOperationException("Recurso no encontrado.");
 
-            var prestamosActivos = await _prestamoRepository.GetActivosByUsuarioIdAsync(usuarioId);
+            var historialUsuario = await _prestamoRepository.GetByUsuarioIdAsync(usuarioId);
             var penalizaciones = await _penalizacionRepository.GetByUsuarioIdAsync(usuarioId);
 
+            try
+            {
+                // 2. Aplicación Centralizada de Reglas
+                PrestamoPolicy.ValidarPrestamo(usuario, recurso, historialUsuario, penalizaciones);
 
-            PrestamoPolicy.ValidarPrestamo(usuario, recurso, prestamosActivos, penalizaciones);
+                // 3. Registro de Solicitud Exitosa (Trazabilidad)
+                var solicitudExito = SolicitudAcceso.RegistrarExito(_guidGenerator.Create(), usuarioId, recursoId, fechaActual);
+                await _unitOfWork.SolicitudesAcceso.AddAsync(solicitudExito);
 
-            int diasPlazo = PrestamoPolicy.ObtenerDiasPlazo();
-            var prestamo = new Prestamo(_guidGenerator.Create(), usuarioId, recursoId, diasPlazo, DateTime.UtcNow, fechaDevolucionEstimada);
+                // 4. Creación del Préstamo
+                int diasPlazo = PrestamoPolicy.ObtenerDiasPlazo(usuario.Rol);
+                var prestamo = new Prestamo(_guidGenerator.Create(), usuarioId, recursoId, diasPlazo, fechaActual, fechaDevolucionEstimada);
 
-            recurso.DisminuirStock(); // bajamos el stock
-            await _prestamoRepository.AddAsync(prestamo);
-            _recursoRepository.Update(recurso);
+                recurso.DisminuirStock(); 
+                await _prestamoRepository.AddAsync(prestamo);
+                _recursoRepository.Update(recurso);
 
-            // También generamos una notificación persistente en la base de datos (aparte del correo)
-            var notificacion = NotificacionFactory.CrearNotificacionPrestamo(_guidGenerator.Create(), usuarioId, prestamo.FechaDevolucionEstimada);
-            await _notificacionRepository.AddAsync(notificacion);
-            
-            await _unitOfWork.SaveChangesAsync();
+                // 5. Notificación Interna
+                var notificacion = NotificacionFactory.CrearNotificacionPrestamo(_guidGenerator.Create(), usuarioId, prestamo.FechaDevolucionEstimada);
+                await _notificacionRepository.AddAsync(notificacion);
+                
+                await _unitOfWork.SaveChangesAsync();
 
-            // Notificacion proactiva vía email
+                // 6. Notificaciones Proactivas (Email)
+                await EnviarNotificacionesEmailAsync(usuario, recurso, prestamo);
+
+                return PrestamoMapper.ToDTO(prestamo);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // REGLA: Toda solicitud de acceso debe quedar registrada, incluso si es rechazada.
+                var solicitudRechazo = SolicitudAcceso.RegistrarRechazo(_guidGenerator.Create(), usuarioId, recursoId, fechaActual, ex.Message);
+                await _unitOfWork.SolicitudesAcceso.AddAsync(solicitudRechazo);
+                await _unitOfWork.SaveChangesAsync();
+
+                _logger.LogInformation("Solicitud de préstamo rechazada: {Motivo}", ex.Message);
+                throw;
+            }
+        }
+
+        private async Task EnviarNotificacionesEmailAsync(Usuario usuario, RecursoBibliografico recurso, Prestamo prestamo)
+        {
             try 
             {
-                // Notificar al estudiante
                 await _emailAdapter.EnviarAsync(usuario.Correo, "Confirmación de Préstamo - SIGEBI", 
                     $"Hola {usuario.Nombre}, se ha registrado tu préstamo del recurso: {recurso.Titulo}. " +
                     $"Fecha de devolución: {prestamo.FechaDevolucionEstimada:dd/MM/yyyy}.");
 
-                // Notificar a todos los bibliotecarios
                 var bibliotecarios = await _usuarioRepository.GetByRolAsync(SIGEBI.Domain.Enums.Seguridad.RolUsuario.Bibliotecario);
                 foreach (var biblio in bibliotecarios)
                 {
@@ -96,8 +121,6 @@ namespace SIGEBI.Business.UseCases.Prestamos
             {
                 _logger.LogWarning(ex, "Error al enviar notificación de email para el préstamo {PrestamoId}.", prestamo.Id);
             }
-
-            return PrestamoMapper.ToDTO(prestamo);
         }
     }
 }

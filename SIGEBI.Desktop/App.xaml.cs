@@ -1,13 +1,18 @@
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using SIGEBI.Services;
-using SIGEBI.Business.DTOs;
 using SIGEBI.ViewModels;
+using Refit;
+using System.Text.Json;
 
 namespace SIGEBI;
 
 /// <summary>
-/// Interaction logic for App.xaml
+/// Punto de entrada de SIGEBI.Desktop.
+/// Configura el contenedor de inversión de control (IoC) con:
+/// - ISigebiApi vía Refit (cliente REST tipado + AuthHandler JWT)
+/// - ResourceUploadService (operaciones multipart/form-data)
+/// - Todos los ViewModels bajo patrón IsBusy / ManejarErrorAsync
 /// </summary>
 public partial class App : Application
 {
@@ -23,10 +28,22 @@ public partial class App : Application
     {
         var services = new ServiceCollection();
 
-        // ── Services ──
+        // ── Middleware ──
         services.AddTransient<AuthHandler>();
-        
-        services.AddHttpClient<ApiService>(client =>
+
+        // ── ISigebiApi (Refit) — Todos los endpoints REST tipados ──
+        services.AddRefitClient<ISigebiApi>(new RefitSettings
+        {
+            ContentSerializer = new SystemTextJsonContentSerializer(new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            })
+        })
+        .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://localhost:7047/"))
+        .AddHttpMessageHandler<AuthHandler>();
+
+        // ── ResourceUploadService — Operaciones multipart (imágenes de recursos) ──
+        services.AddHttpClient<ResourceUploadService>(client =>
         {
             client.BaseAddress = new Uri("https://localhost:7047/");
         })
@@ -45,3 +62,4 @@ public partial class App : Application
         return services.BuildServiceProvider();
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Moq;
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces;
@@ -32,7 +32,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
                 new Mock<IGuidGenerator>().Object);
         }
 
-        // â”€â”€ HELPER â”€â”€
+        // ── HELPER ──
 
         private UsuarioDTO CrearDTO(string correo = "juan@test.com")
             => new UsuarioDTO
@@ -43,7 +43,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
                 IdRol = (int)RolUsuario.Estudiante
             };
 
-        // â”€â”€ PRUEBAS â”€â”€
+        // ── PRUEBAS ──
 
         [Fact]
         public async Task Ejecutar_UsuarioNuevo_RegistraCorrectamente()

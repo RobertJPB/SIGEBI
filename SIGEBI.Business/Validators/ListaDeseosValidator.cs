@@ -1,4 +1,4 @@
-﻿namespace SIGEBI.Business.Validators
+namespace SIGEBI.Business.Validators
 {
     public class ListaDeseosValidator
     {

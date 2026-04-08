@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -10,14 +9,16 @@ namespace SIGEBI.Views.GestionBibliografica
 {
     public partial class GestionBibliograficaPage : Page
     {
-        private readonly ApiService _api;
+        private readonly ResourceUploadService _uploadService;
+        private readonly ISigebiApi _api;
         private readonly SIGEBI.ViewModels.GestionBibliograficaViewModel _viewModel;
 
         public GestionBibliograficaPage()
         {
             InitializeComponent();
-            _api = (ApiService)SIGEBI.App.Current.Services.GetService(typeof(ApiService))!;
-            
+            _uploadService = (ResourceUploadService)SIGEBI.App.Current.Services.GetService(typeof(ResourceUploadService))!;
+            _api = (ISigebiApi)SIGEBI.App.Current.Services.GetService(typeof(ISigebiApi))!;
+
             _viewModel = (SIGEBI.ViewModels.GestionBibliograficaViewModel)SIGEBI.App.Current.Services.GetService(typeof(SIGEBI.ViewModels.GestionBibliograficaViewModel))!;
             DataContext = _viewModel;
 
@@ -32,19 +33,19 @@ namespace SIGEBI.Views.GestionBibliografica
 
         private void BtnAgregarLibro_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new AgregarLibroDialog(_api) { Owner = Window.GetWindow(this) };
+            var dialog = new AgregarLibroDialog(_uploadService, _api) { Owner = Window.GetWindow(this) };
             if (dialog.ShowDialog() == true) _ = _viewModel.CargarRecursosAsync();
         }
 
         private void BtnAgregarRevista_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new AgregarRevistaDialog(_api) { Owner = Window.GetWindow(this) };
+            var dialog = new AgregarRevistaDialog(_uploadService, _api) { Owner = Window.GetWindow(this) };
             if (dialog.ShowDialog() == true) _ = _viewModel.CargarRecursosAsync();
         }
 
         private void BtnAgregarDocumento_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new AgregarDocumentoDialog(_api) { Owner = Window.GetWindow(this) };
+            var dialog = new AgregarDocumentoDialog(_uploadService, _api) { Owner = Window.GetWindow(this) };
             if (dialog.ShowDialog() == true) _ = _viewModel.CargarRecursosAsync();
         }
 
@@ -57,17 +58,17 @@ namespace SIGEBI.Views.GestionBibliografica
 
                 if (tipo.Contains("libro"))
                 {
-                    var dialog = new EditarLibroDialog(_api, recurso) { Owner = Window.GetWindow(this) };
+                    var dialog = new EditarLibroDialog(_uploadService, _api, recurso) { Owner = Window.GetWindow(this) };
                     result = dialog.ShowDialog() == true;
                 }
                 else if (tipo.Contains("revista"))
                 {
-                    var dialog = new EditarRevistaDialog(_api, recurso) { Owner = Window.GetWindow(this) };
+                    var dialog = new EditarRevistaDialog(_uploadService, _api, recurso) { Owner = Window.GetWindow(this) };
                     result = dialog.ShowDialog() == true;
                 }
                 else if (tipo.Contains("documento"))
                 {
-                    var dialog = new EditarDocumentoDialog(_api, recurso) { Owner = Window.GetWindow(this) };
+                    var dialog = new EditarDocumentoDialog(_uploadService, _api, recurso) { Owner = Window.GetWindow(this) };
                     result = dialog.ShowDialog() == true;
                 }
 

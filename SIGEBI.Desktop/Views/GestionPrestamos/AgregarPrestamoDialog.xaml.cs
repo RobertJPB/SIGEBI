@@ -8,14 +8,15 @@ namespace SIGEBI.Views.GestionPrestamos
 {
     public partial class AgregarPrestamoDialog : Window
     {
-        private readonly ApiService _apiService;
+        private readonly ISigebiApi _api;
 
         public AgregarPrestamoDialog()
+            : this((ISigebiApi)SIGEBI.App.Current.Services.GetService(typeof(ISigebiApi))!) { }
+
+        public AgregarPrestamoDialog(ISigebiApi api)
         {
             InitializeComponent();
-            _apiService = (ApiService)Application.Current.Resources["ApiService"] ?? 
-                          (ApiService)SIGEBI.App.Current.Services.GetService(typeof(ApiService))!;
-            
+            _api = api;
             Loaded += AgregarPrestamoDialog_Loaded;
         }
 
@@ -23,11 +24,10 @@ namespace SIGEBI.Views.GestionPrestamos
         {
             try
             {
-                var usuarios = await _apiService.GetUsuariosAsync();
+                var usuarios = await _api.GetUsuariosAsync();
                 CmbUsuarios.ItemsSource = usuarios.Where(u => u.Estado == 1).ToList();
 
-                var recursos = await _apiService.GetRecursosAsync();
-                // Filter resources that have stock available
+                var recursos = await _api.GetRecursosAsync();
                 CmbRecursos.ItemsSource = recursos.Where(r => r.Stock > 0).ToList();
             }
             catch (Exception ex)
@@ -59,7 +59,7 @@ namespace SIGEBI.Views.GestionPrestamos
                     FechaDevolucionEstimada = DpFechaDevolucion.SelectedDate
                 };
 
-                await _apiService.SolicitarPrestamoAsync(request);
+                await _api.SolicitarPrestamoAsync(request);
                 MessageBox.Show("Préstamo registrado correctamente.", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
                 this.DialogResult = true;
                 this.Close();

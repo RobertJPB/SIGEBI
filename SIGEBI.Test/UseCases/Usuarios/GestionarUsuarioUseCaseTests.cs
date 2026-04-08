@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Moq;
 using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistence;
@@ -25,12 +25,12 @@ namespace SIGEBI.Test.UseCases.Usuarios
                 _unitOfWork.Object);
         }
 
-        // â”€â”€ HELPER â”€â”€
+        // ── HELPER ──
 
         private Usuario CrearUsuario()
             => new Usuario(Guid.NewGuid(), "Juan Perez", "juan@test.com", "hash123", RolUsuario.Estudiante);
 
-        // â”€â”€ OBTENER TODOS â”€â”€
+        // ── OBTENER TODOS ──
 
         [Fact]
         public async Task ObtenerTodos_HayUsuarios_DevuelveLista()
@@ -46,7 +46,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
             resultado.Should().HaveCount(2);
         }
 
-        // â”€â”€ OBTENER POR ID â”€â”€
+        // ── OBTENER POR ID ──
 
         [Fact]
         public async Task ObtenerPorId_UsuarioExistente_DevuelveDTO()
@@ -76,7 +76,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
             resultado.Should().BeNull();
         }
 
-        // â”€â”€ ACTIVAR â”€â”€
+        // ── ACTIVAR ──
 
         [Fact]
         public async Task Activar_UsuarioExistente_CambiaEstadoActivo()
@@ -106,7 +106,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
                 _useCase.ActivarAsync(Guid.NewGuid()));
         }
 
-        // â”€â”€ DESACTIVAR â”€â”€
+        // ── DESACTIVAR ──
 
         [Fact]
         public async Task Desactivar_UsuarioExistente_CambiaEstadoInactivo()
@@ -124,7 +124,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
             usuario.Estado.Should().Be(EstadoUsuario.Inactivo);
         }
 
-        // â”€â”€ BLOQUEAR â”€â”€
+        // ── BLOQUEAR ──
 
         [Fact]
         public async Task Bloquear_UsuarioExistente_CambiaEstadoBloqueado()

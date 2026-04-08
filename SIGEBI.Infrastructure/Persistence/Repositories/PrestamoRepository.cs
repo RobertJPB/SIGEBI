@@ -30,5 +30,13 @@ namespace SIGEBI.Infrastructure.Persistence.Repositories
                 .Where(p => p.EstadoActual == EstadoPrestamo.Atrasado)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Prestamo>> GetActivosByRecursoIdAsync(Guid recursoId)
+        {
+            return await _dbSet
+                .Where(p => p.RecursoId == recursoId && 
+                            (p.EstadoActual == EstadoPrestamo.Activo || p.EstadoActual == EstadoPrestamo.Atrasado))
+                .ToListAsync();
+        }
     }
 }

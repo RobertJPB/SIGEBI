@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 namespace SIGEBI.Business.DTOs
 {
     public class PenalizacionDTO

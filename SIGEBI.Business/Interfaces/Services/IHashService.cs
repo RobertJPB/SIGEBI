@@ -1,4 +1,4 @@
-﻿namespace SIGEBI.Business.Interfaces.Services
+namespace SIGEBI.Business.Interfaces.Services
 {
     public interface IHashService
     {

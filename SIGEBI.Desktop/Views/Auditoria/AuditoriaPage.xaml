@@ -7,8 +7,165 @@
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="AuditoriaPage">
-
-    <Grid>
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         
+        <Style x:Key="Badge" TargetType="Border">
+            <Setter Property="Padding" Value="8,2"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid Margin="28,20,28,20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+        <Grid Grid.Row="0" Margin="0,0,0,24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Auditoría de Actividad" FontSize="22" FontWeight="Bold" Foreground="#2c3e50"/>
+                <TextBlock Text="{Binding Contador}" FontSize="12" Foreground="#95a5a6" Margin="0,2,0,0"/>
+            </StackPanel>
+
+            <Button Grid.Column="1" Content="🔄 Actualizar Log" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" 
+                    Command="{Binding CargarAuditoriasCommand}" VerticalAlignment="Center" Padding="10,5"/>
+        </Grid>
+
+        <!-- SEARCH BAR & FILTROS -->
+        <Border Grid.Row="1" Background="White" CornerRadius="8" BorderBrush="#ecf0f1" BorderThickness="1" Margin="0,0,0,20" Padding="12,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="160"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="🔍" VerticalAlignment="Center" Margin="5,0,10,0" Foreground="#bdc3c7"/>
+                <TextBox Grid.Column="1" BorderThickness="0" Background="Transparent" VerticalContentAlignment="Center"
+                         FontSize="13" Text="{Binding FiltroUsuario, UpdateSourceTrigger=PropertyChanged}"
+                         Tag="Filtrar por usuario..."/>
+                <Separator Grid.Column="2" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="8,0"/>
+                <DatePicker Grid.Column="3" BorderThickness="0" Background="Transparent" VerticalContentAlignment="Center"
+                            FontSize="13" SelectedDate="{Binding FiltroFecha}"
+                            SelectedDateFormat="Short"/>
+                <Button Grid.Column="4" Content="&#x2715;" ToolTip="Limpiar filtros" BorderThickness="0"
+                        Background="Transparent" Foreground="#bdc3c7" FontSize="14" Cursor="Hand" Margin="6,0,0,0"
+                        Command="{Binding LimpiarFiltrosCommand}"/>
+            </Grid>
+        </Border>
+
+        <!-- MAIN LOG TABLE -->
+        <Grid Grid.Row="2">
+            <Border Background="White" CornerRadius="10" BorderBrush="#ecf0f1" BorderThickness="1">
+                <DataGrid x:Name="GridAuditoria"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          ItemsSource="{Binding Auditorias}"
+                          HeadersVisibility="Column"
+                          GridLinesVisibility="Horizontal"
+                          HorizontalGridLinesBrush="#f7f9fa"
+                          Background="White"
+                          BorderThickness="0"
+                          RowHeight="48"
+                          SelectionMode="Single"
+                          CanUserResizeRows="False">
+
+                    <DataGrid.Columns>
+                        <!-- Fecha -->
+                        <DataGridTextColumn Header="Fecha y Hora" Binding="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy HH:mm:ss}}" Width="160">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="Margin" Value="10,0"/>
+                                    <Setter Property="Foreground" Value="#7f8c8d"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <!-- Usuario -->
+                        <DataGridTemplateColumn Header="Usuario" Width="*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
+                                        <TextBlock Text="👤" Margin="0,0,8,0" Foreground="#95a5a6"/>
+                                        <TextBlock Text="{Binding NombreUsuario}" FontWeight="SemiBold" Foreground="#34495e"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <!-- Operación -->
+                        <DataGridTemplateColumn Header="Operación" Width="100">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border x:Name="BadgeOp" Style="{StaticResource Badge}">
+                                        <TextBlock x:Name="TxtOp" FontSize="9" FontWeight="Bold"/>
+                                    </Border>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding Operacion}" Value="CREATE">
+                                            <Setter TargetName="BadgeOp" Property="Background" Value="#e8f5e9"/>
+                                            <Setter TargetName="TxtOp" Property="Foreground" Value="#2e7d32"/>
+                                            <Setter TargetName="TxtOp" Property="Text" Value="CREAR"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Operacion}" Value="UPDATE">
+                                            <Setter TargetName="BadgeOp" Property="Background" Value="#e3f2fd"/>
+                                            <Setter TargetName="TxtOp" Property="Foreground" Value="#1565c0"/>
+                                            <Setter TargetName="TxtOp" Property="Text" Value="EDITAR"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Operacion}" Value="DELETE">
+                                            <Setter TargetName="BadgeOp" Property="Background" Value="#ffebee"/>
+                                            <Setter TargetName="TxtOp" Property="Foreground" Value="#c62828"/>
+                                            <Setter TargetName="TxtOp" Property="Text" Value="BORRAR"/>
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <!-- Recurso -->
+                        <DataGridTextColumn Header="Entidad / Recurso" Binding="{Binding Entidad}" Width="1.5*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="Margin" Value="10,0"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <!-- Detalles -->
+                        <DataGridTextColumn Header="Detalles del Cambio" Binding="{Binding Detalles}" Width="4*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="Margin" Value="10,0"/>
+                                    <Setter Property="FontSize" Value="11"/>
+                                    <Setter Property="Foreground" Value="#7f8c8d"/>
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+
+            <!-- Loading Overlay -->
+            <Border Background="#88ffffff" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}" CornerRadius="10">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <ProgressBar IsIndeterminate="True" Width="200" Height="4" Foreground="#34495e"/>
+                    <TextBlock Text="Cargando registros de auditoría..." Margin="0,10,0,0" Foreground="#34495e" HorizontalAlignment="Center" FontWeight="Bold"/>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </Page>

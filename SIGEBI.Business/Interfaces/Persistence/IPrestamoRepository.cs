@@ -7,5 +7,6 @@ namespace SIGEBI.Business.Interfaces.Persistence
         Task<IEnumerable<Prestamo>> GetByUsuarioIdAsync(Guid usuarioId);
         Task<IEnumerable<Prestamo>> GetActivosByUsuarioIdAsync(Guid usuarioId);
         Task<IEnumerable<Prestamo>> GetAtrasadosAsync();
+        Task<IEnumerable<Prestamo>> GetActivosByRecursoIdAsync(Guid recursoId);
     }
 }

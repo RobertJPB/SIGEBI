@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -10,24 +12,36 @@ namespace SIGEBI.ViewModels
 {
     public partial class AuditoriaViewModel : BaseViewModel
     {
-        private readonly ApiService _apiService;
+        private readonly ISigebiApi _api;
+        private List<AuditoriaDTO> _allAuditorias = new();
 
-        [ObservableProperty]
-        private ObservableCollection<AuditoriaDTO> _auditorias = new();
+        [ObservableProperty] private ObservableCollection<AuditoriaDTO> _auditorias = new();
+        [ObservableProperty] private string _contador = "0 registros";
+        [ObservableProperty] private string _filtroUsuario = string.Empty;
+        [ObservableProperty] private DateTime? _filtroFecha;
 
-        [ObservableProperty]
-        private string _mensajeError = string.Empty;
-
-        [ObservableProperty]
-        private bool _tieneError;
-
-        [ObservableProperty]
-        private string _contador = "0 registros";
-
-        public AuditoriaViewModel(ApiService apiService)
+        public AuditoriaViewModel(ISigebiApi api)
         {
-            _apiService = apiService;
+            _api = api;
             Title = "Auditoría del Sistema";
+        }
+
+        partial void OnFiltroUsuarioChanged(string value) => AplicarFiltros();
+        partial void OnFiltroFechaChanged(DateTime? value) => AplicarFiltros();
+
+        private void AplicarFiltros()
+        {
+            var resultado = _allAuditorias.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(FiltroUsuario))
+                resultado = resultado.Where(a => a.NombreUsuario != null &&
+                    a.NombreUsuario.Contains(FiltroUsuario, StringComparison.OrdinalIgnoreCase));
+
+            if (FiltroFecha.HasValue)
+                resultado = resultado.Where(a => a.FechaRegistro.Date == FiltroFecha.Value.Date);
+
+            Auditorias = new ObservableCollection<AuditoriaDTO>(resultado);
+            Contador = $"{Auditorias.Count} registros";
         }
 
         [RelayCommand]
@@ -36,14 +50,14 @@ namespace SIGEBI.ViewModels
             try
             {
                 IsBusy = true;
-                TieneError = false;
-                var data = await _apiService.GetAuditoriasAsync();
-                Auditorias = new ObservableCollection<AuditoriaDTO>(data);
-                Contador = $"{Auditorias.Count} registros";
+                LimpiarError();
+                var data = await _api.GetAuditoriasAsync();
+                _allAuditorias = data;
+                AplicarFiltros();
             }
             catch (Exception ex)
             {
-                MostrarError($"Error al cargar auditorías: {ex.Message}");
+                await ManejarErrorAsync(ex, "cargar logs de auditoría");
             }
             finally
             {
@@ -51,10 +65,11 @@ namespace SIGEBI.ViewModels
             }
         }
 
-        private void MostrarError(string mensaje)
+        [RelayCommand]
+        public void LimpiarFiltros()
         {
-            MensajeError = mensaje;
-            TieneError = true;
+            FiltroUsuario = string.Empty;
+            FiltroFecha = null;
         }
     }
 }

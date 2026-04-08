@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using SIGEBI.Web.Services;
+using Refit;
 
 // Configuracion de la aplicacion web (MVC)
 
@@ -6,10 +8,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
-// Configuración del HttpClient para la comunicación con la API central
-builder.Services.AddHttpClient("SIGEBIAPI", client =>
+// Registro del Servicio de API con Refit (Cumpliendo Punto 2 del Documento)
+builder.Services.AddRefitClient<ISigebiApi>()
+    .ConfigureHttpClient(c =>
+    {
+        c.BaseAddress = new Uri("https://localhost:7047/");
+    });
+
+// HttpClient manual para controladores que no usan Refit directamente
+builder.Services.AddHttpClient("SIGEBIAPI", c =>
 {
-    client.BaseAddress = new Uri("https://localhost:7047/");
+    c.BaseAddress = new Uri("https://localhost:7047/");
 });
 
 // Configuración de sesiones para persistir el token JWT en el cliente

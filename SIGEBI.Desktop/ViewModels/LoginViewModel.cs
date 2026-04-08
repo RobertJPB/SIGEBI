@@ -1,30 +1,25 @@
 using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SIGEBI.Services;
-using SIGEBI.Business.DTOs;
 
 namespace SIGEBI.ViewModels
 {
     public partial class LoginViewModel : BaseViewModel
     {
-        private readonly ApiService _apiService;
+        private readonly ISigebiApi _api;
 
         [ObservableProperty]
         private string _correo = string.Empty;
 
-        [ObservableProperty]
-        private string _mensajeError = string.Empty;
-
-        [ObservableProperty]
-        private bool _tieneError;
-
         // Callback para cerrar la ventana desde la vista
         public Action? OnLoginSuccess { get; set; }
 
-        public LoginViewModel(ApiService apiService)
+        public LoginViewModel(ISigebiApi api)
         {
-            _apiService = apiService;
+            _api = api;
             Title = "SIGEBI - Acceso Administrativo";
         }
 
@@ -32,30 +27,27 @@ namespace SIGEBI.ViewModels
         {
             if (string.IsNullOrWhiteSpace(Correo) || string.IsNullOrWhiteSpace(contrasena))
             {
-                MostrarError("Correo y contraseña son obligatorios.");
+                MensajeError = "Correo y contraseña son obligatorios.";
+                TieneError = true;
                 return;
             }
 
             try
             {
                 IsBusy = true;
-                TieneError = false;
+                LimpiarError();
 
-                var token = await _apiService.LoginAsync(Correo, contrasena);
+                var response = await _api.LoginAsync(new LoginRequestDTO(Correo, contrasena));
 
-                if (string.IsNullOrWhiteSpace(token))
-                {
-                    MostrarError("Correo o contraseña incorrectos.");
-                    return;
-                }
-
-                SessionService.Token = token;
+                // Persistir sesión
+                SessionService.Token = response.Token;
+                ExtraerDatosSesion(response.Token);
 
                 OnLoginSuccess?.Invoke();
             }
             catch (Exception ex)
             {
-                MostrarError($"No se pudo conectar con el servidor. {ex.Message}");
+                await ManejarErrorAsync(ex, "iniciar sesión");
             }
             finally
             {
@@ -63,10 +55,30 @@ namespace SIGEBI.ViewModels
             }
         }
 
-        private void MostrarError(string mensaje)
+        /// <summary>
+        /// Decodifica el JWT para extraer UsuarioId y Nombre del usuario
+        /// sin requerir un endpoint adicional de perfil.
+        /// </summary>
+        private static void ExtraerDatosSesion(string token)
         {
-            MensajeError = mensaje;
-            TieneError = true;
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jwt = handler.ReadJwtToken(token);
+
+                var sub = jwt.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "nameid")?.Value;
+                if (Guid.TryParse(sub, out var userId))
+                    SessionService.UsuarioId = userId;
+
+                var nombre = jwt.Claims.FirstOrDefault(c => c.Type == "name" || c.Type == "unique_name")?.Value;
+                if (!string.IsNullOrWhiteSpace(nombre))
+                    SessionService.NombreUsuario = nombre;
+            }
+            catch
+            {
+                // Si el JWT no tiene los claims esperados, la sesión continúa sin UsuarioId
+            }
         }
     }
 }
+

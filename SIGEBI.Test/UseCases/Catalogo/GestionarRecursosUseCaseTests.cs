@@ -15,6 +15,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
     public class GestionarRecursosUseCaseTests
     {
         private readonly Mock<IRecursoRepository> _recursoRepo;
+        private readonly Mock<IPrestamoRepository> _prestamoRepo;
         private readonly Mock<ICategoriaRepository> _categoriaRepo;
         private readonly Mock<IUnitOfWork> _unitOfWork;
         private readonly IMemoryCache _cache;
@@ -23,12 +24,14 @@ namespace SIGEBI.Test.UseCases.Catalogo
         public GestionarRecursosUseCaseTests()
         {
             _recursoRepo = new Mock<IRecursoRepository>();
+            _prestamoRepo = new Mock<IPrestamoRepository>();
             _categoriaRepo = new Mock<ICategoriaRepository>();
             _unitOfWork = new Mock<IUnitOfWork>();
             _cache = new MemoryCache(new MemoryCacheOptions());
 
             _useCase = new GestionarRecursosUseCase(
                 _recursoRepo.Object,
+                _prestamoRepo.Object,
                 _categoriaRepo.Object,
                 _unitOfWork.Object,
                 _cache,
@@ -165,6 +168,27 @@ namespace SIGEBI.Test.UseCases.Catalogo
 
             // Assert
             _recursoRepo.Verify(r => r.Delete(libro), Times.Once);
+        }
+
+        [Fact]
+        public async Task EliminarRecurso_ConPrestamosActivos_LanzaExcepcion()
+        {
+            // Arrange
+            var libro = new Libro(Guid.NewGuid(), "El Principito", "Antoine", 1, 5, null,
+                                  "978-84-261", "Editorial X", 1943);
+
+            _recursoRepo.Setup(r => r.GetByIdAsync(libro.Id)).ReturnsAsync(libro);
+            
+            // Simulamos que hay un préstamo activo
+            var prestamos = new List<Prestamo> { 
+                new Prestamo(Guid.NewGuid(), Guid.NewGuid(), libro.Id, 15, DateTime.UtcNow) 
+            };
+            _prestamoRepo.Setup(r => r.GetActivosByRecursoIdAsync(libro.Id)).ReturnsAsync(prestamos);
+
+            // Act & Assert
+            var action = () => _useCase.EliminarRecursoAsync(libro.Id);
+            await action.Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*tiene préstamos activos*");
         }
 
         [Fact]

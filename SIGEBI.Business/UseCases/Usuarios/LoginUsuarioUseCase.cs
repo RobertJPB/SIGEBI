@@ -39,4 +39,4 @@ namespace SIGEBI.Business.UseCases.Usuarios
             return usuario;
         }
     }
-}
+}

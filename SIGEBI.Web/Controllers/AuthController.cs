@@ -5,6 +5,8 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using System.IdentityModel.Tokens.Jwt;
+using Refit;
+using SIGEBI.Web.Services;
 
 namespace SIGEBI.Web.Controllers
 {
@@ -17,11 +19,11 @@ namespace SIGEBI.Web.Controllers
 
     public class AuthController : Controller
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly ISigebiApi _api;
 
-        public AuthController(IHttpClientFactory httpClientFactory)
+        public AuthController(ISigebiApi api)
         {
-            _httpClientFactory = httpClientFactory;
+            _api = api;
         }
 
         [HttpGet]
@@ -41,30 +43,14 @@ namespace SIGEBI.Web.Controllers
 
             try
             {
-                var client = _httpClientFactory.CreateClient("SIGEBIAPI");
-
-                var payload = new
-                {
-                    correo = model.Correo,
-                    contrasena = model.Contrasena
-                };
-
-                var json = JsonSerializer.Serialize(payload);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var response = await client.PostAsync("api/Auth/login", content);
-                var responseBody = await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    model.ErrorMessage = $"Credenciales incorrectas. Código: {(int)response.StatusCode}";
-                    return View(model);
-                }
-
-                var result = JsonSerializer.Deserialize<JsonElement>(responseBody);
+                var payload = new { correo = model.Correo, contrasena = model.Contrasena };
+                
+                // Consumo mediante Servicio (Punto 2 Actividades)
+                var result = await _api.LoginAsync(payload);
 
                 if (!result.TryGetProperty("token", out var tokenElement))
                 {
-                    model.ErrorMessage = $"La API no devolvió token. Respuesta: {responseBody}";
+                    model.ErrorMessage = "La API no devolvió token.";
                     return View(model);
                 }
 

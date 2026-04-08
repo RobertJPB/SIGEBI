@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using Refit;
+using SIGEBI.Web.Services;
 
 namespace SIGEBI.Web.Controllers
 {
@@ -22,48 +24,53 @@ namespace SIGEBI.Web.Controllers
 
     public class PrestamosController : Controller
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly ISigebiApi _api;
 
-        public PrestamosController(IHttpClientFactory httpClientFactory)
+        public PrestamosController(ISigebiApi api)
         {
-            _httpClientFactory = httpClientFactory;
+            _api = api;
+        }
+
+        private string GetBearerToken()
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            return string.IsNullOrWhiteSpace(token) ? string.Empty : $"Bearer {token}";
         }
 
         public async Task<IActionResult> Index()
         {
-            var token = HttpContext.Session.GetString("JwtToken");
-            if (string.IsNullOrWhiteSpace(token))
+            var token = GetBearerToken();
+            if (string.IsNullOrEmpty(token))
                 return RedirectToAction("Login", "Auth");
 
-            var usuarioId = HttpContext.Session.GetString("UsuarioId");
-            if (string.IsNullOrWhiteSpace(usuarioId))
+            var usuarioIdStr = HttpContext.Session.GetString("UsuarioId");
+            if (string.IsNullOrEmpty(usuarioIdStr) || !Guid.TryParse(usuarioIdStr, out var usuarioId))
                 return RedirectToAction("Login", "Auth");
 
             var model = new PrestamosIndexViewModel();
 
             try
             {
-                var client = _httpClientFactory.CreateClient("SIGEBIAPI");
-                client.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", token);
-
-                var response = await client.GetAsync($"api/Prestamos/usuario/{usuarioId}");
-
-                if (!response.IsSuccessStatusCode)
+                // Consumo mediante Servicio Desacoplado (Punto 2 Actividades)
+                var dtos = await _api.GetPrestamosByUsuarioAsync(usuarioId, token);
+                
+                model.Prestamos = dtos.Select(d => new PrestamoViewModel
                 {
-                    model.ErrorMessage = "No se pudieron cargar los préstamos.";
-                    return View(model);
-                }
-
-                var json = await response.Content.ReadAsStringAsync();
-                model.Prestamos = JsonSerializer.Deserialize<List<PrestamoViewModel>>(
-                    json,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
-                    ?? new List<PrestamoViewModel>();
+                    Id = d.Id,
+                    TituloRecurso = d.TituloRecurso,
+                    FechaInicio = d.FechaInicio,
+                    FechaDevolucionEstimada = d.FechaDevolucionEstimada,
+                    FechaDevolucionReal = d.FechaDevolucionReal,
+                    Estado = d.Estado
+                }).ToList();
             }
-            catch
+            catch (ApiException apiEx)
             {
-                model.ErrorMessage = "Error al conectar con el servidor.";
+                model.ErrorMessage = $"Error al obtener datos de la API: {apiEx.ReasonPhrase}";
+            }
+            catch (Exception ex)
+            {
+                model.ErrorMessage = $"Error inesperado: {ex.Message}";
             }
 
             return View(model);

@@ -10,26 +10,17 @@ namespace SIGEBI.ViewModels
 {
     public partial class NotificacionesViewModel : BaseViewModel
     {
-        private readonly ApiService _apiService;
+        private readonly ISigebiApi _api;
 
         [ObservableProperty]
         private ObservableCollection<NotificacionDTO> _notificaciones = new();
 
         [ObservableProperty]
-        private string _mensajeError = string.Empty;
-
-        [ObservableProperty]
-        private bool _tieneError;
-
-        [ObservableProperty]
         private string _contador = "0 notificaciones";
 
-        // ID del usuario autenticado para consultar sus notificaciones
-        public Guid UsuarioId { get; set; }
-
-        public NotificacionesViewModel(ApiService apiService)
+        public NotificacionesViewModel(ISigebiApi api)
         {
-            _apiService = apiService;
+            _api = api;
             Title = "Notificaciones";
         }
 
@@ -39,14 +30,16 @@ namespace SIGEBI.ViewModels
             try
             {
                 IsBusy = true;
-                TieneError = false;
-                var data = await _apiService.GetNotificacionesAsync(UsuarioId);
+                LimpiarError();
+
+                // El UsuarioId se obtiene de la sesión iniciada — no se necesita parámetro externo
+                var data = await _api.GetNotificacionesAsync(SessionService.UsuarioId);
                 Notificaciones = new ObservableCollection<NotificacionDTO>(data);
                 Contador = $"{Notificaciones.Count} notificaciones";
             }
             catch (Exception ex)
             {
-                MostrarError($"Error al cargar notificaciones: {ex.Message}");
+                await ManejarErrorAsync(ex, "cargar notificaciones");
             }
             finally
             {
@@ -60,20 +53,15 @@ namespace SIGEBI.ViewModels
             try
             {
                 IsBusy = true;
-                await _apiService.EliminarNotificacionAsync(id);
+                await _api.EliminarNotificacionAsync(id);
                 await CargarNotificacionesAsync();
             }
             catch (Exception ex)
             {
-                MostrarError($"Error al eliminar notificación: {ex.Message}");
+                await ManejarErrorAsync(ex, "eliminar notificación");
                 IsBusy = false;
             }
         }
-
-        private void MostrarError(string mensaje)
-        {
-            MensajeError = mensaje;
-            TieneError = true;
-        }
     }
 }
+

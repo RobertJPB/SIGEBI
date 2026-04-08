@@ -27,6 +27,7 @@ namespace SIGEBI.Infrastructure.IoC
             services.AddScoped<INotificacionRepository, NotificacionRepository>();
             services.AddScoped<IAuditoriaRepository, AuditoriaRepository>();
             services.AddScoped<IListaDeseosRepository, ListaDeseosRepository>();
+            services.AddScoped<ISolicitudAccesoRepository, SolicitudAccesoRepository>();
 
             // Unidad de trabajo: coordina todos los repositorios en una sola transacción.
             services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -35,7 +36,7 @@ namespace SIGEBI.Infrastructure.IoC
             services.AddScoped<IHashService, HashService>();
             services.AddScoped<IEmailAdapter, EmailAdapter>();
             services.AddScoped<IJwtService, JwtService>();
-            services.AddScoped<AuditoriaInterceptor>();
+            services.AddSingleton<AuditoriaInterceptor>();
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>(); // Registro del generador
 
             return services;

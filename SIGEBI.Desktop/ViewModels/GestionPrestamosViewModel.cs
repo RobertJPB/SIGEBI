@@ -10,23 +10,17 @@ namespace SIGEBI.ViewModels
 {
     public partial class GestionPrestamosViewModel : BaseViewModel
     {
-        private readonly ApiService _apiService;
+        private readonly ISigebiApi _api;
 
         [ObservableProperty]
         private ObservableCollection<PrestamoResponseDTO> _prestamos = new();
 
         [ObservableProperty]
-        private string _mensajeError = string.Empty;
-
-        [ObservableProperty]
-        private bool _tieneError;
-
-        [ObservableProperty]
         private string _contador = "0 préstamos";
 
-        public GestionPrestamosViewModel(ApiService apiService)
+        public GestionPrestamosViewModel(ISigebiApi api)
         {
-            _apiService = apiService;
+            _api = api;
             Title = "Gestión de Préstamos";
         }
 
@@ -36,14 +30,14 @@ namespace SIGEBI.ViewModels
             try
             {
                 IsBusy = true;
-                TieneError = false;
-                var data = await _apiService.GetPrestamosAsync();
+                LimpiarError();
+                var data = await _api.GetPrestamosAsync();
                 Prestamos = new ObservableCollection<PrestamoResponseDTO>(data);
                 Contador = $"{Prestamos.Count} préstamos";
             }
             catch (Exception ex)
             {
-                MostrarError($"Error al cargar préstamos: {ex.Message}");
+                await ManejarErrorAsync(ex, "cargar préstamos");
             }
             finally
             {
@@ -57,12 +51,12 @@ namespace SIGEBI.ViewModels
             try
             {
                 IsBusy = true;
-                await _apiService.DevolverPrestamoAsync(prestamoId);
+                await _api.DevolverPrestamoAsync(prestamoId);
                 await CargarPrestamosAsync();
             }
             catch (Exception ex)
             {
-                MostrarError($"Error al devolver préstamo: {ex.Message}");
+                await ManejarErrorAsync(ex, "devolver préstamo");
                 IsBusy = false;
             }
         }
@@ -73,20 +67,15 @@ namespace SIGEBI.ViewModels
             try
             {
                 IsBusy = true;
-                await _apiService.EliminarPrestamoAsync(prestamoId);
+                await _api.EliminarPrestamoAsync(prestamoId);
                 await CargarPrestamosAsync();
             }
             catch (Exception ex)
             {
-                MostrarError($"Error al eliminar préstamo: {ex.Message}");
+                await ManejarErrorAsync(ex, "eliminar préstamo");
                 IsBusy = false;
             }
         }
-
-        private void MostrarError(string mensaje)
-        {
-            MensajeError = mensaje;
-            TieneError = true;
-        }
     }
 }
+

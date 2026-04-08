@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Windows;
 using SIGEBI.Services;
@@ -8,21 +8,23 @@ namespace SIGEBI.Views.GestionBibliografica
 {
     public partial class AgregarDocumentoDialog : Window
     {
-        private readonly ApiService _api;
+        private readonly ResourceUploadService _api;
+        private readonly ISigebiApi _sigebiApi;
         private byte[]? _imagenBytes;
         private string? _imagenNombre;
 
-        public AgregarDocumentoDialog() : this((ApiService)SIGEBI.App.Current.Services.GetService(typeof(ApiService))!) { }
+        public AgregarDocumentoDialog() : this((ResourceUploadService)SIGEBI.App.Current.Services.GetService(typeof(ResourceUploadService))!, (ISigebiApi)SIGEBI.App.Current.Services.GetService(typeof(ISigebiApi))!) { }
 
-        public AgregarDocumentoDialog(ApiService api)
+        public AgregarDocumentoDialog(ResourceUploadService api, ISigebiApi sigebiApi)
         {
             InitializeComponent();
             _api = api;
+            _sigebiApi = sigebiApi;
             Loaded += async (s, e) =>
             {
                 try
                 {
-                    var categorias = await _api.GetCategoriasAsync();
+                    var categorias = await _sigebiApi.GetCategoriasAsync();
                     CmbCategoria.ItemsSource = categorias;
                 }
                 catch

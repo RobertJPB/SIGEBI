@@ -10,23 +10,14 @@ namespace SIGEBI.ViewModels
 {
     public partial class PenalizacionesViewModel : BaseViewModel
     {
-        private readonly ApiService _apiService;
+        private readonly ISigebiApi _api;
 
-        [ObservableProperty]
-        private ObservableCollection<PenalizacionDTO> _penalizaciones = new();
+        [ObservableProperty] private ObservableCollection<PenalizacionDTO> _penalizaciones = new();
+        [ObservableProperty] private string _contador = "0 penalizaciones";
 
-        [ObservableProperty]
-        private string _mensajeError = string.Empty;
-
-        [ObservableProperty]
-        private bool _tieneError;
-
-        [ObservableProperty]
-        private string _contador = "0 penalizaciones";
-
-        public PenalizacionesViewModel(ApiService apiService)
+        public PenalizacionesViewModel(ISigebiApi api)
         {
-            _apiService = apiService;
+            _api = api;
             Title = "Penalizaciones";
         }
 
@@ -36,14 +27,14 @@ namespace SIGEBI.ViewModels
             try
             {
                 IsBusy = true;
-                TieneError = false;
-                var data = await _apiService.GetPenalizacionesAsync();
+                LimpiarError();
+                var data = await _api.GetPenalizacionesAsync();
                 Penalizaciones = new ObservableCollection<PenalizacionDTO>(data);
                 Contador = $"{Penalizaciones.Count} penalizaciones";
             }
             catch (Exception ex)
             {
-                MostrarError($"Error al cargar penalizaciones: {ex.Message}");
+                await ManejarErrorAsync(ex, "cargar penalizaciones");
             }
             finally
             {
@@ -57,12 +48,12 @@ namespace SIGEBI.ViewModels
             try
             {
                 IsBusy = true;
-                await _apiService.FinalizarPenalizacionAsync(id);
+                await _api.FinalizarPenalizacionAsync(id);
                 await CargarPenalizacionesAsync();
             }
             catch (Exception ex)
             {
-                MostrarError($"Error al finalizar penalización: {ex.Message}");
+                await ManejarErrorAsync(ex, "finalizar penalización");
                 IsBusy = false;
             }
         }
@@ -73,20 +64,15 @@ namespace SIGEBI.ViewModels
             try
             {
                 IsBusy = true;
-                await _apiService.AplicarPenalizacionesAsync();
+                await _api.AplicarPenalizacionesAsync();
                 await CargarPenalizacionesAsync();
             }
             catch (Exception ex)
             {
-                MostrarError($"Error al aplicar penalizaciones: {ex.Message}");
+                await ManejarErrorAsync(ex, "aplicar penalizaciones");
                 IsBusy = false;
             }
         }
 
-        private void MostrarError(string mensaje)
-        {
-            MensajeError = mensaje;
-            TieneError = true;
-        }
     }
 }

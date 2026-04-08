@@ -1,4 +1,4 @@
-﻿using SIGEBI.Business.DTOs;
+using SIGEBI.Business.DTOs;
 
 namespace SIGEBI.Business.Validators
 {
@@ -15,7 +15,7 @@ namespace SIGEBI.Business.Validators
                 errores.Add("El RecursoId es obligatorio.");
 
             if (dto.Calificacion < 1 || dto.Calificacion > 5)
-                errores.Add("La calificación debe estar entre 1 y 5.");
+                errores.Add("La calificaci�n debe estar entre 1 y 5.");
 
             if (dto.Comentario != null && dto.Comentario.Length > 500)
                 errores.Add("El comentario no puede superar los 500 caracteres.");

@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Moq;
 using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistence;
@@ -31,7 +31,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
                 new Mock<IGuidGenerator>().Object);
         }
 
-        // Ã¢â€â‚¬Ã¢â€â‚¬ OBTENER NOTIFICACIONES Ã¢â€â‚¬Ã¢â€â‚¬
+        // â”€â”€ OBTENER NOTIFICACIONES â”€â”€
 
         // Caso de Uso: Notificaciones - Proceso: Consultar todas las alertas enviadas a un usuario particular.
         [Fact]
@@ -53,9 +53,9 @@ namespace SIGEBI.Test.UseCases.Usuarios
             resultado.Should().HaveCount(1);
         }
 
-        // Ã¢â€â‚¬Ã¢â€â‚¬ MARCAR COMO LEIDA Ã¢â€â‚¬Ã¢â€â‚¬
+        // â”€â”€ MARCAR COMO LEIDA â”€â”€
 
-        // Caso de Uso: Notificaciones - Proceso: Cambiar el estado de una alerta a "LeÃƒÂ­da".
+        // Caso de Uso: Notificaciones - Proceso: Cambiar el estado de una alerta a "LeÃ­da".
         [Fact]
         public async Task MarcarComoLeida_Existente_CambiaEstadoAnLeida()
         {
@@ -72,9 +72,9 @@ namespace SIGEBI.Test.UseCases.Usuarios
             _notificacionRepo.Verify(r => r.Update(notificacion), Times.Once);
         }
 
-        // Ã¢â€â‚¬Ã¢â€â‚¬ ELIMINAR Ã¢â€â‚¬Ã¢â€â‚¬
+        // â”€â”€ ELIMINAR â”€â”€
 
-        // Caso de Uso: Notificaciones - Proceso: Remover permanentemente una notificaciÃƒÂ³n del historial.
+        // Caso de Uso: Notificaciones - Proceso: Remover permanentemente una notificaciÃ³n del historial.
         [Fact]
         public async Task EliminarNotificacion_Existente_LlamarDelete()
         {
@@ -90,9 +90,9 @@ namespace SIGEBI.Test.UseCases.Usuarios
             _notificacionRepo.Verify(r => r.Delete(notificacion), Times.Once);
         }
 
-        // Ã¢â€â‚¬Ã¢â€â‚¬ ENVIAR NOTIFICACION Ã¢â€â‚¬Ã¢â€â‚¬
+        // â”€â”€ ENVIAR NOTIFICACION â”€â”€
 
-        // Caso de Uso: Notificaciones - Proceso: Crear y registrar automÃƒÂ¡ticamente una alerta de vencimiento de prÃƒÂ©stamo.
+        // Caso de Uso: Notificaciones - Proceso: Crear y registrar automÃ¡ticamente una alerta de vencimiento de prÃ©stamo.
         [Fact]
         public async Task EnviarNotificacionPrestamo_UsuarioExistente_CreaYGuarda()
         {

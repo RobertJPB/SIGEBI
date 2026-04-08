@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Moq;
 using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.Interfaces.Services;

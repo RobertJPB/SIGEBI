@@ -22,6 +22,7 @@ namespace SIGEBI.Infrastructure.Persistence
         private INotificacionRepository? _notificaciones;
         private IAuditoriaRepository? _auditorias;
         private IListaDeseosRepository? _listasDeseos;
+        private ISolicitudAccesoRepository? _solicitudesAcceso;
 
         public UnitOfWork(SIGEBIDbContext context)
         {
@@ -38,6 +39,7 @@ namespace SIGEBI.Infrastructure.Persistence
         public INotificacionRepository Notificaciones => _notificaciones ??= new NotificacionRepository(_context); 
         public IAuditoriaRepository Auditorias => _auditorias ??= new AuditoriaRepository(_context); 
         public IListaDeseosRepository ListasDeseos => _listasDeseos ??= new ListaDeseosRepository(_context); 
+        public ISolicitudAccesoRepository SolicitudesAcceso => _solicitudesAcceso ??= new SolicitudAccesoRepository(_context); 
 
         public async Task<int> SaveChangesAsync() // Guardar cambios
             => await _context.SaveChangesAsync();

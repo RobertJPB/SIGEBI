@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Web.Models;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text;
+using Refit;
+using SIGEBI.Web.Services;
 
 namespace SIGEBI.Web.Controllers
 {
@@ -15,13 +16,19 @@ namespace SIGEBI.Web.Controllers
 
     public class CatalogoController : Controller
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly ISigebiApi _api;
         private readonly IConfiguration _configuration;
 
-        public CatalogoController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public CatalogoController(ISigebiApi api, IConfiguration configuration)
         {
-            _httpClientFactory = httpClientFactory;
+            _api = api;
             _configuration = configuration;
+        }
+
+        private string GetBearerToken()
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            return string.IsNullOrWhiteSpace(token) ? string.Empty : $"Bearer {token}";
         }
 
         public async Task<IActionResult> Index(string? busqueda)
@@ -34,36 +41,21 @@ namespace SIGEBI.Web.Controllers
 
             try
             {
-                var client = _httpClientFactory.CreateClient("SIGEBIAPI");
-                var token = HttpContext.Session.GetString("JwtToken");
+                var token = GetBearerToken();
+                if (string.IsNullOrEmpty(token)) return RedirectToAction("Login", "Auth");
 
-                if (string.IsNullOrWhiteSpace(token))
-                    return RedirectToAction("Login", "Auth");
+                // Consumo mediante Servicio (Punto 2 Actividades)
+                var dtos = string.IsNullOrWhiteSpace(busqueda)
+                    ? await _api.GetRecursosAsync(token)
+                    : await _api.BuscarRecursosAsync(busqueda, token);
 
-                client.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", token);
-
-                var url = string.IsNullOrWhiteSpace(busqueda)
-                    ? "api/Recursos"
-                    : $"api/Recursos/buscar?titulo={Uri.EscapeDataString(busqueda)}";
-
-                var response = await client.GetAsync(url);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    return View(model);
-                }
-
-                var json = await response.Content.ReadAsStringAsync();
-                model.Recursos = JsonSerializer.Deserialize<List<RecursoViewModel>>(
-                    json,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
-                    ?? new List<RecursoViewModel>();
+                model.Recursos = dtos.Select(MapDtoToViewModel).ToList();
 
                 return View(model);
             }
-            catch
+            catch (Exception)
             {
+                // En producción registraríamos el error
                 return View(model);
             }
         }
@@ -72,37 +64,19 @@ namespace SIGEBI.Web.Controllers
         {
             try
             {
-                var client = _httpClientFactory.CreateClient("SIGEBIAPI");
-                var token = HttpContext.Session.GetString("JwtToken");
+                var token = GetBearerToken();
+                if (string.IsNullOrEmpty(token)) return RedirectToAction("Login", "Auth");
 
-                if (string.IsNullOrWhiteSpace(token))
-                    return RedirectToAction("Login", "Auth");
+                // 1. Obtener detalles del recurso mediante servicio
+                var dto = await _api.GetRecursoAsync(id, token);
+                var recurso = MapDtoToViewModel(dto);
 
-                client.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", token);
-
-                // 1. Obtener detalles del recurso
-                var response = await client.GetAsync($"api/Recursos/{id}");
-                if (!response.IsSuccessStatusCode)
-                    return RedirectToAction("Index");
-
-                var json = await response.Content.ReadAsStringAsync();
-                var recurso = JsonSerializer.Deserialize<RecursoViewModel>(
-                    json,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                if (recurso == null)
-                    return RedirectToAction("Index");
-
-                // 2. Obtener valoraciones/comentarios
-                var valResponse = await client.GetAsync($"api/Valoraciones/recurso/{id}");
-                if (valResponse.IsSuccessStatusCode)
+                // 2. Obtener valoraciones mediante servicio
+                try 
                 {
-                    var valJson = await valResponse.Content.ReadAsStringAsync();
-                    recurso.Valoraciones = JsonSerializer.Deserialize<List<SIGEBI.Business.DTOs.ValoracionDTO>>(
-                        valJson,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
+                    recurso.Valoraciones = await _api.GetValoracionesAsync(id, token);
                 }
+                catch { /* Ignorar si no hay valoraciones */ }
 
                 ViewBag.ApiBaseUrl = _configuration["ApiSettings:BaseUrl"];
                 return View(recurso);
@@ -113,28 +87,51 @@ namespace SIGEBI.Web.Controllers
             }
         }
 
+        private RecursoViewModel MapDtoToViewModel(SIGEBI.Business.DTOs.RecursoDetalleDTO dto)
+        {
+            return new RecursoViewModel
+            {
+                Id = dto.Id,
+                Titulo = dto.Titulo,
+                Autor = dto.Autor,
+                CategoriaNombre = dto.CategoriaNombre,
+                Stock = dto.Stock,
+                Estado = dto.Estado,
+                TipoRecurso = dto.TipoRecurso,
+                ImagenUrl = dto.ImagenUrl,
+                Descripcion = dto.Descripcion,
+                ISBN = dto.ISBN,
+                Editorial = dto.Editorial,
+                Anio = dto.Anio,
+                Genero = dto.Genero,
+                ISSN = dto.ISSN,
+                NumeroEdicion = dto.NumeroEdicion,
+                Formato = dto.Formato,
+                Institucion = dto.Institucion,
+                PromedioValoraciones = dto.PromedioValoraciones
+            };
+        }
+
         [HttpPost]
         public async Task<IActionResult> SolicitarPrestamo(Guid recursoId)
         {
             try
             {
-                var client = _httpClientFactory.CreateClient("SIGEBIAPI");
-                var token = HttpContext.Session.GetString("JwtToken");
+                var token = GetBearerToken();
                 var usuarioId = HttpContext.Session.GetString("UsuarioId");
 
-                if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(usuarioId))
+                if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(usuarioId))
                     return Json(new { success = false, message = "Sesión expirada" });
 
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
                 var request = new { UsuarioId = Guid.Parse(usuarioId), RecursoId = recursoId };
-                var response = await client.PostAsJsonAsync("api/Prestamos", request);
+                await _api.SolicitarPrestamoAsync(request, token);
 
-                if (response.IsSuccessStatusCode)
-                    return Json(new { success = true });
-                
-                var error = await response.Content.ReadAsStringAsync();
-                return Json(new { success = false, message = "No se pudo procesar el préstamo: " + error });
+                return Json(new { success = true });
+            }
+            catch (ApiException apiEx)
+            {
+                var error = await apiEx.GetContentAsAsync<string>();
+                return Json(new { success = false, message = "No se pudo procesar el préstamo: " + (error ?? apiEx.ReasonPhrase) });
             }
             catch (Exception ex)
             {
@@ -147,14 +144,11 @@ namespace SIGEBI.Web.Controllers
         {
             try
             {
-                var client = _httpClientFactory.CreateClient("SIGEBIAPI");
-                var token = HttpContext.Session.GetString("JwtToken");
+                var token = GetBearerToken();
                 var usuarioId = HttpContext.Session.GetString("UsuarioId");
 
-                if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(usuarioId))
+                if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(usuarioId))
                     return RedirectToAction("Login", "Auth");
-
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
                 var request = new
                 {
@@ -164,7 +158,7 @@ namespace SIGEBI.Web.Controllers
                     Comentario = comentario
                 };
 
-                await client.PostAsJsonAsync("api/Valoraciones", request);
+                await _api.ValorarAsync(request, token);
                 return RedirectToAction("Detalle", new { id = recursoId });
             }
             catch
@@ -178,21 +172,17 @@ namespace SIGEBI.Web.Controllers
         {
             try
             {
-                var client = _httpClientFactory.CreateClient("SIGEBIAPI");
-                var token = HttpContext.Session.GetString("JwtToken");
-
-                if (string.IsNullOrWhiteSpace(token))
+                var token = GetBearerToken();
+                if (string.IsNullOrEmpty(token))
                     return Json(new { success = false, message = "Sesión expirada" });
 
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-                var response = await client.DeleteAsync($"api/Valoraciones/{id}");
-
-                if (response.IsSuccessStatusCode)
-                    return Json(new { success = true });
-
-                var error = await response.Content.ReadAsStringAsync();
-                return Json(new { success = false, message = "No se pudo eliminar: " + error });
+                await _api.EliminarValoracionAsync(id, token);
+                return Json(new { success = true });
+            }
+            catch (ApiException apiEx)
+            {
+                var error = await apiEx.GetContentAsAsync<string>();
+                return Json(new { success = false, message = "No se pudo eliminar: " + (error ?? apiEx.ReasonPhrase) });
             }
             catch (Exception ex)
             {
@@ -205,22 +195,19 @@ namespace SIGEBI.Web.Controllers
         {
             try
             {
-                var client = _httpClientFactory.CreateClient("SIGEBIAPI");
-                var token = HttpContext.Session.GetString("JwtToken");
+                var token = GetBearerToken();
                 var usuarioId = HttpContext.Session.GetString("UsuarioId");
 
-                if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(usuarioId))
+                if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(usuarioId))
                     return Json(new { success = false, message = "Sesión expirada" });
 
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-                var response = await client.PostAsync($"api/ListaDeseos/usuario/{usuarioId}/recurso/{recursoId}", null);
-
-                if (response.IsSuccessStatusCode)
-                    return Json(new { success = true });
-
-                var error = await response.Content.ReadAsStringAsync();
-                return Json(new { success = false, message = "No se pudo agregar a la lista: " + error });
+                await _api.AgregarAListaDeseosAsync(Guid.Parse(usuarioId), recursoId, token);
+                return Json(new { success = true });
+            }
+            catch (ApiException apiEx)
+            {
+                var error = await apiEx.GetContentAsAsync<string>();
+                return Json(new { success = false, message = "No se pudo agregar a la lista: " + (error ?? apiEx.ReasonPhrase) });
             }
             catch (Exception ex)
             {

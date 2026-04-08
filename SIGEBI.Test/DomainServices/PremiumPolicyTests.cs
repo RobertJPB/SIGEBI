@@ -8,9 +8,9 @@ using Xunit;
 
 namespace SIGEBI.Test.Domain
 {
-    public class PremiumPolicyTests
+    public class PrestamoPolicyTests
     {
-        // â”€â”€ HELPERS â”€â”€
+        // ── HELPERS ──
 
         private Usuario CrearUsuarioActivo(RolUsuario rol = RolUsuario.Estudiante)
             => new Usuario(Guid.NewGuid(), "Juan Perez", "juan@test.com", "hash123", rol);
@@ -18,7 +18,7 @@ namespace SIGEBI.Test.Domain
         private Penalizacion CrearPenalizacionActiva(Guid usuarioId)
             => new Penalizacion(Guid.NewGuid(), usuarioId, "Atraso", 5, DateTime.UtcNow, null);
 
-        // â”€â”€ PUEDE REALIZAR PRESTAMO â”€â”€
+        // ── PUEDE REALIZAR PRESTAMO ──
 
         [Fact]
         public void PuedeRealizarPrestamo_UsuarioActivoSinPrestamos_DevuelveTrue()
@@ -50,6 +50,37 @@ namespace SIGEBI.Test.Domain
         }
 
         [Fact]
+        public void PuedeRealizarPrestamo_DocenteConOchoPrestamos_DevuelveTrue()
+        {
+            // Arrange
+            var usuario = CrearUsuarioActivo(RolUsuario.Docente);
+            var prestamos = Enumerable.Range(0, 8)
+                .Select(_ => new Prestamo(Guid.NewGuid(), usuario.Id, Guid.NewGuid(), 7, DateTime.UtcNow))
+                .ToList();
+
+            // Act
+            var resultado = PrestamoPolicy.PuedeRealizarPrestamo(usuario, prestamos);
+
+            // Assert
+            resultado.Should().BeTrue(); // Límite es 10 para docentes
+        }
+
+        [Fact]
+        public void PuedeRealizarPrestamo_ConPrestamoAtrasado_DevuelveFalse()
+        {
+            // Arrange
+            var usuario = CrearUsuarioActivo(RolUsuario.Docente);
+            var prestamoVencido = new Prestamo(Guid.NewGuid(), usuario.Id, Guid.NewGuid(), 15, DateTime.UtcNow.AddDays(-20));
+            prestamoVencido.MarcarAtrasadoSiAplica(DateTime.UtcNow);
+
+            // Act
+            var resultado = PrestamoPolicy.PuedeRealizarPrestamo(usuario, new List<Prestamo> { prestamoVencido });
+
+            // Assert
+            resultado.Should().BeFalse();
+        }
+
+        [Fact]
         public void PuedeRealizarPrestamo_UsuarioBloqueado_DevuelveFalse()
         {
             // Arrange
@@ -63,7 +94,7 @@ namespace SIGEBI.Test.Domain
             resultado.Should().BeFalse();
         }
 
-        // â”€â”€ TIENE PENALIZACION ACTIVA â”€â”€
+        // ── TIENE PENALIZACION ACTIVA ──
 
         [Fact]
         public void TienePenalizacionActiva_SinPenalizaciones_DevuelveFalse()
@@ -88,27 +119,27 @@ namespace SIGEBI.Test.Domain
             resultado.Should().BeTrue();
         }
 
-        // â”€â”€ OBTENER DIAS PLAZO â”€â”€
+        // ── OBTENER DIAS PLAZO ──
 
         [Fact]
-        public void ObtenerDiasPlazo_Estudiante_DevuelteQuinceDias()
+        public void ObtenerDiasPlazo_Estudiante_DevuelveQuinceDias()
         {
-            var dias = PrestamoPolicy.ObtenerDiasPlazo();
+            var dias = PrestamoPolicy.ObtenerDiasPlazo(RolUsuario.Estudiante);
             dias.Should().Be(15);
         }
 
         [Fact]
-        public void ObtenerDiasPlazo_Administrador_DevuelveQuinceDias()
+        public void ObtenerDiasPlazo_Docente_DevuelveTreintaDias()
         {
-            var dias = PrestamoPolicy.ObtenerDiasPlazo();
-            dias.Should().Be(15);
+            var dias = PrestamoPolicy.ObtenerDiasPlazo(RolUsuario.Docente);
+            dias.Should().Be(30);
         }
 
         [Fact]
-        public void ObtenerDiasPlazo_Bibliotecario_DevuelteQuinceDias()
+        public void ObtenerDiasPlazo_Administrador_DevuelveTreintaDias()
         {
-            var dias = PrestamoPolicy.ObtenerDiasPlazo();
-            dias.Should().Be(15);
+            var dias = PrestamoPolicy.ObtenerDiasPlazo(RolUsuario.Administrador);
+            dias.Should().Be(30);
         }
     }
 }

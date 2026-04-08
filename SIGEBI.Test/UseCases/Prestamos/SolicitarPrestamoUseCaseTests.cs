@@ -21,6 +21,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
         private readonly Mock<IRecursoRepository> _recursoRepo;
         private readonly Mock<IPenalizacionRepository> _penalizacionRepo;
         private readonly Mock<INotificacionRepository> _notificacionRepo;
+        private readonly Mock<ISolicitudAccesoRepository> _solicitudAccesoRepo;
         private readonly Mock<IEmailAdapter> _emailAdapter;
         private readonly Mock<IUnitOfWork> _unitOfWork;
         private readonly SolicitarPrestamoUseCase _useCase;
@@ -32,8 +33,12 @@ namespace SIGEBI.Test.UseCases.Prestamos
             _recursoRepo = new Mock<IRecursoRepository>();
             _penalizacionRepo = new Mock<IPenalizacionRepository>();
             _notificacionRepo = new Mock<INotificacionRepository>();
+            _solicitudAccesoRepo = new Mock<ISolicitudAccesoRepository>();
             _emailAdapter = new Mock<IEmailAdapter>();
             _unitOfWork = new Mock<IUnitOfWork>();
+
+            // Setup UnitOfWork
+            _unitOfWork.Setup(u => u.SolicitudesAcceso).Returns(_solicitudAccesoRepo.Object);
 
             _useCase = new SolicitarPrestamoUseCase(
                 _prestamoRepo.Object,
@@ -66,7 +71,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
 
             _usuarioRepo.Setup(r => r.GetByIdAsync(usuario.Id)).ReturnsAsync(usuario);
             _recursoRepo.Setup(r => r.GetByIdAsync(libro.Id)).ReturnsAsync(libro);
-            _prestamoRepo.Setup(r => r.GetActivosByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Prestamo>());
+            _prestamoRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Prestamo>());
             _penalizacionRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Penalizacion>());
             _prestamoRepo.Setup(r => r.AddAsync(It.IsAny<Prestamo>())).Returns(Task.CompletedTask);
             _unitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
@@ -114,7 +119,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
 
             _usuarioRepo.Setup(r => r.GetByIdAsync(usuario.Id)).ReturnsAsync(usuario);
             _recursoRepo.Setup(r => r.GetByIdAsync(libro.Id)).ReturnsAsync(libro);
-            _prestamoRepo.Setup(r => r.GetActivosByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Prestamo>());
+            _prestamoRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Prestamo>());
             _penalizacionRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Penalizacion> { penalizacion });
 
             // Act & Assert
@@ -131,7 +136,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
 
             _usuarioRepo.Setup(r => r.GetByIdAsync(usuario.Id)).ReturnsAsync(usuario);
             _recursoRepo.Setup(r => r.GetByIdAsync(libro.Id)).ReturnsAsync(libro);
-            _prestamoRepo.Setup(r => r.GetActivosByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Prestamo>());
+            _prestamoRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Prestamo>());
             _penalizacionRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Penalizacion>());
 
             // Act & Assert
@@ -149,7 +154,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
 
             _usuarioRepo.Setup(r => r.GetByIdAsync(usuario.Id)).ReturnsAsync(usuario);
             _recursoRepo.Setup(r => r.GetByIdAsync(libro.Id)).ReturnsAsync(libro);
-            _prestamoRepo.Setup(r => r.GetActivosByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Prestamo>());
+            _prestamoRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Prestamo>());
             _penalizacionRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Penalizacion>());
             _prestamoRepo.Setup(r => r.AddAsync(It.IsAny<Prestamo>())).Returns(Task.CompletedTask);
             _unitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
@@ -170,7 +175,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
 
             _usuarioRepo.Setup(r => r.GetByIdAsync(usuario.Id)).ReturnsAsync(usuario);
             _recursoRepo.Setup(r => r.GetByIdAsync(libro.Id)).ReturnsAsync(libro);
-            _prestamoRepo.Setup(r => r.GetActivosByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Prestamo>());
+            _prestamoRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Prestamo>());
             _penalizacionRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Penalizacion>());
             _prestamoRepo.Setup(r => r.AddAsync(It.IsAny<Prestamo>())).Returns(Task.CompletedTask);
             _unitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
@@ -197,6 +202,31 @@ namespace SIGEBI.Test.UseCases.Prestamos
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
                 _useCase.EjecutarAsync(usuario.Id, libro.Id, fechaExcedida));
+        }
+
+        [Fact]
+        public async Task Ejecutar_UsuarioConPrestamoVencido_LanzaExcepcion()
+        {
+            // Arrange
+            var usuario = CrearUsuarioActivo();
+            var libro = CrearLibroDisponible();
+            
+            // Simulamos un préstamo vencido
+            var prestamoVencido = new Prestamo(Guid.NewGuid(), usuario.Id, Guid.NewGuid(), 15, DateTime.UtcNow.AddDays(-20));
+            prestamoVencido.MarcarAtrasadoSiAplica(DateTime.UtcNow);
+
+            _usuarioRepo.Setup(r => r.GetByIdAsync(usuario.Id)).ReturnsAsync(usuario);
+            _recursoRepo.Setup(r => r.GetByIdAsync(libro.Id)).ReturnsAsync(libro);
+            _prestamoRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Prestamo> { prestamoVencido });
+            _penalizacionRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Penalizacion>());
+
+            // Act & Assert
+            var action = () => _useCase.EjecutarAsync(usuario.Id, libro.Id);
+            await action.Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*vencida*");
+                
+            // Verificar que se registró el rechazo en la trazabilidad
+            _solicitudAccesoRepo.Verify(r => r.AddAsync(It.Is<SolicitudAcceso>(s => !s.FueAprobada)), Times.Once);
         }
     }
 }

@@ -11,20 +11,30 @@ namespace SIGEBI.Domain.DomainServices
 {
     public class PrestamoPolicy
     {
-        private const int MaxPrestamosPorEstudiante = 3;
+        // Límites dinámicos por rol
+        private const int MaxPrestamosEstudiante = 3;
+        private const int MaxPrestamosDocente = 10;
         private const int DiasPlazoEstudiante = 15;
+        private const int DiasPlazoDocente = 30;
+
         public const int MaxDiasPrestamoTotal = 30;
 
-        public static bool PuedeRealizarPrestamo(Usuario usuario, IEnumerable<Prestamo> prestamosActivos)
+        public static bool PuedeRealizarPrestamo(Usuario usuario, IEnumerable<Prestamo> historialUsuario)
         {
             if (usuario.Estado != EstadoUsuario.Activo)
                 return false;
 
-            var activos = prestamosActivos.Count(p =>
+            // REGLA: El acceso está condicionado por la existencia de préstamos vencidos.
+            if (historialUsuario.Any(p => p.EstadoActual == EstadoPrestamo.Atrasado))
+                return false;
+
+            int limite = usuario.Rol == RolUsuario.Docente ? MaxPrestamosDocente : MaxPrestamosEstudiante;
+
+            var activos = historialUsuario.Count(p =>
                 p.EstadoActual == EstadoPrestamo.Activo ||
                 p.EstadoActual == EstadoPrestamo.Atrasado);
 
-            return activos < MaxPrestamosPorEstudiante;
+            return activos < limite;
         }
 
         public static bool TienePenalizacionActiva(IEnumerable<Penalizacion> penalizaciones)
@@ -33,28 +43,39 @@ namespace SIGEBI.Domain.DomainServices
                 p.Estado == EstadoPenalizacion.Activa);
         }
 
-        public static int ObtenerDiasPlazo()
+        public static int ObtenerDiasPlazo(RolUsuario rol)
         {
-            return DiasPlazoEstudiante;
+            return rol == RolUsuario.Docente ? DiasPlazoDocente : DiasPlazoEstudiante;
         }
 
         public static void ValidarPrestamo(Usuario usuario, RecursoBibliografico recurso,
-            IEnumerable<Prestamo> prestamosActivos, IEnumerable<Penalizacion> penalizaciones)
+            IEnumerable<Prestamo> historialUsuario, IEnumerable<Penalizacion> penalizaciones)
         {
-            // Primero verificamos si el usuario no esta castigado
+            // 1. Estado activo del usuario
+            if (usuario.Estado != EstadoUsuario.Activo)
+                throw new InvalidOperationException("El usuario debe estar en estado Activo para solicitar préstamos.");
+
+            // 2. Existencia de préstamos vencidos
+            if (historialUsuario.Any(p => p.EstadoActual == EstadoPrestamo.Atrasado))
+                throw new InvalidOperationException("El usuario tiene al menos una devolución vencida y no puede realizar nuevos préstamos.");
+
+            // 3. Existencia de penalizaciones activas
             if (TienePenalizacionActiva(penalizaciones))
-                throw new InvalidOperationException("El usuario tiene una penalización activa y no puede realizar préstamos.");
+                throw new InvalidOperationException("El usuario tiene una penalización activa y el acceso está restringido.");
 
-            // Luego vemos si no excedio su limite
-            if (!PuedeRealizarPrestamo(usuario, prestamosActivos))
-                throw new InvalidOperationException($"El usuario ha alcanzado el límite de {MaxPrestamosPorEstudiante} préstamos permitidos.");
+            // 4. Límite excedido según rol
+            if (!PuedeRealizarPrestamo(usuario, historialUsuario))
+            {
+                int limite = usuario.Rol == RolUsuario.Docente ? MaxPrestamosDocente : MaxPrestamosEstudiante;
+                throw new InvalidOperationException($"El usuario ha alcanzado el límite máximo de {limite} préstamos permitidos para su rol.");
+            }
 
-            // TODO: Revisar si el estado Disponible es suficiente o si hay que chequear algo mas
-            if (recurso.Estado != EstadoRecurso.Disponible)
-                throw new InvalidOperationException("El recurso no está disponible para préstamo.");
-
+            // 5. Disponibilidad del recurso
             if (recurso.Stock <= 0)
                 throw new InvalidOperationException("No hay stock disponible del recurso.");
+            
+            if (recurso.Estado != EstadoRecurso.Disponible)
+                throw new InvalidOperationException("El recurso no se encuentra en estado Disponible.");
         }
     }
 }

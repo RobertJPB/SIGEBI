@@ -8,23 +8,28 @@ namespace SIGEBI.Views.GestionBibliografica
 {
     public partial class EditarDocumentoDialog : Window
     {
-        private readonly ApiService _api;
+        private readonly ResourceUploadService _api;
+        private readonly ISigebiApi _sigebiApi;
         private readonly RecursoDetalleDTO _recurso;
         private byte[]? _imagenBytes;
         private string? _imagenNombre;
 
-        public EditarDocumentoDialog() : this((ApiService)SIGEBI.App.Current.Services.GetService(typeof(ApiService))!, new RecursoDetalleDTO()) { }
+        public EditarDocumentoDialog() : this(
+            (ResourceUploadService)SIGEBI.App.Current.Services.GetService(typeof(ResourceUploadService))!,
+            (ISigebiApi)SIGEBI.App.Current.Services.GetService(typeof(ISigebiApi))!,
+            new RecursoDetalleDTO()) { }
 
-        public EditarDocumentoDialog(ApiService api, RecursoDetalleDTO recurso)
+        public EditarDocumentoDialog(ResourceUploadService api, ISigebiApi sigebiApi, RecursoDetalleDTO recurso)
         {
             InitializeComponent();
             _api = api;
+            _sigebiApi = sigebiApi;
             _recurso = recurso;
             Loaded += async (s, e) =>
             {
                 try
                 {
-                    var categorias = await _api.GetCategoriasAsync();
+                    var categorias = await _sigebiApi.GetCategoriasAsync();
                     CmbCategoria.ItemsSource = categorias;
                     CmbCategoria.SelectedValue = recurso.CategoriaId;
                 }

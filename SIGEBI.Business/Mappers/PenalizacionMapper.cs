@@ -1,4 +1,4 @@
-﻿using SIGEBI.Business.DTOs;
+using SIGEBI.Business.DTOs;
 using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Business.Mappers

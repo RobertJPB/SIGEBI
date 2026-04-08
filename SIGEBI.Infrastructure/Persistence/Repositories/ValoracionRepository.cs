@@ -33,4 +33,4 @@ namespace SIGEBI.Infrastructure.Persistence.Repositories
                 .ToDictionaryAsync(x => x.RecursoId, x => x.Promedio);
         }
     }
-}
+}

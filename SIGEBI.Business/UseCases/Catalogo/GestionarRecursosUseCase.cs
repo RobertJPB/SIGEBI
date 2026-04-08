@@ -13,6 +13,7 @@ namespace SIGEBI.Business.UseCases.Catalogo
     public class GestionarRecursosUseCase : IGestionarRecursosUseCase
     {
         private readonly IRecursoRepository _recursoRepository;
+        private readonly IPrestamoRepository _prestamoRepository;
         private readonly ICategoriaRepository _categoriaRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMemoryCache _cache;
@@ -20,12 +21,14 @@ namespace SIGEBI.Business.UseCases.Catalogo
 
         public GestionarRecursosUseCase(
             IRecursoRepository recursoRepository,
+            IPrestamoRepository prestamoRepository,
             ICategoriaRepository categoriaRepository,
             IUnitOfWork unitOfWork,
             IMemoryCache cache,
             IGuidGenerator guidGenerator)
         {
             _recursoRepository = recursoRepository;
+            _prestamoRepository = prestamoRepository;
             _categoriaRepository = categoriaRepository;
             _unitOfWork = unitOfWork;
             _cache = cache;
@@ -158,6 +161,14 @@ namespace SIGEBI.Business.UseCases.Catalogo
         {
             var recurso = await _recursoRepository.GetByIdAsync(recursoId)
                 ?? throw new KeyNotFoundException("Recurso no encontrado.");
+
+            // REGLA: No se permite la eliminación de recursos con préstamos activos.
+            var prestamosActivos = await _prestamoRepository.GetActivosByRecursoIdAsync(recursoId);
+            if (prestamosActivos.Any())
+            {
+                throw new InvalidOperationException("No se puede eliminar el recurso porque tiene préstamos activos o vencidos pendientes de devolución.");
+            }
+
             _recursoRepository.Delete(recurso);
             await _unitOfWork.SaveChangesAsync();
             

@@ -142,6 +142,30 @@ namespace SIGEBI.Services
             var response = await _httpClient.DeleteAsync($"api/Usuarios/{id}");
             response.EnsureSuccessStatusCode();
         }
+        
+        public async Task ActivarUsuarioAsync(Guid id)
+        {
+            var response = await _httpClient.PutAsync($"api/Usuarios/{id}/activar", null);
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task DesactivarUsuarioAsync(Guid id)
+        {
+            var response = await _httpClient.PutAsync($"api/Usuarios/{id}/desactivar", null);
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task BloquearUsuarioAsync(Guid id)
+        {
+            var response = await _httpClient.PutAsync($"api/Usuarios/{id}/bloquear", null);
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task CambiarRolUsuarioAsync(Guid id, int nuevoRol)
+        {
+            var response = await PostJsonAsync($"api/Usuarios/{id}/rol", nuevoRol);
+            response.EnsureSuccessStatusCode();
+        }
 
         public async Task ActualizarFotoPerfilAsync(byte[] imageBytes, string fileName)
         {

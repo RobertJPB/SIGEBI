@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Caching.Memory;
 using FluentAssertions;
 using Moq;
 using SIGEBI.Business.Interfaces.Persistence;

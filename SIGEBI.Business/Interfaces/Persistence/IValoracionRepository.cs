@@ -9,4 +9,4 @@ namespace SIGEBI.Business.Interfaces.Persistence
         Task<double> GetPromedioCalificacionAsync(Guid recursoId);
         Task<Dictionary<Guid, double>> GetPromediosBatchAsync(IEnumerable<Guid> recursoIds);
     }
-}
+}

@@ -1,4 +1,4 @@
-﻿namespace SIGEBI.Business.DTOs
+namespace SIGEBI.Business.DTOs
 {
     public class CategoriaDTO
     {

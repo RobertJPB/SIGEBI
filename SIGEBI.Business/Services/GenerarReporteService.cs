@@ -1,13 +1,13 @@
 using SIGEBI.Business.DTOs;
-using SIGEBI.Business.UseCases.Usuarios;
+using SIGEBI.Business.Interfaces.UseCases.Usuarios;
 
 namespace SIGEBI.Business.Services
 {
     public class GenerarReportesService
     {
-        private readonly GenerarReportesUseCase _generarReportesUseCase;
+        private readonly IGenerarReportesUseCase _generarReportesUseCase;
 
-        public GenerarReportesService(GenerarReportesUseCase generarReportesUseCase)
+        public GenerarReportesService(IGenerarReportesUseCase generarReportesUseCase)
         {
             _generarReportesUseCase = generarReportesUseCase;
         }

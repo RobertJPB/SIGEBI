@@ -1,4 +1,4 @@
-﻿using SIGEBI.Domain.Entities;
+using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Business.Interfaces.Services
 {
