@@ -7,7 +7,7 @@ namespace SIGEBI.Business.DTOs
         public Guid UsuarioId { get; set; }
         public string NombreUsuario { get; set; } = string.Empty;
         public string Motivo { get; set; } = string.Empty;
-        public decimal Monto { get; set; }
+        public int DiasSancion { get; set; }
         public DateTime FechaDesde { get; set; }
         public DateTime? FechaHasta { get; set; }
         public string Estado { get; set; } = string.Empty;

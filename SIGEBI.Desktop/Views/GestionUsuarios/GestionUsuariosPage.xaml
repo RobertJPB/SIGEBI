@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:SIGEBI.Views.GestionUsuarios"
+      xmlns:conv="clr-namespace:SIGEBI.Converters"
       mc:Ignorable="d" 
       d:DesignHeight="600" d:DesignWidth="900"
       Title="Gestión de Usuarios"
@@ -11,6 +12,25 @@
 
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <conv:ApiUrlConverter x:Key="ApiUrlConv"/>
+
+        <Style x:Key="BtnTableAccion" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}"
+                                BorderBrush="{TemplateBinding Foreground}" BorderThickness="1">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         
         <Style x:Key="BtnPrimario" TargetType="Button">
             <Setter Property="Background" Value="#1a5c2e"/>
@@ -125,7 +145,7 @@
                                         <Border Width="34" Height="34" CornerRadius="17" Background="#e8f5ee" ClipToBounds="True">
                                             <Grid>
                                                 <TextBlock Text="👤" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#1a5c2e"/>
-                                                <Image Source="{Binding ImagenUrl}" Stretch="UniformToFill"/>
+                                                <Image Source="{Binding ImagenUrl, Converter={StaticResource ApiUrlConv}}" Stretch="UniformToFill"/>
                                             </Grid>
                                         </Border>
                                         <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
@@ -188,27 +208,28 @@
                         </DataGridTemplateColumn>
 
                         <!-- Acciones -->
-                        <DataGridTemplateColumn Header="Acciones" Width="180">
+                        <DataGridTemplateColumn Header="Acciones" Width="280">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                         <!-- Activar/Desactivar -->
-                                        <Button Content="🔓" ToolTip="Activar" Foreground="#1e8e3e"
+                                        <Button Content="Activar" ToolTip="Activar cuenta" Foreground="#1e8e3e"
                                                 Command="{Binding DataContext.ActivarCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                                CommandParameter="{Binding Id}">
+                                                CommandParameter="{Binding Id}" Margin="0,0,4,0">
                                             <Button.Style>
-                                                <Style TargetType="Button" BasedOn="{StaticResource BtnIcon}">
+                                                <Style TargetType="Button" BasedOn="{StaticResource BtnTableAccion}">
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding Estado}" Value="1"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
                                             </Button.Style>
                                         </Button>
-                                        <Button Content="🔒" ToolTip="Desactivar" Foreground="#f9ab00"
+
+                                        <Button Content="Desactivar" ToolTip="Desactivar cuenta" Foreground="#f9ab00"
                                                 Command="{Binding DataContext.DesactivarCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                                CommandParameter="{Binding Id}">
+                                                CommandParameter="{Binding Id}" Margin="0,0,4,0">
                                             <Button.Style>
-                                                <Style TargetType="Button" BasedOn="{StaticResource BtnIcon}">
+                                                <Style TargetType="Button" BasedOn="{StaticResource BtnTableAccion}">
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding Estado}" Value="0"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger>
                                                         <DataTrigger Binding="{Binding Estado}" Value="2"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger>
@@ -218,11 +239,11 @@
                                         </Button>
 
                                         <!-- Bloquear -->
-                                        <Button Content="🚫" ToolTip="Bloquear" Foreground="#d93025"
+                                        <Button Content="Bloquear" ToolTip="Bloquear acceso" Foreground="#d93025"
                                                 Command="{Binding DataContext.BloquearCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                                 CommandParameter="{Binding Id}" Margin="4,0">
                                             <Button.Style>
-                                                <Style TargetType="Button" BasedOn="{StaticResource BtnIcon}">
+                                                <Style TargetType="Button" BasedOn="{StaticResource BtnTableAccion}">
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding Estado}" Value="2"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger>
                                                     </Style.Triggers>
@@ -230,11 +251,11 @@
                                             </Button.Style>
                                         </Button>
 
-                                        <Rectangle Width="1" Height="20" Fill="#eee" Margin="4,0"/>
+                                        <Rectangle Width="1" Height="20" Fill="#eee" Margin="8,0"/>
 
-                                        <Button Content="🗑️" ToolTip="Eliminar" Style="{StaticResource BtnIcon}" Foreground="#777"
+                                        <Button Content="Eliminar" Style="{StaticResource BtnTableAccion}" Foreground="#777"
                                                 Command="{Binding DataContext.EliminarCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                                CommandParameter="{Binding Id}"/>
+                                                CommandParameter="{Binding Id}" Margin="4,0"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>

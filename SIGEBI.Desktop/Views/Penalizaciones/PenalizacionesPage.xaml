@@ -80,15 +80,15 @@
                 <TextBlock Text="{Binding Contador}" FontSize="12" Foreground="#7a9e84" Margin="0,2,0,0"/>
             </StackPanel>
 
-            <Button Grid.Column="1" Content="⚙️ Ejecutar Proceso de Sanción" Style="{StaticResource BtnPrimario}" 
+            <Button Grid.Column="1" Content="âš™ï¸ Ejecutar Proceso de SanciÃ³n" Style="{StaticResource BtnPrimario}" 
                     Command="{Binding AplicarPenalizacionesCommand}" VerticalAlignment="Center"/>
         </Grid>
 
         <!-- INFO BOX -->
         <Border Grid.Row="1" Background="#e8f5ee" CornerRadius="8" Margin="0,0,0,20" Padding="15">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="ℹ️" FontSize="18" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                <TextBlock Text="El proceso de sanción revisa todos los préstamos atrasados y aplica las multas correspondientes de forma automática." 
+                <TextBlock Text="â„¹ï¸" FontSize="18" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBlock Text="El proceso de sanciÃ³n revisa todos los prÃ©stamos atrasados y aplica las suspensiones correspondientes de forma automÃ¡tica." 
                            VerticalAlignment="Center" Foreground="#1a5c2e" FontSize="13" TextWrapping="Wrap"/>
             </StackPanel>
         </Border>
@@ -117,10 +117,10 @@
                         <DataGridTextColumn Header="Motivo / Recurso" Binding="{Binding Motivo}" Width="3*"/>
 
                         <!-- Monto -->
-                        <DataGridTemplateColumn Header="Monto" Width="120">
+                        <DataGridTemplateColumn Header="Suspensión" Width="120">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Monto, StringFormat='{}{0:C}'}" VerticalAlignment="Center" FontWeight="Bold" Foreground="#d93025"/>
+                                    <TextBlock Text="{Binding DiasSancion, StringFormat='{}{0} días'}" VerticalAlignment="Center" FontWeight="Bold" Foreground="#d93025"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -156,7 +156,7 @@
                         <DataGridTemplateColumn Header="Acciones" Width="100">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Content="✅" ToolTip="Finalizar y Marcar como Pagado" Foreground="#1e8e3e"
+                                    <Button Content="✅" ToolTip="Finalizar y Levantar Sanción" Foreground="#1e8e3e"
                                             Command="{Binding DataContext.FinalizarCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                             CommandParameter="{Binding Id}">
                                         <Button.Style>

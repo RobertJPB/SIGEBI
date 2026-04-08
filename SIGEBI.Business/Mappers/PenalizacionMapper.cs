@@ -19,7 +19,7 @@ namespace SIGEBI.Business.Mappers
                 UsuarioId = penalizacion.UsuarioId,
                 NombreUsuario = penalizacion.Usuario?.Nombre ?? string.Empty,
                 Motivo = penalizacion.Motivo,
-                Monto = SIGEBI.Domain.DomainServices.PenalizacionCalculator.CalcularMonto(diasPenalizacion),
+                DiasSancion = diasPenalizacion,
                 FechaDesde = penalizacion.FechaInicio,
                 FechaHasta = penalizacion.FechaFin,
                 Estado = penalizacion.Estado.ToString()
