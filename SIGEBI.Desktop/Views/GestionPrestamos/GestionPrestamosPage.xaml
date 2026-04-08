@@ -81,6 +81,30 @@
             </StackPanel>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <!-- Buscador de Préstamos -->
+                <Border BorderBrush="#dde8e2" BorderThickness="1" CornerRadius="6" Background="White" Margin="0,0,12,0" Width="220" Height="34">
+                    <Grid>
+                        <TextBox Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" 
+                                 BorderThickness="0" Background="Transparent" VerticalAlignment="Center" 
+                                 Padding="10,0,30,0" FontSize="12" Foreground="#2c3e50" />
+                        <TextBlock Text="🔍 Buscar préstamo..." IsHitTestVisible="False" VerticalAlignment="Center" Margin="12,0,0,0" FontSize="12" Foreground="#aab7b0">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SearchQuery}" Value="">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding SearchQuery}" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                </Border>
+                
                 <Button Content="+ Registrar Préstamo" Style="{StaticResource BtnPrimario}" Click="BtnRegistrarPrestamo_Click"/>
             </StackPanel>
         </Grid>

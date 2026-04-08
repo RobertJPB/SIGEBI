@@ -44,7 +44,7 @@ namespace SIGEBI.Web.Controllers
                 var token = GetBearerToken();
                 if (string.IsNullOrEmpty(token)) return RedirectToAction("Login", "Auth");
 
-                // Consumo mediante Servicio (Punto 2 Actividades)
+                // Consumo mediante Servicio 
                 var dtos = string.IsNullOrWhiteSpace(busqueda)
                     ? await _api.GetRecursosAsync(token)
                     : await _api.BuscarRecursosAsync(busqueda, token);

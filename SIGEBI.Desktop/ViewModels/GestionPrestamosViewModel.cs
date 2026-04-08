@@ -12,11 +12,40 @@ namespace SIGEBI.ViewModels
     {
         private readonly ISigebiApi _api;
 
+        private IEnumerable<PrestamoResponseDTO> _todosLosPrestamos = Array.Empty<PrestamoResponseDTO>();
+
         [ObservableProperty]
         private ObservableCollection<PrestamoResponseDTO> _prestamos = new();
 
         [ObservableProperty]
         private string _contador = "0 préstamos";
+
+        [ObservableProperty]
+        private string _searchQuery = string.Empty;
+
+        partial void OnSearchQueryChanged(string value)
+        {
+            FiltrarResultados();
+        }
+
+        private void FiltrarResultados()
+        {
+            if (string.IsNullOrWhiteSpace(SearchQuery))
+            {
+                Prestamos = new ObservableCollection<PrestamoResponseDTO>(_todosLosPrestamos);
+            }
+            else
+            {
+                var query = SearchQuery.ToLowerInvariant();
+                var filtrados = _todosLosPrestamos.Where(p => 
+                    (p.NombreUsuario?.ToLowerInvariant().Contains(query) == true) ||
+                    (p.TituloRecurso?.ToLowerInvariant().Contains(query) == true) ||
+                    (p.Estado?.ToLowerInvariant().Contains(query) == true));
+                
+                Prestamos = new ObservableCollection<PrestamoResponseDTO>(filtrados);
+            }
+            Contador = $"{Prestamos.Count} préstamos visualizados";
+        }
 
         public GestionPrestamosViewModel(ISigebiApi api)
         {
@@ -32,8 +61,8 @@ namespace SIGEBI.ViewModels
                 IsBusy = true;
                 LimpiarError();
                 var data = await _api.GetPrestamosAsync();
-                Prestamos = new ObservableCollection<PrestamoResponseDTO>(data);
-                Contador = $"{Prestamos.Count} préstamos";
+                _todosLosPrestamos = data;
+                FiltrarResultados();
             }
             catch (Exception ex)
             {

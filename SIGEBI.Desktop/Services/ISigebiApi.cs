@@ -76,6 +76,12 @@ namespace SIGEBI.Services
         [Patch("/api/Penalizaciones/{id}/finalizar")]
         Task FinalizarPenalizacionAsync(Guid id);
 
+        [Delete("/api/Penalizaciones/{id}")]
+        Task EliminarPenalizacionAsync(Guid id);
+
+        [Post("/api/Penalizaciones")]
+        Task AplicarPenalizacionManualAsync([Body] AplicarPenalizacionManualDTO dto);
+
         [Post("/api/Penalizaciones/aplicar")]
         Task AplicarPenalizacionesAsync();
 

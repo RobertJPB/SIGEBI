@@ -12,8 +12,34 @@ namespace SIGEBI.ViewModels
     {
         private readonly ISigebiApi _api;
 
+        private IEnumerable<PenalizacionDTO> _todasLasPenalizaciones = Array.Empty<PenalizacionDTO>();
+
         [ObservableProperty] private ObservableCollection<PenalizacionDTO> _penalizaciones = new();
         [ObservableProperty] private string _contador = "0 penalizaciones";
+        [ObservableProperty] private string _searchQuery = string.Empty;
+
+        partial void OnSearchQueryChanged(string value)
+        {
+            FiltrarResultados();
+        }
+
+        private void FiltrarResultados()
+        {
+            if (string.IsNullOrWhiteSpace(SearchQuery))
+            {
+                Penalizaciones = new ObservableCollection<PenalizacionDTO>(_todasLasPenalizaciones);
+            }
+            else
+            {
+                var query = SearchQuery.ToLowerInvariant();
+                var filtrados = _todasLasPenalizaciones.Where(p => 
+                    (p.NombreUsuario?.ToLowerInvariant().Contains(query) == true) ||
+                    (p.Motivo?.ToLowerInvariant().Contains(query) == true));
+                
+                Penalizaciones = new ObservableCollection<PenalizacionDTO>(filtrados);
+            }
+            Contador = $"{Penalizaciones.Count} penalizaciones visualizadas";
+        }
 
         public PenalizacionesViewModel(ISigebiApi api)
         {
@@ -29,8 +55,8 @@ namespace SIGEBI.ViewModels
                 IsBusy = true;
                 LimpiarError();
                 var data = await _api.GetPenalizacionesAsync();
-                Penalizaciones = new ObservableCollection<PenalizacionDTO>(data);
-                Contador = $"{Penalizaciones.Count} penalizaciones";
+                _todasLasPenalizaciones = data;
+                FiltrarResultados();
             }
             catch (Exception ex)
             {
@@ -74,5 +100,50 @@ namespace SIGEBI.ViewModels
             }
         }
 
+        [RelayCommand]
+        public async Task EliminarAsync(Guid id)
+        {
+            var warning = System.Windows.MessageBox.Show("¿Estás seguro de eliminar esta penalización permanentemente?", "Confirmación", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Warning);
+            if (warning != System.Windows.MessageBoxResult.Yes) return;
+
+            try
+            {
+                IsBusy = true;
+                await _api.EliminarPenalizacionAsync(id);
+                await CargarPenalizacionesAsync();
+            }
+            catch (Exception ex)
+            {
+                await ManejarErrorAsync(ex, "eliminar penalización");
+                IsBusy = false;
+            }
+        }
+
+        [RelayCommand]
+        public void AbrirAplicarManual()
+        {
+            var modal = new SIGEBI.Views.Penalizaciones.AplicarPenalizacionWindow
+            {
+                DataContext = this,
+                Owner = System.Windows.Application.Current.MainWindow
+            };
+            modal.ShowDialog();
+        }
+
+        [RelayCommand]
+        public async Task AplicarManualAsync(AplicarPenalizacionManualDTO dto)
+        {
+            try
+            {
+                IsBusy = true;
+                await _api.AplicarPenalizacionManualAsync(dto);
+                await CargarPenalizacionesAsync();
+            }
+            catch (Exception ex)
+            {
+                await ManejarErrorAsync(ex, "aplicar penalización manual");
+                IsBusy = false;
+            }
+        }
     }
 }
