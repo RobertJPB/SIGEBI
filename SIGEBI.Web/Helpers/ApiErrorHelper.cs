@@ -8,9 +8,9 @@ namespace SIGEBI.Web.Helpers
         public static Task<string> GetErrorMessageAsync(ApiException apiEx)
         {
             if (string.IsNullOrWhiteSpace(apiEx.Content))
-                return Task.FromResult(apiEx.ReasonPhrase);
+                return Task.FromResult(apiEx.ReasonPhrase ?? "Error de red");
 
-            return Task.FromResult(ParseJsonError(apiEx.Content) ?? apiEx.ReasonPhrase);
+            return Task.FromResult(ParseJsonError(apiEx.Content) ?? apiEx.ReasonPhrase ?? "Error en el servidor");
         }
 
         public static async Task<string> GetErrorMessageAsync(HttpResponseMessage response)

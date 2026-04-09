@@ -40,7 +40,6 @@ namespace SIGEBI.Domain.Entities
             if (fechaFinUtc < FechaInicio)
                 throw new InvalidOperationException("La fecha de fin no puede ser anterior a la de inicio.");
 
-            FechaFin = fechaFinUtc;
             Estado = Enums.Operacion.EstadoPenalizacion.Finalizada;
         }
     }

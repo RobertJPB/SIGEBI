@@ -66,11 +66,21 @@ namespace SIGEBI.ViewModels
                 var handler = new JwtSecurityTokenHandler();
                 var jwt = handler.ReadJwtToken(token);
 
-                var sub = jwt.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "nameid")?.Value;
+                // Buscamos el ID del usuario (puede venir como 'sub', 'nameid' o el URI largo de ClaimTypes.NameIdentifier)
+                var sub = jwt.Claims.FirstOrDefault(c => 
+                    c.Type == "sub" || 
+                    c.Type == "nameid" || 
+                    c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+                
                 if (Guid.TryParse(sub, out var userId))
                     SessionService.UsuarioId = userId;
 
-                var nombre = jwt.Claims.FirstOrDefault(c => c.Type == "name" || c.Type == "unique_name")?.Value;
+                // Buscamos el Nombre (puede venir como 'unique_name', 'name' o el URI de ClaimTypes.Name)
+                var nombre = jwt.Claims.FirstOrDefault(c => 
+                    c.Type == "name" || 
+                    c.Type == "unique_name" || 
+                    c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name")?.Value;
+                
                 if (!string.IsNullOrWhiteSpace(nombre))
                     SessionService.NombreUsuario = nombre;
             }

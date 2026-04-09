@@ -10,6 +10,7 @@ public class Valoracion
     public Guid RecursoId { get; private set; } // ID del recurso valorado
     public int Calificacion { get; private set; } // Puntaje (1-5)
     public string? Comentario { get; private set; } // Reseña opcional
+    public DateTime FechaRegistro { get; private set; } // Fecha de publicación
 
     public Usuario Usuario { get; private set; } = null!; // Navegación al autor
     public RecursoBibliografico Recurso { get; private set; } = null!; // Material valorado
@@ -27,6 +28,7 @@ public class Valoracion
         RecursoId = recursoId;
         Calificacion = calificacion;
         Comentario = string.IsNullOrWhiteSpace(comentario) ? null : comentario.Trim();
+        FechaRegistro = DateTime.UtcNow;
     }
 
     public void ActualizarCalificacion(int nuevaCalificacion)

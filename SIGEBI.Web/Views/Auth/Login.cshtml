@@ -111,7 +111,6 @@
     <div class="card login-card">
 
         <div class="login-header">
-            <span class="logo-icon"></span>
             <h3>SIGEBI</h3>
             <p>Sistema de Gestion Bibliotecaria</p>
         </div>
@@ -121,7 +120,6 @@
             @if (!string.IsNullOrEmpty(Model.ErrorMessage))
             {
                 <div class="alert alert-danger py-2">
-                    <i class="bi bi-exclamation-circle me-2"></i>
                     @Model.ErrorMessage
                 </div>
             }
@@ -129,7 +127,6 @@
             @if (TempData["LogoutMessage"] != null)
             {
                 <div class="alert alert-warning py-2">
-                    <i class="bi bi-shield-lock me-2"></i>
                     @TempData["LogoutMessage"]
                 </div>
             }
@@ -140,7 +137,7 @@
 
                 <div class="mb-3">
                     <label class="form-label">
-                        <i class="bi bi-envelope me-1"></i>Correo electronico
+                        Correo electronico
                     </label>
 
                     <input asp-for="Correo"
@@ -152,7 +149,7 @@
 
                 <div class="mb-4">
                     <label class="form-label">
-                        <i class="bi bi-lock me-1"></i>Contrasena
+                        Contrasena
                     </label>
 
                     <input asp-for="Contrasena"
@@ -163,7 +160,6 @@
                 </div>
 
                 <button type="submit" class="btn btn-login w-100">
-                    <i class="bi bi-box-arrow-in-right me-2"></i>
                     Iniciar Sesion
                 </button>
 

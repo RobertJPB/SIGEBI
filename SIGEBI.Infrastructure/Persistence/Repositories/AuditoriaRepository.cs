@@ -12,8 +12,10 @@ namespace SIGEBI.Infrastructure.Persistence.Repositories
         public override async Task<IEnumerable<Auditoria>> GetAllAsync() // Todo el historial
         {
             return await _dbSet
+                .AsNoTracking()
                 .Include(a => a.Usuario)
                 .OrderByDescending(a => a.FechaRegistro)
+                .Take(200) // Limitamos a los últimos 200 para evitar bloqueos por volumen de datos
                 .ToListAsync();
         }
 

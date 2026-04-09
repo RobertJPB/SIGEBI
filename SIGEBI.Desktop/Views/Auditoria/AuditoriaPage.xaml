@@ -104,7 +104,7 @@
 
                     <DataGrid.Columns>
                         <!-- Fecha -->
-                        <DataGridTextColumn Header="Fecha y Hora" Binding="{Binding FechaRegistro, StringFormat={}{0:dd/MM/yyyy HH:mm:ss}}" Width="160">
+                        <DataGridTextColumn Header="Fecha y Hora" Binding="{Binding FechaRegistro, StringFormat={}{0:dd/MM/yyyy HH:mm:ss}}" Width="150">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="VerticalAlignment" Value="Center"/>
@@ -115,12 +115,12 @@
                         </DataGridTextColumn>
 
                         <!-- Usuario -->
-                        <DataGridTemplateColumn Header="Usuario" Width="*">
+                        <DataGridTemplateColumn Header="Usuario" Width="180">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
                                         <TextBlock Text="👤" Margin="0,0,8,0" Foreground="#95a5a6"/>
-                                        <TextBlock Text="{Binding NombreUsuario}" FontWeight="SemiBold" Foreground="#34495e"/>
+                                        <TextBlock Text="{Binding NombreUsuario}" FontWeight="SemiBold" Foreground="#34495e" TextWrapping="Wrap"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
@@ -134,20 +134,30 @@
                                         <TextBlock x:Name="TxtOp" FontSize="9" FontWeight="Bold"/>
                                     </Border>
                                     <DataTemplate.Triggers>
-                                        <DataTrigger Binding="{Binding AccionDescripcion}" Value="Create">
-                                            <Setter TargetName="BadgeOp" Property="Background" Value="#e8f5e9"/>
+                                        <DataTrigger Binding="{Binding AccionDescripcion}" Value="Crear">
+                                            <Setter TargetName="BadgeOp" Property="Background" Value="#e8f5ee"/>
                                             <Setter TargetName="TxtOp" Property="Foreground" Value="#2e7d32"/>
                                             <Setter TargetName="TxtOp" Property="Text" Value="CREAR"/>
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding AccionDescripcion}" Value="Update">
-                                            <Setter TargetName="BadgeOp" Property="Background" Value="#e3f2fd"/>
-                                            <Setter TargetName="TxtOp" Property="Foreground" Value="#1565c0"/>
+                                        <DataTrigger Binding="{Binding AccionDescripcion}" Value="Actualizar">
+                                            <Setter TargetName="BadgeOp" Property="Background" Value="#fff8e1"/>
+                                            <Setter TargetName="TxtOp" Property="Foreground" Value="#f57f17"/>
                                             <Setter TargetName="TxtOp" Property="Text" Value="EDITAR"/>
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding AccionDescripcion}" Value="Delete">
+                                        <DataTrigger Binding="{Binding AccionDescripcion}" Value="Eliminar">
                                             <Setter TargetName="BadgeOp" Property="Background" Value="#ffebee"/>
                                             <Setter TargetName="TxtOp" Property="Foreground" Value="#c62828"/>
                                             <Setter TargetName="TxtOp" Property="Text" Value="BORRAR"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding AccionDescripcion}" Value="Login">
+                                            <Setter TargetName="BadgeOp" Property="Background" Value="#e3f2fd"/>
+                                            <Setter TargetName="TxtOp" Property="Foreground" Value="#1565c0"/>
+                                            <Setter TargetName="TxtOp" Property="Text" Value="SESIÓN"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding AccionDescripcion}" Value="AccesoDenegado">
+                                            <Setter TargetName="BadgeOp" Property="Background" Value="#fafafa"/>
+                                            <Setter TargetName="TxtOp" Property="Foreground" Value="#424242"/>
+                                            <Setter TargetName="TxtOp" Property="Text" Value="BLOQUEO"/>
                                         </DataTrigger>
                                     </DataTemplate.Triggers>
                                 </DataTemplate>
@@ -164,18 +174,14 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
 
-                        <!-- Detalles -->
-                        <DataGridTextColumn Header="Detalle Acción" Binding="{Binding Detalle}" Width="4*">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
-                                    <Setter Property="Margin" Value="10,0"/>
-                                    <Setter Property="FontSize" Value="11"/>
-                                    <Setter Property="Foreground" Value="#7f8c8d"/>
-                                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
+                        <!-- Detalle Acción -->
+                        <DataGridTemplateColumn Header="Detalle Acción" Width="4*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Detalle}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="10,4" FontSize="11" Foreground="#2c3e50"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                     </DataGrid.Columns>
                 </DataGrid>
             </Border>

@@ -409,7 +409,12 @@
                             }
 
                             <div class="review-content">
-                                <div class="review-user">@(string.IsNullOrEmpty(val.NombreUsuario) ? "Usuario de SIGEBI" : val.NombreUsuario)</div>
+                                <div class="review-user">
+                                    @(string.IsNullOrEmpty(val.NombreUsuario) ? "Usuario de SIGEBI" : val.NombreUsuario)
+                                    <span style="font-size: 0.75rem; color: var(--muted); font-weight: 400; margin-left: 8px;">
+                                        &bull; @val.FechaRegistro.ToString("MMMM yyyy")
+                                    </span>
+                                </div>
                                 <div class="review-stars">
                                     @for (int i = 0; i < val.Calificacion; i++) { <i class="bi bi-star-fill"></i> }
                                 </div>
@@ -457,6 +462,25 @@
                 <div class="modal-footer">
                     <button type="button" class="btn-cancel-action" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" id="confirmLoanBtn" class="btn-confirm-action">Confirmar Préstamo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Review Modal -->
+    <div class="modal fade" id="deleteReviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title fw-bold" style="color:#d93025">Eliminar Comentario</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted">¿Estás seguro de que deseas eliminar tu comentario de forma permanente? Esta acción no se puede deshacer.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel-action" data-bs-dismiss="modal">Mantener comentario</button>
+                    <button type="button" id="confirmDeleteReviewBtn" class="btn-confirm-action" style="background:#d93025">Eliminar ahora</button>
                 </div>
             </div>
         </div>
@@ -530,17 +554,34 @@
             });
         });
 
+        let reviewIdToDelete = null;
+
         function eliminarValoracion(id) {
-            if (confirm('¿Estás seguro de eliminar tu comentario?')) {
-                $.post('/Catalogo/EliminarValoracion', { id: id, recursoId: '@Model.Id' }, function(data) {
+            reviewIdToDelete = id;
+            const modal = new bootstrap.Modal(document.getElementById('deleteReviewModal'));
+            modal.show();
+        }
+
+        $(document).ready(function() {
+            $('#confirmDeleteReviewBtn').click(function() {
+                const btn = $(this);
+                if (!reviewIdToDelete) return;
+
+                btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Eliminando...');
+
+                $.post('/Catalogo/EliminarValoracion', { id: reviewIdToDelete, recursoId: '@Model.Id' }, function(data) {
                     if (data.success) {
                         location.reload();
                     } else {
+                        btn.prop('disabled', false).text('Eliminar ahora');
                         alert('Error: ' + data.message);
                     }
+                }).fail(function() {
+                    btn.prop('disabled', false).text('Eliminar ahora');
+                    alert('Error de conexión con el servidor.');
                 });
-            }
-        }
+            });
+        });
 
         // Script para el punto rojo de notificaciones
         (function() {

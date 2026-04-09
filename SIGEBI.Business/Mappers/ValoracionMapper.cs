@@ -15,7 +15,8 @@ namespace SIGEBI.Business.Mappers
                 RecursoId = valoracion.RecursoId,
                 Calificacion = valoracion.Calificacion,
                 Comentario = valoracion.Comentario,
-                ImagenUrl = valoracion.Usuario?.ImagenUrl
+                ImagenUrl = valoracion.Usuario?.ImagenUrl,
+                FechaRegistro = valoracion.FechaRegistro
             };
         }
     }

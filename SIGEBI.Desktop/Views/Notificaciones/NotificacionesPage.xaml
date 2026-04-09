@@ -9,7 +9,6 @@
       Title="Notificaciones">
 
     <Page.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         
         <Style x:Key="BtnIcon" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
@@ -78,86 +77,35 @@
                 <TextBlock Text="{Binding Contador}" FontSize="12" Foreground="#7a9e84" Margin="0,2,0,0"/>
             </StackPanel>
 
-            <Button Grid.Column="1" Content="Actualizar" Style="{StaticResource BtnSecundario}" 
-                    Command="{Binding CargarNotificacionesCommand}" VerticalAlignment="Center"/>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Content="Marcar todas como leídas" Style="{StaticResource BtnSecundario}" 
+                        Command="{Binding MarcarTodasLeidasCommand}" 
+                        Visibility="{Binding TienePendientes, Converter={StaticResource BoolToVis}}"/>
+                <Button Content="Actualizar" Style="{StaticResource BtnSecundario}" 
+                        Command="{Binding CargarNotificacionesCommand}"/>
+            </StackPanel>
         </Grid>
 
-        <!-- INFO BOX -->
-        <Border Grid.Row="1" Background="#eef2f8" CornerRadius="8" Margin="0,0,0,20" Padding="15">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="&#x1F4E2;" FontSize="18" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                <TextBlock Text="Aquí se muestran los avisos importantes sobre préstamos próximos a vencer, sanciones aplicadas y otras novedades del sistema." 
-                           VerticalAlignment="Center" Foreground="#2c3e50" FontSize="13" TextWrapping="Wrap"/>
-            </StackPanel>
-        </Border>
-
-        <!-- MAIN TABLE -->
-        <Grid Grid.Row="2">
-            <Border Background="White" CornerRadius="10" BorderBrush="#dde8e2" BorderThickness="1">
-                <DataGrid x:Name="GridNotificaciones"
-                          AutoGenerateColumns="False"
-                          IsReadOnly="True"
-                          ItemsSource="{Binding Notificaciones}"
-                          HeadersVisibility="Column"
-                          GridLinesVisibility="Horizontal"
-                          HorizontalGridLinesBrush="#f0f4f2"
-                          Background="White"
-                          BorderThickness="0"
-                          RowHeight="60"
-                          SelectionMode="Single"
-                          CanUserResizeRows="False">
-
-                    <DataGrid.Columns>
-                        <!-- Fecha -->
-                        <DataGridTextColumn Header="Fecha" Binding="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy HH:mm}}" Width="140">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
-                                    <Setter Property="Margin" Value="10,0"/>
-                                    <Setter Property="Foreground" Value="#7f8c8d"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-                        
-                        <!-- Mensaje -->
-                        <DataGridTemplateColumn Header="Mensaje" Width="*">
+                        <!-- Acciones -->
+                        <DataGridTemplateColumn Header="Acciones" Width="100">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Mensaje}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="10,4" FontSize="13"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-
-                        <!-- Estado -->
-                        <DataGridTemplateColumn Header="Estado" Width="100">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Border x:Name="BadgeEstado" Style="{StaticResource Badge}">
-                                        <TextBlock x:Name="TxtEstado" FontSize="9" FontWeight="Bold"/>
-                                    </Border>
+                                    <StackPanel Orientation="Horizontal">
+                                        <!-- Botón de lectura (Solo visible si no está leída) -->
+                                        <Button x:Name="BtnMarcarLeida" Content="&#x2713;" ToolTip="Marcar como leída" Foreground="#2e7d32"
+                                                Command="{Binding DataContext.MarcarLeidaCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                CommandParameter="{Binding Id}" Style="{StaticResource BtnIcon}"
+                                                Visibility="Collapsed"/>
+                                        
+                                        <Button Content="&#x2715;" ToolTip="Eliminar notificación" Foreground="#d93025"
+                                                Command="{Binding DataContext.EliminarCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                CommandParameter="{Binding Id}" Style="{StaticResource BtnIcon}"/>
+                                    </StackPanel>
                                     <DataTemplate.Triggers>
                                         <DataTrigger Binding="{Binding Estado}" Value="NoLeida">
-                                            <Setter TargetName="BadgeEstado" Property="Background" Value="#e3f2fd"/>
-                                            <Setter TargetName="TxtEstado" Property="Foreground" Value="#1565c0"/>
-                                            <Setter TargetName="TxtEstado" Property="Text" Value="NUEVA"/>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Estado}" Value="Leida">
-                                            <Setter TargetName="BadgeEstado" Property="Background" Value="#f5f5f5"/>
-                                            <Setter TargetName="TxtEstado" Property="Foreground" Value="#9e9e9e"/>
-                                            <Setter TargetName="TxtEstado" Property="Text" Value="LEÍDA"/>
+                                            <Setter TargetName="BtnMarcarLeida" Property="Visibility" Value="Visible"/>
                                         </DataTrigger>
                                     </DataTemplate.Triggers>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-
-                        <!-- Acciones -->
-                        <DataGridTemplateColumn Header="Acciones" Width="80">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button Content="&#x2715;" ToolTip="Eliminar notificación" Foreground="#d93025"
-                                            Command="{Binding DataContext.EliminarCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                            CommandParameter="{Binding Id}" Style="{StaticResource BtnIcon}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>

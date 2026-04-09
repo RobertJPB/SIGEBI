@@ -98,6 +98,12 @@ namespace SIGEBI.Services
         [Put("/api/Notificaciones/usuario/{id}/leida")]
         Task MarcarNotificacionLeidaAsync(Guid id);
 
+        [Put("/api/Notificaciones/usuario/{usuarioId}/leidas")]
+        Task MarcarTodasComoLeidasAsync(Guid usuarioId);
+
+        [Get("/api/Notificaciones/usuario/{usuarioId}/count")]
+        Task<int> GetCantPendientesAsync(Guid usuarioId);
+
         // ── AUDITORÍA ──
         [Get("/api/Auditoria")]
         Task<List<AuditoriaDTO>> GetAuditoriasAsync();

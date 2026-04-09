@@ -163,19 +163,27 @@
                         <DataGridTemplateColumn Header="Acciones" Width="100">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Content="✅" ToolTip="Finalizar y Levantar Sanción" Foreground="#1e8e3e"
-                                            Command="{Binding DataContext.FinalizarCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                            CommandParameter="{Binding Id}">
-                                        <Button.Style>
-                                            <Style TargetType="Button" BasedOn="{StaticResource BtnIcon}">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Estado}" Value="Finalizada">
-                                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Button.Style>
-                                    </Button>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="✅" ToolTip="Finalizar y Levantar Sanción" Foreground="#1e8e3e"
+                                                Command="{Binding DataContext.FinalizarCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                CommandParameter="{Binding Id}">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource BtnIcon}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Estado}" Value="Finalizada">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+
+                                        <Button Content="🗑️" ToolTip="Eliminar Penalización Permanentemente" Foreground="#d93025"
+                                                Style="{StaticResource BtnIcon}"
+                                                Command="{Binding DataContext.EliminarCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                CommandParameter="{Binding Id}"
+                                                Margin="4,0,0,0"/>
+                                    </StackPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>

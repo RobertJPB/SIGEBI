@@ -92,7 +92,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
 
                 // Notificación de penalización
                 var notiPenalizacion = NotificacionFactory.CrearNotificacionPenalizacion(
-                    _guidGenerator.Create(), prestamo.UsuarioId, motivo, penalizacion.FechaFin.Value);
+                    _guidGenerator.Create(), prestamo.UsuarioId, motivo, penalizacion.FechaFin ?? DateTime.UtcNow.AddDays(diasPenalizacion));
                 await _notificacionRepository.AddAsync(notiPenalizacion);
             }
 

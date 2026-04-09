@@ -138,6 +138,11 @@
                                        Text="Notificaciones"
                                        FontSize="12" FontWeight="SemiBold"
                                        Foreground="#a0c4ac" VerticalAlignment="Center"/>
+                            
+                            <!-- Red Dot Indicator Centered -->
+                            <Ellipse Width="8" Height="8" Fill="#ff4d4f" 
+                                     Margin="8,0,0,0" VerticalAlignment="Center"
+                                     Visibility="{Binding TienePendientes, Converter={StaticResource BoolToVis}}"/>
                         </StackPanel>
                     </Button>
 

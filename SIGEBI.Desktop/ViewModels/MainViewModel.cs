@@ -1,4 +1,7 @@
+using System;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using SIGEBI.Services;
 
 namespace SIGEBI.ViewModels
 {
@@ -8,10 +11,29 @@ namespace SIGEBI.ViewModels
         [ObservableProperty]
         private string _seccionActual = "Gestión Bibliográfica";
 
-        public MainViewModel()
+        [ObservableProperty]
+        private int _notificacionesPendientes;
+
+        public bool TienePendientes => NotificacionesPendientes > 0;
+
+        private readonly ISigebiApi _api;
+
+        public MainViewModel(ISigebiApi api)
         {
-            // Título principal de la ventana (Proof of Concept)
+            _api = api;
             Title = "SIGEBI MVVM - Panel Administrativo";
+            _ = ActualizarConteoNotificacionesAsync();
+        }
+
+        public async Task ActualizarConteoNotificacionesAsync()
+        {
+            if (SessionService.UsuarioId == Guid.Empty) return;
+            try
+            {
+                NotificacionesPendientes = await _api.GetCantPendientesAsync(SessionService.UsuarioId);
+                OnPropertyChanged(nameof(TienePendientes));
+            }
+            catch { /* Silencioso en el main */ }
         }
     }
 }

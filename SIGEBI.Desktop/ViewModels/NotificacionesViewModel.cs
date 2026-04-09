@@ -55,11 +55,41 @@ namespace SIGEBI.ViewModels
                 IsBusy = true;
                 await _api.MarcarNotificacionLeidaAsync(id);
                 await CargarNotificacionesAsync();
+                
+                // Actualizar contador global
+                ActualizarNotificacionesGlobal();
             }
             catch (Exception ex)
             {
                 await ManejarErrorAsync(ex, "marcar notificación como leída");
                 IsBusy = false;
+            }
+        }
+
+        [RelayCommand]
+        public async Task MarcarTodasLeidasAsync()
+        {
+            try
+            {
+                IsBusy = true;
+                await _api.MarcarTodasComoLeidasAsync(SessionService.UsuarioId);
+                await CargarNotificacionesAsync();
+                
+                // Actualizar contador global
+                ActualizarNotificacionesGlobal();
+            }
+            catch (Exception ex)
+            {
+                await ManejarErrorAsync(ex, "marcar todas como leídas");
+                IsBusy = false;
+            }
+        }
+
+        private void ActualizarNotificacionesGlobal()
+        {
+            if (App.Current.Services.GetService(typeof(MainViewModel)) is MainViewModel mainVm)
+            {
+                _ = mainVm.ActualizarConteoNotificacionesAsync();
             }
         }
 

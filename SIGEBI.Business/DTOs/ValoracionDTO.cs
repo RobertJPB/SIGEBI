@@ -10,5 +10,6 @@ namespace SIGEBI.Business.DTOs
         public int Calificacion { get; set; }
         public string? Comentario { get; set; }
         public string? ImagenUrl { get; set; }
+        public DateTime FechaRegistro { get; set; }
     }
 }
