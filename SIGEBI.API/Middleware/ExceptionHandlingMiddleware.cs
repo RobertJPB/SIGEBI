@@ -15,7 +15,7 @@ namespace SIGEBI.API.Middleware
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context)
+        public async Task InvokeAsync(HttpContext context, [FromServices] global::SIGEBI.Business.Interfaces.Common.IAuditService audit)
         {
             try
             {
@@ -24,6 +24,12 @@ namespace SIGEBI.API.Middleware
             }
             catch (Exception ex)
             {
+                if (ex is UnauthorizedAccessException)
+                {
+                    await audit.LogActionAsync(SIGEBI.Domain.Enums.Auditoria.TipoAccionAuditoria.AccesoDenegado, 
+                        "Seguridad", $"Intento de acceso no autorizado: {ex.Message}");
+                }
+
                 // Si ocurre un error no controlado en cualquier parte de la ejecución (UseCase, Repository, etc.),
                 // el flujo cae aquí para ser procesado de forma unificada.
                 await ManejarExcepcionAsync(context, ex);

@@ -189,9 +189,12 @@
             </a>
             <div class="nav-divider"></div>
             <a class="nav-link active" href="/Perfil/Index">
-                @if(!string.IsNullOrEmpty(Model.ImagenUrl))
+                @{
+                    var userImg = Context.User.FindFirst("UsuarioImagen")?.Value;
+                }
+                @if (!string.IsNullOrEmpty(userImg))
                 {
-                    <img src="@(Model.ApiBaseUrl.TrimEnd('/') + "/" + Model.ImagenUrl.TrimStart('/'))" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.3);" />
+                    <img src="@(Model.ApiBaseUrl.TrimEnd('/') + "/" + userImg.TrimStart('/'))" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.3);" />
                 }
                 else
                 {

@@ -1,0 +1,33 @@
+﻿  Determinando los proyectos que se van a restaurar...
+  Se ha restaurado C:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Domain\SIGEBI.Domain.csproj (en 171 ms).
+  Se ha restaurado c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Desktop\SIGEBI.Desktop.csproj (en 420 ms).
+  Se ha restaurado c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Business\SIGEBI.Business.csproj (en 389 ms).
+  Se ha restaurado c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Web\SIGEBI.Web.csproj (en 449 ms).
+  Se ha restaurado c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.API\SIGEBI.API.csproj (en 452 ms).
+  Se ha restaurado c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Test\SIGEBI.Test.csproj (en 451 ms).
+  Se ha restaurado C:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Infrastructure\SIGEBI.Infrastructure.csproj (en 451 ms).
+  SIGEBI.Domain -> C:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Domain\bin\Debug\net8.0\SIGEBI.Domain.dll
+c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Business\UseCases\Prestamos\DevolverPrestamoUseCase.cs(89,74): warning CS8629: Un tipo que acepta valores NULL puede ser nulo. [c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Business\SIGEBI.Business.csproj]
+  SIGEBI.Business -> c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Business\bin\Debug\net8.0\SIGEBI.Business.dll
+c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Web\Controllers\CatalogoController.cs(133,34): warning CS8600: Se va a convertir un literal nulo o un posible valor nulo en un tipo que no acepta valores NULL [c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Web\SIGEBI.Web.csproj]
+c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Web\Controllers\CatalogoController.cs(141,35): warning CS8600: Se va a convertir un literal nulo o un posible valor nulo en un tipo que no acepta valores NULL [c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Web\SIGEBI.Web.csproj]
+  SIGEBI.Infrastructure -> C:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Infrastructure\bin\Debug\net8.0\SIGEBI.Infrastructure.dll
+  SIGEBI.Web -> c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Web\bin\Debug\net8.0\SIGEBI.Web.dll
+c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Test\UseCases\Prestamos\SolicitarPrestamoUseCaseTests.cs(51,26): error CS0246: El nombre del tipo o del espacio de nombres 'IMemoryCache' no se encontr├│ (┬┐falta una directiva using o una referencia de ensamblado?) [c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Test\SIGEBI.Test.csproj]
+c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Test\UseCases\Prestamos\DevolverPrestamoUseCaseTests.cs(41,26): error CS0246: El nombre del tipo o del espacio de nombres 'IMemoryCache' no se encontr├│ (┬┐falta una directiva using o una referencia de ensamblado?) [c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Test\SIGEBI.Test.csproj]
+  SIGEBI.Desktop -> c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Desktop\bin\Debug\net8.0-windows\SIGEBI.Desktop.dll
+  SIGEBI.API -> c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.API\bin\Debug\net8.0\SIGEBI.API.dll
+
+ERROR al compilar.
+
+c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Business\UseCases\Prestamos\DevolverPrestamoUseCase.cs(89,74): warning CS8629: Un tipo que acepta valores NULL puede ser nulo. [c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Business\SIGEBI.Business.csproj]
+c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Web\Controllers\CatalogoController.cs(133,34): warning CS8600: Se va a convertir un literal nulo o un posible valor nulo en un tipo que no acepta valores NULL [c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Web\SIGEBI.Web.csproj]
+c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Web\Controllers\CatalogoController.cs(141,35): warning CS8600: Se va a convertir un literal nulo o un posible valor nulo en un tipo que no acepta valores NULL [c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Web\SIGEBI.Web.csproj]
+c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Test\UseCases\Prestamos\SolicitarPrestamoUseCaseTests.cs(51,26): error CS0246: El nombre del tipo o del espacio de nombres 'IMemoryCache' no se encontr├│ (┬┐falta una directiva using o una referencia de ensamblado?) [c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Test\SIGEBI.Test.csproj]
+c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Test\UseCases\Prestamos\DevolverPrestamoUseCaseTests.cs(41,26): error CS0246: El nombre del tipo o del espacio de nombres 'IMemoryCache' no se encontr├│ (┬┐falta una directiva using o una referencia de ensamblado?) [c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Test\SIGEBI.Test.csproj]
+    3 Advertencia(s)
+    2 Errores
+
+Tiempo transcurrido 00:00:11.65
+
+Hay actualizaciones de carga de trabajo disponibles. Ejecute "dotnet workload list" para obtener m├ís informaci├│n.

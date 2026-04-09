@@ -1,28 +1,33 @@
 using System;
 using System.Globalization;
 using System.Windows.Data;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace SIGEBI.Converters
+namespace SIGEBI.Desktop.Converters
 {
     public class ApiUrlConverter : IValueConverter
     {
-        private const string BaseUrl = "https://localhost:7047/";
+        private static string? _baseUrl;
 
-        public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? Convert(object? value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is string path && !string.IsNullOrWhiteSpace(path))
-            {
-                if (path.StartsWith("http", StringComparison.OrdinalIgnoreCase))
-                {
-                    return path;
-                }
+            if (value == null) return null;
 
-                // Asegurar que no haya doble diagonal
-                var cleanPath = path.TrimStart('/');
-                return $"{BaseUrl}{cleanPath}";
+            if (string.IsNullOrEmpty(_baseUrl))
+            {
+                var config = App.Current.Services.GetService<IConfiguration>();
+                _baseUrl = config?["ApiSettings:BaseUrl"] ?? "http://localhost:5031/";
             }
 
-            return null;
+            string? relativePath = value.ToString();
+            if (string.IsNullOrEmpty(relativePath)) return null;
+
+            // Limpiamos barras duplicadas
+            string baseUri = _baseUrl!.TrimEnd('/');
+            string path = relativePath!.TrimStart('/');
+
+            return $"{baseUri}/{path}";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

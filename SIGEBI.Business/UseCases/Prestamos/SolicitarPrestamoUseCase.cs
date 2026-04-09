@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Caching.Memory;
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Common;
@@ -12,6 +14,7 @@ using SIGEBI.Business.Mappers;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Entities.Recursos;
+using SIGEBI.Domain.Enums.Auditoria;
 
 namespace SIGEBI.Business.UseCases.Prestamos
 {
@@ -24,8 +27,10 @@ namespace SIGEBI.Business.UseCases.Prestamos
         private readonly INotificacionRepository _notificacionRepository;
         private readonly IEmailAdapter _emailAdapter;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMemoryCache _cache;
         private readonly IGuidGenerator _guidGenerator;
         private readonly ILogger<SolicitarPrestamoUseCase> _logger;
+        private readonly IAuditService _audit;
 
         public SolicitarPrestamoUseCase(
             IPrestamoRepository prestamoRepository,
@@ -35,8 +40,10 @@ namespace SIGEBI.Business.UseCases.Prestamos
             INotificacionRepository notificacionRepository,
             IEmailAdapter emailAdapter,
             IUnitOfWork unitOfWork,
+            IMemoryCache cache,
             IGuidGenerator guidGenerator,
-            ILogger<SolicitarPrestamoUseCase> logger)
+            ILogger<SolicitarPrestamoUseCase> logger,
+            IAuditService audit)
         {
             _prestamoRepository = prestamoRepository;
             _usuarioRepository = usuarioRepository;
@@ -45,8 +52,10 @@ namespace SIGEBI.Business.UseCases.Prestamos
             _notificacionRepository = notificacionRepository;
             _emailAdapter = emailAdapter;
             _unitOfWork = unitOfWork;
+            _cache = cache;
             _guidGenerator = guidGenerator;
             _logger = logger;
+            _audit = audit;
         }
 
         // Ejecuta el flujo de préstamo: valida usuario/recurso, comprueba disponibilidad y persiste el registro.
@@ -81,11 +90,19 @@ namespace SIGEBI.Business.UseCases.Prestamos
                 await _prestamoRepository.AddAsync(prestamo);
                 _recursoRepository.Update(recurso);
 
+                // Auditoría
+                await _audit.LogActionAsync(TipoAccionAuditoria.PrestamoRealizado, "Prestamo", 
+                    $"Nuevo compromiso de préstamo para el recurso '{recurso.Titulo}' por el usuario {usuario.Nombre}", 
+                    usuario.Id);
+
                 // 5. Notificación Interna
                 var notificacion = NotificacionFactory.CrearNotificacionPrestamo(_guidGenerator.Create(), usuarioId, prestamo.FechaDevolucionEstimada);
                 await _notificacionRepository.AddAsync(notificacion);
                 
                 await _unitOfWork.SaveChangesAsync();
+                
+                // Invalidamos la caché del catálogo para que el stock se actualice de inmediato en la web
+                _cache.Remove("RecursosDisponibles");
                 
                 // Obtenemos correos de bibliotecarios ANTES de disparar el segundo plano
                 // para evitar problemas con la resolución de alcances (scope) del repositorio.

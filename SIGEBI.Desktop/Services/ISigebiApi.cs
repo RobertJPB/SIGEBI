@@ -48,10 +48,13 @@ namespace SIGEBI.Services
         Task ActivarUsuarioAsync(Guid id);
 
         [Put("/api/Usuarios/{id}/desactivar")]
-        Task DesactivarUsuarioAsync(Guid id);
+        Task DesactivarUsuarioAsync(Guid id, [Body] string motivo);
 
         [Put("/api/Usuarios/{id}/bloquear")]
-        Task BloquearUsuarioAsync(Guid id);
+        Task BloquearUsuarioAsync(Guid id, [Body] string motivo);
+
+        [Put("/api/Usuarios/{id}/suspender")]
+        Task SuspenderUsuarioAsync(Guid id);
 
         [Post("/api/Usuarios/{id}/rol")]
         Task CambiarRolUsuarioAsync(Guid id, [Body] int nuevoRol);
@@ -91,6 +94,9 @@ namespace SIGEBI.Services
 
         [Delete("/api/Notificaciones/{id}")]
         Task EliminarNotificacionAsync(Guid id);
+
+        [Put("/api/Notificaciones/usuario/{id}/leida")]
+        Task MarcarNotificacionLeidaAsync(Guid id);
 
         // ── AUDITORÍA ──
         [Get("/api/Auditoria")]

@@ -16,5 +16,18 @@ namespace SIGEBI.Views.Penalizaciones
             DataContext = _viewModel;
             Loaded += (s, e) => _ = _viewModel.CargarPenalizacionesAsync();
         }
+
+        private void BtnAplicarPenalizacion_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new AplicarPenalizacionDialog(_viewModel)
+            {
+                Owner = Window.GetWindow(this)
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                // El ViewModel ya maneja la carga después de aplicar
+            }
+        }
     }
 }

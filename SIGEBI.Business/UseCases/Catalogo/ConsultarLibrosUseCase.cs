@@ -44,7 +44,7 @@ namespace SIGEBI.Business.UseCases.Catalogo
                     list.Add(dto);
                 }
                 dtos = list;
-                _cache.Set("RecursosDisponibles", dtos, TimeSpan.FromMinutes(15));
+                _cache.Set("RecursosDisponibles", dtos, TimeSpan.FromMinutes(5));
             }
 
             return dtos!;

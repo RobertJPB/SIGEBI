@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SIGEBI.Business.Interfaces;
@@ -48,8 +49,10 @@ namespace SIGEBI.Test.UseCases.Prestamos
                 _notificacionRepo.Object,
                 _emailAdapter.Object,
                 _unitOfWork.Object,
+                new Mock<IMemoryCache>().Object,
                 new Mock<IGuidGenerator>().Object,
-                Microsoft.Extensions.Logging.Abstractions.NullLogger<SolicitarPrestamoUseCase>.Instance);
+                Microsoft.Extensions.Logging.Abstractions.NullLogger<SolicitarPrestamoUseCase>.Instance,
+                new Mock<IAuditService>().Object);
         }
 
         // â”€â”€ HELPERS â”€â”€

@@ -12,8 +12,9 @@ namespace SIGEBI.Business.Interfaces.UseCases.Usuarios
         Task<IEnumerable<UsuarioDTO>> ObtenerTodosAsync();
         Task<UsuarioDTO?> ObtenerPorIdAsync(Guid id);
         Task ActivarAsync(Guid id);
-        Task DesactivarAsync(Guid id);
-        Task BloquearAsync(Guid id);
+        Task DesactivarAsync(Guid id, string motivo);
+        Task SuspenderAsync(Guid id);
+        Task BloquearAsync(Guid id, string motivo);
         Task CambiarRolAsync(Guid id, RolUsuario nuevoRol);
         Task EliminarAsync(Guid id);
         Task ActualizarImagenAsync(Guid id, string? nuevaUrl);

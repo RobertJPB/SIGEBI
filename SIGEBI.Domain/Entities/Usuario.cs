@@ -6,19 +6,15 @@ namespace SIGEBI.Domain.Entities
 {
     public class Usuario : IDesactivable
     {
-        /// <summary>
-        /// Hash centinela que marca la cuenta de sistema. Este valor nunca puede
-        /// ser generado por BCrypt, por lo que garantiza que la cuenta no puede
-        /// autenticarse a través del flujo normal de login.
-        /// </summary>
         public const string SistemaHashCentinela = "SYSTEM_ACCOUNT_NO_LOGIN";
 
-        public Guid Id { get; private set; } // ID único
-        public string Nombre { get; private set; } = null!; // Nombre completo
-        public string Correo { get; private set; } = null!; // Email institucional
-        public string ContrasenaHash { get; private set; } = null!; // Password cifrada
-        public RolUsuario Rol { get; private set; } // Nivel de acceso
-        public EstadoUsuario Estado { get; private set; } // Estado actual
+        public Guid Id { get; private set; }
+        public string Nombre { get; private set; } = null!;
+        public string Correo { get; private set; } = null!;
+        public string ContrasenaHash { get; private set; } = null!;
+        public RolUsuario Rol { get; private set; }
+        public EstadoUsuario Estado { get; private set; }
+        public string? MotivoEstado { get; private set; }
 
         public ICollection<Prestamo> Prestamos { get; private set; } = new List<Prestamo>();
         public ICollection<Penalizacion> Penalizaciones { get; private set; } = new List<Penalizacion>();
@@ -32,55 +28,40 @@ namespace SIGEBI.Domain.Entities
 
         public Usuario(Guid id, string nombre, string correo, string contrasenaHash, RolUsuario rol)
         {
-            // Validaciones basicas antes de crear el usuario
             Id = id;
-            if (string.IsNullOrWhiteSpace(nombre))
-                throw new ArgumentException("El nombre es requerido.", nameof(nombre));
-            
-            // Validación de correo usando la anotación estándar de .NET
-            if (string.IsNullOrWhiteSpace(correo) || !new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(correo))
-                throw new ArgumentException("Correo inválido.", nameof(correo));
-            if (string.IsNullOrWhiteSpace(contrasenaHash))
-                throw new ArgumentException("La contraseña es requerida.", nameof(contrasenaHash));
-
-            Nombre = nombre.Trim();
-            Correo = correo.Trim();
-            ContrasenaHash = contrasenaHash;
+            Nombre = nombre ?? throw new ArgumentNullException(nameof(nombre));
+            Correo = correo ?? throw new ArgumentNullException(nameof(correo));
+            ContrasenaHash = contrasenaHash ?? throw new ArgumentNullException(nameof(contrasenaHash));
             Rol = rol;
             Estado = EstadoUsuario.Activo;
         }
 
-        public void Bloquear()
+        public void Activar() 
         {
-            if (Estado == EstadoUsuario.Bloqueado) return;
+            Estado = EstadoUsuario.Activo;
+            MotivoEstado = null;
+        }
+
+        public void Desactivar(string motivo) 
+        {
+            if (string.IsNullOrWhiteSpace(motivo)) throw new ArgumentException("El motivo es obligatorio.");
+            Estado = EstadoUsuario.Inactivo;
+            MotivoEstado = motivo;
+        }
+
+        public void Suspender() => Estado = EstadoUsuario.Suspendido;
+
+        public void Bloquear(string motivo)
+        {
+            if (string.IsNullOrWhiteSpace(motivo)) throw new ArgumentException("El motivo es obligatorio.");
             Estado = EstadoUsuario.Bloqueado;
+            MotivoEstado = motivo;
         }
 
-        public void Activar() => Estado = EstadoUsuario.Activo;
-        public void Desactivar() => Estado = EstadoUsuario.Inactivo;
         public void CambiarRol(RolUsuario nuevoRol) => Rol = nuevoRol;
-
-        public void CambiarNombre(string nuevoNombre)
-        {
-            if (string.IsNullOrWhiteSpace(nuevoNombre))
-                throw new ArgumentException("El nombre es requerido.", nameof(nuevoNombre));
-            Nombre = nuevoNombre.Trim();
-        }
-
-        public void CambiarCorreo(string nuevoCorreo)
-        {
-            if (string.IsNullOrWhiteSpace(nuevoCorreo) || !new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(nuevoCorreo))
-                throw new ArgumentException("Correo inválido.", nameof(nuevoCorreo));
-            Correo = nuevoCorreo.Trim();
-        }
-
-        public void CambiarContrasenaHash(string nuevoHash)
-        {
-            if (string.IsNullOrWhiteSpace(nuevoHash))
-                throw new ArgumentException("La contraseña es requerida.", nameof(nuevoHash));
-            ContrasenaHash = nuevoHash;
-        }
-
-        public void ActualizarImagen(string? nuevaUrl) => ImagenUrl = nuevaUrl;
+        public void CambiarNombre(string n) => Nombre = n;
+        public void CambiarCorreo(string c) => Correo = c;
+        public void CambiarContrasenaHash(string h) => ContrasenaHash = h;
+        public void ActualizarImagen(string? u) => ImagenUrl = u;
     }
 }

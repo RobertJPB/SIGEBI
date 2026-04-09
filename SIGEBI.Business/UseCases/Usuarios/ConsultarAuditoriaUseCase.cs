@@ -33,5 +33,10 @@ namespace SIGEBI.Business.UseCases.Usuarios
         }
 
 
+        public async Task<IEnumerable<AuditoriaDTO>> ObtenerPorEntidadAsync(string entidad, string entidadId)
+        {
+            var auditorias = await _auditoriaRepository.GetByEntidadAsync(entidad, entidadId);
+            return auditorias.Select(AuditoriaMapper.ToDTO);
+        }
     }
 }

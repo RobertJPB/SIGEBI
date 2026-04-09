@@ -399,7 +399,7 @@
                         <div class="review-item">
                             @if (!string.IsNullOrEmpty(val.ImagenUrl))
                             {
-                                <img src="@(apiBase.TrimEnd('/') + "/" + val.ImagenUrl.TrimStart('/'))" class="review-avatar" alt="@val.NombreUsuario" />
+                                <img src="@($"{apiBase?.TrimEnd('/')}/{val.ImagenUrl.TrimStart('/')}")" class="review-avatar" alt="@val.NombreUsuario" />
                             }
                             else
                             {
@@ -513,9 +513,19 @@
                         $('.btn-main').prop('disabled', true).text('Solicitud Enviada');
                     } else {
                         statusMsg.removeClass('d-none alert-success').addClass('alert-danger')
-                                 .html('<i class="bi bi-exclamation-triangle-fill me-2"></i> Error: ' + data.message);
+                                 .html('<i class="bi bi-exclamation-triangle-fill me-2"></i> ' + data.message);
                         btn.prop('disabled', false).text('Confirmar Préstamo');
                     }
+                }).fail(function(xhr) {
+                    $('#loanModal').modal('hide');
+                    let msg = "Error de conexión con el servidor.";
+                    if (xhr.status === 400 && xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+                    console.error("Loan Request Error:", xhr);
+                    statusMsg.removeClass('d-none alert-success').addClass('alert-danger')
+                             .html('<i class="bi bi-exclamation-triangle-fill me-2"></i> ' + msg);
+                    btn.prop('disabled', false).text('Confirmar Préstamo');
                 });
             });
         });

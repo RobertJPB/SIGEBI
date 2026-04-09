@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Moq;
 using SIGEBI.Business.Interfaces;
+using SIGEBI.Business.Interfaces.UseCases.Usuarios;
 using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.UseCases.Usuarios;
 using SIGEBI.Domain.Entities;
@@ -12,17 +13,23 @@ namespace SIGEBI.Test.UseCases.Usuarios
     public class GestionarUsuarioUseCaseTests
     {
         private readonly Mock<IUsuarioRepository> _usuarioRepo;
+        private readonly Mock<INotificacionesUseCase> _notificaciones;
         private readonly Mock<IUnitOfWork> _unitOfWork;
+        private readonly Mock<Microsoft.Extensions.Caching.Memory.IMemoryCache> _cache;
         private readonly GestionarUsuarioUseCase _useCase;
 
         public GestionarUsuarioUseCaseTests()
         {
             _usuarioRepo = new Mock<IUsuarioRepository>();
+            _notificaciones = new Mock<INotificacionesUseCase>();
             _unitOfWork = new Mock<IUnitOfWork>();
+            _cache = new Mock<Microsoft.Extensions.Caching.Memory.IMemoryCache>();
 
             _useCase = new GestionarUsuarioUseCase(
                 _usuarioRepo.Object,
-                _unitOfWork.Object);
+                _notificaciones.Object,
+                _unitOfWork.Object,
+                _cache.Object);
         }
 
         // ── HELPER ──
@@ -83,7 +90,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
         {
             // Arrange
             var usuario = CrearUsuario();
-            usuario.Desactivar();
+            usuario.Desactivar("Motivo de prueba");
 
             _usuarioRepo.Setup(r => r.GetByIdAsync(usuario.Id)).ReturnsAsync(usuario);
             _unitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
@@ -118,7 +125,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
             _unitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
 
             // Act
-            await _useCase.DesactivarAsync(usuario.Id);
+            await _useCase.DesactivarAsync(usuario.Id, "Motivo de prueba");
 
             // Assert
             usuario.Estado.Should().Be(EstadoUsuario.Inactivo);
@@ -136,7 +143,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
             _unitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
 
             // Act
-            await _useCase.BloquearAsync(usuario.Id);
+            await _useCase.BloquearAsync(usuario.Id, "Motivo de prueba");
 
             // Assert
             usuario.Estado.Should().Be(EstadoUsuario.Bloqueado);

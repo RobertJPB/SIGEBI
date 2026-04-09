@@ -71,17 +71,53 @@ namespace SIGEBI.Infrastructure.Persistence.Interceptors
                     actorId = u.Id;
                 }
 
+                var detalle = GenerarDetalleDescriptivo(entry);
+
                 var auditRecord = new Auditoria(
                     usuarioId: actorId,
                     accion: action,
                     tablaAfectada: tableName,
-                    detalle: $"Cambio automático detectado en {tableName} (Interceptor)",
+                    detalle: detalle,
                     ipAddress: _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "::1",
                     fechaRegistroUtc: DateTime.UtcNow
                 );
 
                 context.Set<Auditoria>().Add(auditRecord);
             }
+        }
+
+        private string GenerarDetalleDescriptivo(Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry entry)
+        {
+            var entityName = entry.Entity.GetType().Name;
+            
+            if (entry.State == EntityState.Added)
+            {
+                var nombre = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "Nombre" || p.Metadata.Name == "Titulo")?.CurrentValue;
+                return nombre != null ? $"Creado nuevo {entityName}: {nombre}" : $"Creación de registro en {entityName}";
+            }
+
+            if (entry.State == EntityState.Deleted)
+            {
+                return $"Eliminación permanente de registro en {entityName}";
+            }
+
+            if (entry.State == EntityState.Modified)
+            {
+                var cambios = entry.Properties
+                    .Where(p => p.IsModified && !Equals(p.OriginalValue, p.CurrentValue))
+                    .Select(p => $"{p.Metadata.Name}: '{p.OriginalValue ?? "null"}' -> '{p.CurrentValue ?? "null"}'")
+                    .ToList();
+
+                if (cambios.Any())
+                {
+                    var msg = $"Actualización en {entityName}. Cambios: {string.Join(" | ", cambios)}";
+                    return msg.Length > 450 ? msg.Substring(0, 447) + "..." : msg;
+                }
+                
+                return $"Actualización detectada en {entityName} (sin cambios aparentes en propiedades)";
+            }
+
+            return $"Acción sobre {entityName}";
         }
     }
 }

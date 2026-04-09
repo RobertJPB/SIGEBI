@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Business.DTOs;
+using SIGEBI.Business.Exceptions;
 using SIGEBI.Business.Interfaces.Services;
 using SIGEBI.Business.Interfaces.UseCases.Usuarios;
 using SIGEBI.Business.Validators;
@@ -42,17 +43,31 @@ namespace SIGEBI.API.Controllers
             if (dto == null || string.IsNullOrWhiteSpace(dto.Correo) || string.IsNullOrWhiteSpace(dto.Contrasena))
                 return BadRequest("Correo y contraseña son obligatorios.");
 
-            var usuario = await _loginUseCase.EjecutarAsync(dto.Correo, dto.Contrasena);
-
-            if (usuario == null)
-                return Unauthorized("Correo o contraseña incorrectos.");
-
-            var token = _jwtService.GenerarToken(usuario);
-
-            return Ok(new
+            try
             {
-                token = token
-            });
+                var usuario = await _loginUseCase.EjecutarAsync(dto.Correo, dto.Contrasena);
+
+                if (usuario == null)
+                    return Unauthorized("Correo o contraseña incorrectos.");
+
+                var token = _jwtService.GenerarToken(usuario);
+
+                return Ok(new
+                {
+                    token = token
+                });
+            }
+            catch (UsuarioEstadoException ex)
+            {
+                // Devolvemos 403 Forbidden para indicar que la autenticación fue válida pero el acceso está prohibido por el estado de la cuenta.
+                return StatusCode(StatusCodes.Status403Forbidden, new { 
+                    error = "CuentaRestringida",
+                    message = ex.Message,
+                    estado = (int)ex.Estado,
+                    motivo = ex.Motivo,
+                    fechaFin = ex.FechaFin
+                 });
+            }
         }
 
         // Registra un nuevo usuario aplicando las validaciones correspondientes (formato de correo, etc.).

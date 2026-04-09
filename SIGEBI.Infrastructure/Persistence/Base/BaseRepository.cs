@@ -35,7 +35,7 @@ namespace SIGEBI.Infrastructure.Persistence.Base
         {
             if (entity is IDesactivable desactivableEntity)
             {
-                desactivableEntity.Desactivar();
+                desactivableEntity.Desactivar("Borrado lógico desde repositorio base.");
                 _dbSet.Update(entity);
             }
             else

@@ -6,7 +6,10 @@ using Refit;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add<SIGEBI.Web.Filters.UserStatusActionFilter>();
+});
 
 // Registro del Servicio de API con Refit (Cumpliendo Punto 2 del Documento)
 builder.Services.AddRefitClient<ISigebiApi>()

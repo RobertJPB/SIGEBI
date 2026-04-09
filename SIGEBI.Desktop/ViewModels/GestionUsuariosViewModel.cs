@@ -99,15 +99,39 @@ namespace SIGEBI.ViewModels
         [RelayCommand]
         public async Task DesactivarAsync(Guid id)
         {
+            var dialog = new SIGEBI.Views.GestionUsuarios.MotivoDialog("Desactivar Cuenta")
+            {
+                Owner = System.Windows.Application.Current.MainWindow
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                try
+                {
+                    IsBusy = true;
+                    await _api.DesactivarUsuarioAsync(id, dialog.Motivo!);
+                    await CargarUsuariosAsync();
+                }
+                catch (Exception ex)
+                {
+                    await ManejarErrorAsync(ex, "desactivar usuario");
+                    IsBusy = false;
+                }
+            }
+        }
+
+        [RelayCommand]
+        public async Task SuspenderAsync(Guid id)
+        {
             try
             {
                 IsBusy = true;
-                await _api.DesactivarUsuarioAsync(id);
+                await _api.SuspenderUsuarioAsync(id);
                 await CargarUsuariosAsync();
             }
             catch (Exception ex)
             {
-                await ManejarErrorAsync(ex, "desactivar usuario");
+                await ManejarErrorAsync(ex, "suspender usuario");
                 IsBusy = false;
             }
         }
@@ -115,16 +139,24 @@ namespace SIGEBI.ViewModels
         [RelayCommand]
         public async Task BloquearAsync(Guid id)
         {
-            try
+            var dialog = new SIGEBI.Views.GestionUsuarios.MotivoDialog("Bloquear Cuenta")
             {
-                IsBusy = true;
-                await _api.BloquearUsuarioAsync(id);
-                await CargarUsuariosAsync();
-            }
-            catch (Exception ex)
+                Owner = System.Windows.Application.Current.MainWindow
+            };
+
+            if (dialog.ShowDialog() == true)
             {
-                await ManejarErrorAsync(ex, "bloquear usuario");
-                IsBusy = false;
+                try
+                {
+                    IsBusy = true;
+                    await _api.BloquearUsuarioAsync(id, dialog.Motivo!);
+                    await CargarUsuariosAsync();
+                }
+                catch (Exception ex)
+                {
+                    await ManejarErrorAsync(ex, "bloquear usuario");
+                    IsBusy = false;
+                }
             }
         }
 

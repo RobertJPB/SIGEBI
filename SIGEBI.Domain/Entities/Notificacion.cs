@@ -1,4 +1,5 @@
 using System;
+using SIGEBI.Domain.Enums.Operacion;
 
 namespace SIGEBI.Domain.Entities
 {

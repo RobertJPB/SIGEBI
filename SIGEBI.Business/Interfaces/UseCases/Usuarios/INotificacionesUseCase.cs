@@ -12,6 +12,9 @@ namespace SIGEBI.Business.Interfaces.UseCases.Usuarios
         Task MarcarComoLeidaAsync(Guid notificacionId);
         Task EliminarNotificacionAsync(Guid id);
         Task<NotificacionDTO> ObtenerPorIdAsync(Guid id);
+        Task MarcarTodasComoLeidasAsync(Guid usuarioId);
+        Task<IEnumerable<NotificacionDTO>> ObtenerTodasAsync();
         Task EnviarNotificacionPrestamoAsync(Guid usuarioId, DateTime fechaDevolucion);
+        Task EnviarNotificacionAsync(Guid usuarioId, string mensaje);
     }
 }

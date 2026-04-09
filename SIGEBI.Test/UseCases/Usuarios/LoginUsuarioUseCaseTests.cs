@@ -1,10 +1,12 @@
 using FluentAssertions;
 using Moq;
+using SIGEBI.Business.Exceptions;
 using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.Interfaces.Services;
 using SIGEBI.Business.UseCases.Usuarios;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Enums.Seguridad;
+using SIGEBI.Business.Interfaces.Common;
 using Xunit;
 
 namespace SIGEBI.Test.UseCases.Usuarios
@@ -13,16 +15,19 @@ namespace SIGEBI.Test.UseCases.Usuarios
     {
         private readonly Mock<IUsuarioRepository> _usuarioRepo;
         private readonly Mock<IHashService> _hashService;
+        private readonly Mock<IAuditService> _audit;
         private readonly LoginUsuarioUseCase _useCase;
 
         public LoginUsuarioUseCaseTests()
         {
             _usuarioRepo = new Mock<IUsuarioRepository>();
             _hashService = new Mock<IHashService>();
+            _audit = new Mock<IAuditService>();
 
             _useCase = new LoginUsuarioUseCase(
                 _usuarioRepo.Object,
-                _hashService.Object);
+                _hashService.Object,
+                _audit.Object);
         }
 
         // -- HELPER --
@@ -92,6 +97,60 @@ namespace SIGEBI.Test.UseCases.Usuarios
 
             // Assert 
             _hashService.Verify(h => h.Verificar("password123", "hash123"), Times.Once);
+        }
+
+        [Fact]
+        public async Task Ejecutar_UsuarioInactivo_LanzaExcepcion()
+        {
+            // Arrange
+            var usuario = CrearUsuario();
+            usuario.Desactivar("Motivo de prueba");
+
+            _usuarioRepo.Setup(r => r.GetByCorreoAsync("juan@test.com")).ReturnsAsync(usuario);
+            _hashService.Setup(h => h.Verificar("password123", "hash123")).Returns(true);
+
+            // Act
+            Func<Task> act = async () => await _useCase.EjecutarAsync("juan@test.com", "password123");
+
+            // Assert
+            await act.Should().ThrowAsync<UsuarioEstadoException>()
+                .Where(e => e.Estado == EstadoUsuario.Inactivo);
+        }
+
+        [Fact]
+        public async Task Ejecutar_UsuarioSuspendido_LanzaExcepcion()
+        {
+            // Arrange
+            var usuario = CrearUsuario();
+            usuario.Suspender();
+
+            _usuarioRepo.Setup(r => r.GetByCorreoAsync("juan@test.com")).ReturnsAsync(usuario);
+            _hashService.Setup(h => h.Verificar("password123", "hash123")).Returns(true);
+
+            // Act
+            Func<Task> act = async () => await _useCase.EjecutarAsync("juan@test.com", "password123");
+
+            // Assert
+            await act.Should().ThrowAsync<UsuarioEstadoException>()
+                .Where(e => e.Estado == EstadoUsuario.Suspendido);
+        }
+
+        [Fact]
+        public async Task Ejecutar_UsuarioBloqueado_LanzaExcepcion()
+        {
+            // Arrange
+            var usuario = CrearUsuario();
+            usuario.Bloquear("Motivo de prueba");
+
+            _usuarioRepo.Setup(r => r.GetByCorreoAsync("juan@test.com")).ReturnsAsync(usuario);
+            _hashService.Setup(h => h.Verificar("password123", "hash123")).Returns(true);
+
+            // Act
+            Func<Task> act = async () => await _useCase.EjecutarAsync("juan@test.com", "password123");
+
+            // Assert
+            await act.Should().ThrowAsync<UsuarioEstadoException>()
+                .Where(e => e.Estado == EstadoUsuario.Bloqueado);
         }
     }
 }

@@ -110,7 +110,7 @@ namespace SIGEBI.Test.Domain
         {
             var libro = new Libro(Guid.NewGuid(), "El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943);
 
-            libro.Desactivar();
+            libro.Desactivar("Motivo de prueba");
 
             libro.Estado.Should().Be(EstadoRecurso.Inactivo);
         }
@@ -119,7 +119,7 @@ namespace SIGEBI.Test.Domain
         public void DisminuirStock_LibroInactivo_LanzaExcepcion()
         {
             var libro = new Libro(Guid.NewGuid(), "El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943);
-            libro.Desactivar();
+            libro.Desactivar("Motivo de prueba");
 
             var act = () => libro.DisminuirStock();
 

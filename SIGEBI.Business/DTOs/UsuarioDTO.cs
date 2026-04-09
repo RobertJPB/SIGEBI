@@ -16,5 +16,7 @@ namespace SIGEBI.Business.DTOs
 
         public short Estado { get; set; }
         public string? ImagenUrl { get; set; }
+        public string? MotivoSancion { get; set; }
+        public DateTime? FechaFinSancion { get; set; }
     }
 }

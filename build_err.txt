@@ -1,0 +1,15 @@
+﻿  Determinando los proyectos que se van a restaurar...
+  Todos los proyectos est├ín actualizados para la restauraci├│n.
+  SIGEBI.Domain -> C:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Domain\bin\Debug\net8.0\SIGEBI.Domain.dll
+  SIGEBI.Business -> C:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Business\bin\Debug\net8.0\SIGEBI.Business.dll
+C:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Desktop\Views\Penalizaciones\AplicarPenalizacionDialog.xaml.cs(47,53): error CS1061: "PenalizacionesViewModel" no contiene una definici├│n para "ErrorMessage" ni un m├®todo de extensi├│n accesible "ErrorMessage" que acepte un primer argumento del tipo "PenalizacionesViewModel" (┬┐falta alguna directiva using o una referencia de ensamblado?) [C:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Desktop\SIGEBI.Desktop_zoaxgspb_wpftmp.csproj]
+
+ERROR al compilar.
+
+C:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Desktop\Views\Penalizaciones\AplicarPenalizacionDialog.xaml.cs(47,53): error CS1061: "PenalizacionesViewModel" no contiene una definici├│n para "ErrorMessage" ni un m├®todo de extensi├│n accesible "ErrorMessage" que acepte un primer argumento del tipo "PenalizacionesViewModel" (┬┐falta alguna directiva using o una referencia de ensamblado?) [C:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Desktop\SIGEBI.Desktop_zoaxgspb_wpftmp.csproj]
+    0 Advertencia(s)
+    1 Errores
+
+Tiempo transcurrido 00:00:04.41
+
+Hay actualizaciones de carga de trabajo disponibles. Ejecute "dotnet workload list" para obtener m├ís informaci├│n.

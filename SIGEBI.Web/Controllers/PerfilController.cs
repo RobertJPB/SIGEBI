@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using SIGEBI.Web.Helpers;
 
 namespace SIGEBI.Web.Controllers
 {
@@ -162,7 +163,7 @@ namespace SIGEBI.Web.Controllers
                 }
                 else
                 {
-                    var error = await response.Content.ReadAsStringAsync();
+                    var error = await ApiErrorHelper.GetErrorMessageAsync(response);
                     TempData["Error"] = "No se pudo actualizar: " + error;
                 }
             }

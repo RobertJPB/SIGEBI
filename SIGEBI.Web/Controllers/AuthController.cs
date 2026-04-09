@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.IdentityModel.Tokens.Jwt;
 using Refit;
 using SIGEBI.Web.Services;
+using SIGEBI.Web.Helpers;
 
 namespace SIGEBI.Web.Controllers
 {
@@ -87,13 +88,19 @@ namespace SIGEBI.Web.Controllers
                     HttpContext.Session.SetString("UsuarioNombre", usuarioNombreClaim);
                 }
 
+                var usuarioImagenClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "ImagenUrl")?.Value;
+                if (!string.IsNullOrEmpty(usuarioImagenClaim))
+                {
+                    HttpContext.Session.SetString("UsuarioImagen", usuarioImagenClaim);
+                }
+
                 // Crear cookie de autenticación
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, usuarioNombreClaim ?? model.Correo),
                     new Claim(ClaimTypes.NameIdentifier, usuarioIdClaim ?? ""),
                     new Claim(ClaimTypes.Role, usuarioRolClaim ?? ""),
-                    new Claim("JwtToken", token)
+                    new Claim("JwtToken", token),
+                    new Claim("UsuarioImagen", usuarioImagenClaim ?? "")
                 };
 
                 var claimsIdentity = new ClaimsIdentity(
@@ -113,11 +120,31 @@ namespace SIGEBI.Web.Controllers
 
                 return RedirectToAction("Index", "Catalogo");
             }
+            catch (ApiException apiEx)
+            {
+                var message = await ApiErrorHelper.GetErrorMessageAsync(apiEx);
+                model.ErrorMessage = message;
+                return View(model);
+            }
             catch (Exception ex)
             {
                 model.ErrorMessage = $"No se pudo conectar con el servidor. Detalle: {ex.Message}";
                 return View(model);
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Logout(string? message)
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            HttpContext.Session.Clear();
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                TempData["LogoutMessage"] = message;
+            }
+
+            return RedirectToAction("Login");
         }
     }
 }

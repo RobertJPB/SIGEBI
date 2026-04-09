@@ -1,0 +1,33 @@
+﻿  Determinando los proyectos que se van a restaurar...
+  Se ha restaurado c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Domain\SIGEBI.Domain.csproj (en 228 ms).
+  Se ha restaurado c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Business\SIGEBI.Business.csproj (en 507 ms).
+  Se ha restaurado c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Desktop\SIGEBI.Desktop.csproj (en 562 ms).
+  Se ha restaurado c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Web\SIGEBI.Web.csproj (en 600 ms).
+  Se ha restaurado c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Infrastructure\SIGEBI.Infrastructure.csproj (en 646 ms).
+  Se ha restaurado c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Test\SIGEBI.Test.csproj (en 648 ms).
+  Se ha restaurado c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.API\SIGEBI.API.csproj (en 648 ms).
+  SIGEBI.Domain -> c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Domain\bin\Debug\net8.0\SIGEBI.Domain.dll
+c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Business\UseCases\Prestamos\DevolverPrestamoUseCase.cs(89,74): warning CS8629: Un tipo que acepta valores NULL puede ser nulo. [c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Business\SIGEBI.Business.csproj]
+  SIGEBI.Business -> c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Business\bin\Debug\net8.0\SIGEBI.Business.dll
+  SIGEBI.Infrastructure -> c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Infrastructure\bin\Debug\net8.0\SIGEBI.Infrastructure.dll
+c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Test\UseCases\Prestamos\SolicitarPrestamoUseCaseTests.cs(43,28): error CS7036: No se ha dado ning├║n argumento que corresponda al par├ímetro requerido "logger" de "SolicitarPrestamoUseCase.SolicitarPrestamoUseCase(IPrestamoRepository, IUsuarioRepository, IRecursoRepository, IPenalizacionRepository, INotificacionRepository, IEmailAdapter, IUnitOfWork, IMemoryCache, IGuidGenerator, ILogger<SolicitarPrestamoUseCase>)" [c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Test\SIGEBI.Test.csproj]
+c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Test\UseCases\Prestamos\DevolverPrestamoUseCaseTests.cs(34,28): error CS7036: No se ha dado ning├║n argumento que corresponda al par├ímetro requerido "guidGenerator" de "DevolverPrestamoUseCase.DevolverPrestamoUseCase(IPrestamoRepository, IRecursoRepository, IPenalizacionRepository, INotificacionRepository, IListaDeseosRepository, IUnitOfWork, IMemoryCache, IGuidGenerator)" [c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Test\SIGEBI.Test.csproj]
+c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Web\Controllers\CatalogoController.cs(133,34): warning CS8600: Se va a convertir un literal nulo o un posible valor nulo en un tipo que no acepta valores NULL [c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Web\SIGEBI.Web.csproj]
+c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Web\Controllers\CatalogoController.cs(141,35): warning CS8600: Se va a convertir un literal nulo o un posible valor nulo en un tipo que no acepta valores NULL [c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Web\SIGEBI.Web.csproj]
+  SIGEBI.Web -> c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Web\bin\Debug\net8.0\SIGEBI.Web.dll
+  SIGEBI.Desktop -> c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Desktop\bin\Debug\net8.0-windows\SIGEBI.Desktop.dll
+  SIGEBI.API -> c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.API\bin\Debug\net8.0\SIGEBI.API.dll
+
+ERROR al compilar.
+
+c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Business\UseCases\Prestamos\DevolverPrestamoUseCase.cs(89,74): warning CS8629: Un tipo que acepta valores NULL puede ser nulo. [c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Business\SIGEBI.Business.csproj]
+c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Web\Controllers\CatalogoController.cs(133,34): warning CS8600: Se va a convertir un literal nulo o un posible valor nulo en un tipo que no acepta valores NULL [c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Web\SIGEBI.Web.csproj]
+c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Web\Controllers\CatalogoController.cs(141,35): warning CS8600: Se va a convertir un literal nulo o un posible valor nulo en un tipo que no acepta valores NULL [c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Web\SIGEBI.Web.csproj]
+c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Test\UseCases\Prestamos\SolicitarPrestamoUseCaseTests.cs(43,28): error CS7036: No se ha dado ning├║n argumento que corresponda al par├ímetro requerido "logger" de "SolicitarPrestamoUseCase.SolicitarPrestamoUseCase(IPrestamoRepository, IUsuarioRepository, IRecursoRepository, IPenalizacionRepository, INotificacionRepository, IEmailAdapter, IUnitOfWork, IMemoryCache, IGuidGenerator, ILogger<SolicitarPrestamoUseCase>)" [c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Test\SIGEBI.Test.csproj]
+c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Test\UseCases\Prestamos\DevolverPrestamoUseCaseTests.cs(34,28): error CS7036: No se ha dado ning├║n argumento que corresponda al par├ímetro requerido "guidGenerator" de "DevolverPrestamoUseCase.DevolverPrestamoUseCase(IPrestamoRepository, IRecursoRepository, IPenalizacionRepository, INotificacionRepository, IListaDeseosRepository, IUnitOfWork, IMemoryCache, IGuidGenerator)" [c:\Users\Administrador\Desktop\SIGEBI\SIGEBI.Test\SIGEBI.Test.csproj]
+    3 Advertencia(s)
+    2 Errores
+
+Tiempo transcurrido 00:00:14.85
+
+Hay actualizaciones de carga de trabajo disponibles. Ejecute "dotnet workload list" para obtener m├ís informaci├│n.

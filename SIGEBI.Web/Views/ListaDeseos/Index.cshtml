@@ -109,7 +109,20 @@
                 Notificaciones
             </a>
             <div class="nav-divider"></div>
-            <a class="nav-link" href="/Perfil/Index"><i class="bi bi-person-circle"></i> Perfil</a>
+            <a class="nav-link" href="/Perfil/Index">
+                @{
+                    var userImg = Context.User.FindFirst("UsuarioImagen")?.Value;
+                }
+                @if (!string.IsNullOrEmpty(userImg))
+                {
+                    <img src="@(Model.ApiBaseUrl.TrimEnd('/') + "/" + userImg.TrimStart('/'))" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.3);" />
+                }
+                else
+                {
+                    <i class="bi bi-person-circle"></i>
+                }
+                Perfil
+            </a>
         </div>
     </nav>
 

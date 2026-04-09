@@ -20,5 +20,12 @@ namespace SIGEBI.Infrastructure.Persistence.Repositories
         {
             return await _dbSet.Where(u => u.Estado == EstadoUsuario.Activo).ToListAsync();
         }
+
+        public async Task<IEnumerable<Usuario>> GetAllConPenalizacionesAsync()
+        {
+            return await _dbSet
+                .Include(u => u.Penalizaciones)
+                .ToListAsync();
+        }
     }
 }

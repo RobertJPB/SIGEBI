@@ -123,12 +123,30 @@ namespace SIGEBI.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("{id}/desactivar")]
-        public async Task<IActionResult> Desactivar(Guid id)
+        public async Task<IActionResult> Desactivar(Guid id, [FromBody] string motivo)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarUsuarios(rol), "desactivar usuario");
 
-            await _gestionarUsuario.DesactivarAsync(id);
+            if (string.IsNullOrWhiteSpace(motivo)) return BadRequest("El motivo de desactivación es obligatorio.");
+
+            await _gestionarUsuario.DesactivarAsync(id, motivo);
+            return NoContent();
+        }
+
+        // Suspende el acceso de un usuario.
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPut("{id}/suspender")]
+        public async Task<IActionResult> Suspender(Guid id)
+        {
+            var rol = User.ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarUsuarios(rol), "suspender usuario");
+
+            await _gestionarUsuario.SuspenderAsync(id);
             return NoContent();
         }
 
@@ -139,12 +157,14 @@ namespace SIGEBI.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("{id}/bloquear")]
-        public async Task<IActionResult> Bloquear(Guid id)
+        public async Task<IActionResult> Bloquear(Guid id, [FromBody] string motivo)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarUsuarios(rol), "bloquear usuario");
 
-            await _gestionarUsuario.BloquearAsync(id);
+            if (string.IsNullOrWhiteSpace(motivo)) return BadRequest("El motivo de bloqueo es obligatorio.");
+
+            await _gestionarUsuario.BloquearAsync(id, motivo);
             return NoContent();
         }
 

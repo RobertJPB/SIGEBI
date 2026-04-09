@@ -8,5 +8,6 @@ namespace SIGEBI.Business.Interfaces.Persistence
         Task<Usuario?> GetByCorreoAsync(string correo);
         Task<IEnumerable<Usuario>> GetByRolAsync(RolUsuario rol);
         Task<IEnumerable<Usuario>> GetActivosAsync();
+        Task<IEnumerable<Usuario>> GetAllConPenalizacionesAsync();
     }
 }

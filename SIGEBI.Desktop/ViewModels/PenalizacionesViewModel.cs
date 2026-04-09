@@ -15,6 +15,10 @@ namespace SIGEBI.ViewModels
         private IEnumerable<PenalizacionDTO> _todasLasPenalizaciones = Array.Empty<PenalizacionDTO>();
 
         [ObservableProperty] private ObservableCollection<PenalizacionDTO> _penalizaciones = new();
+        [ObservableProperty] private ObservableCollection<UsuarioDTO> _usuarios = new();
+        [ObservableProperty] private UsuarioDTO? _selectedUsuario;
+        [ObservableProperty] private string _motivoManual = string.Empty;
+        [ObservableProperty] private int _diasManual = 7;
         [ObservableProperty] private string _contador = "0 penalizaciones";
         [ObservableProperty] private string _searchQuery = string.Empty;
 
@@ -54,9 +58,18 @@ namespace SIGEBI.ViewModels
             {
                 IsBusy = true;
                 LimpiarError();
+                
+                // Cargar penalizaciones
                 var data = await _api.GetPenalizacionesAsync();
                 _todasLasPenalizaciones = data;
                 FiltrarResultados();
+
+                // Cargar usuarios para el combo manual (solo una vez o si es necesario)
+                if (Usuarios.Count == 0)
+                {
+                    var userList = await _api.GetUsuariosAsync();
+                    Usuarios = new ObservableCollection<UsuarioDTO>(userList.OrderBy(u => u.Nombre));
+                }
             }
             catch (Exception ex)
             {
@@ -84,21 +97,6 @@ namespace SIGEBI.ViewModels
             }
         }
 
-        [RelayCommand]
-        public async Task AplicarPenalizacionesAsync()
-        {
-            try
-            {
-                IsBusy = true;
-                await _api.AplicarPenalizacionesAsync();
-                await CargarPenalizacionesAsync();
-            }
-            catch (Exception ex)
-            {
-                await ManejarErrorAsync(ex, "aplicar penalizaciones");
-                IsBusy = false;
-            }
-        }
 
         [RelayCommand]
         public async Task EliminarAsync(Guid id)
@@ -119,15 +117,45 @@ namespace SIGEBI.ViewModels
             }
         }
 
+
         [RelayCommand]
-        public void AbrirAplicarManual()
+        public async Task EjecutarAplicarManualAsync()
         {
-            var modal = new SIGEBI.Views.Penalizaciones.AplicarPenalizacionWindow
+            if (SelectedUsuario == null)
             {
-                DataContext = this,
-                Owner = System.Windows.Application.Current.MainWindow
-            };
-            modal.ShowDialog();
+                System.Windows.MessageBox.Show("Por favor selecciona un usuario.", "Aviso", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(MotivoManual))
+            {
+                System.Windows.MessageBox.Show("Por favor ingresa un motivo.", "Aviso", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                IsBusy = true;
+                var dto = new AplicarPenalizacionManualDTO
+                {
+                    UsuarioId = SelectedUsuario.Id,
+                    Motivo = MotivoManual,
+                    DiasPenalizacion = DiasManual
+                };
+
+                await _api.AplicarPenalizacionManualAsync(dto);
+                
+                // Limpiar form
+                MotivoManual = string.Empty;
+                SelectedUsuario = null;
+                
+                await CargarPenalizacionesAsync();
+            }
+            catch (Exception ex)
+            {
+                await ManejarErrorAsync(ex, "aplicar penalización manual");
+            }
+            finally { IsBusy = false; }
         }
 
         [RelayCommand]

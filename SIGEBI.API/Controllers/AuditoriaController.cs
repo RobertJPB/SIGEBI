@@ -59,5 +59,19 @@ namespace SIGEBI.API.Controllers
         }
 
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpGet("entidad/{entidad}/{entidadId}")]
+        public async Task<IActionResult> ObtenerPorEntidad(string entidad, string entidadId)
+        {
+            var rol = User.ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerAuditoria(rol), "ver auditoría por entidad");
+
+            var auditorias = await _auditoriaUseCase.ObtenerPorEntidadAsync(entidad, entidadId);
+            return Ok(auditorias);
+        }
     }
 }

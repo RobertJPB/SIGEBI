@@ -32,17 +32,32 @@ namespace SIGEBI.ViewModels
         /// </summary>
         /// <param name="ex">Excepción capturada.</param>
         /// <param name="accion">Descripción de la acción fallida (ej: "cargar usuarios").</param>
-        protected async Task ManejarErrorAsync(Exception ex, string accion)
+        protected Task ManejarErrorAsync(Exception ex, string accion)
         {
             string mensaje;
 
             if (ex is ApiException apiEx)
             {
                 // Extrae el error de negocio enviado por la API (400, 404, 500, etc.)
-                var errorBody = await apiEx.GetContentAsAsync<string>();
-                var detalle = !string.IsNullOrWhiteSpace(errorBody)
-                    ? errorBody
-                    : $"{(int)apiEx.StatusCode} {apiEx.ReasonPhrase}";
+                string detalle = apiEx.ReasonPhrase;
+                
+                if (!string.IsNullOrWhiteSpace(apiEx.Content))
+                {
+                    try 
+                    {
+                        using var doc = System.Text.Json.JsonDocument.Parse(apiEx.Content);
+                        var root = doc.RootElement;
+                        
+                        if (root.TryGetProperty("detail", out var detailProp))
+                            detalle = detailProp.GetString() ?? detalle;
+                        else if (root.TryGetProperty("message", out var msgProp))
+                            detalle = msgProp.GetString() ?? detalle;
+                        else if (root.TryGetProperty("title", out var titleProp))
+                            detalle = titleProp.GetString() ?? detalle;
+                    }
+                    catch { /* Fallback al reason phrase */ }
+                }
+
                 mensaje = $"No se pudo {accion}: {detalle}";
             }
             else
@@ -53,6 +68,8 @@ namespace SIGEBI.ViewModels
 
             MensajeError = mensaje;
             TieneError = true;
+
+            return Task.CompletedTask;
         }
 
         /// <summary>Limpia el estado de error.</summary>

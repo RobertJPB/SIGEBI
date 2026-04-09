@@ -30,12 +30,19 @@ namespace SIGEBI.Infrastructure.Persistence.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<RecursoBibliografico>> BuscarPorTituloAsync(string titulo) // Buscar por título
-            => await _dbSet
+        public async Task<IEnumerable<RecursoBibliografico>> BuscarPorTituloAsync(string query) // Buscar por título o autor
+        {
+            if (string.IsNullOrWhiteSpace(query))
+                return await GetAllAsync();
+
+            var queryLower = query.ToLower();
+            return await _dbSet
                 .AsNoTracking()
                 .Include(r => r.Categoria)
-                .Where(r => r.Titulo.Contains(titulo))
+                .Where(r => r.Titulo.ToLower().Contains(queryLower) || 
+                            r.Autor.ToLower().Contains(queryLower))
                 .ToListAsync();
+        }
 
         public async Task<IEnumerable<Libro>> GetLibrosAsync() // Solo libros
             => await _context.Set<Libro>().Include(r => r.Categoria).AsNoTracking().ToListAsync();

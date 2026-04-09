@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text;
 using Refit;
 using SIGEBI.Web.Services;
+using SIGEBI.Web.Helpers;
 
 namespace SIGEBI.Web.Controllers
 {
@@ -130,12 +131,12 @@ namespace SIGEBI.Web.Controllers
             }
             catch (ApiException apiEx)
             {
-                var error = await apiEx.GetContentAsAsync<string>();
-                return Json(new { success = false, message = "No se pudo procesar el préstamo: " + (error ?? apiEx.ReasonPhrase) });
+                string message = await ApiErrorHelper.GetErrorMessageAsync(apiEx);
+                return Json(new { success = false, message = "No se pudo procesar el préstamo: " + message });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = ex.Message });
+                return Json(new { success = false, message = "Error interno: " + ex.Message });
             }
         }
 
@@ -206,8 +207,8 @@ namespace SIGEBI.Web.Controllers
             }
             catch (ApiException apiEx)
             {
-                var error = await apiEx.GetContentAsAsync<string>();
-                return Json(new { success = false, message = "No se pudo agregar a la lista: " + (error ?? apiEx.ReasonPhrase) });
+                var error = await ApiErrorHelper.GetErrorMessageAsync(apiEx);
+                return Json(new { success = false, message = "No se pudo agregar a la lista: " + error });
             }
             catch (Exception ex)
             {

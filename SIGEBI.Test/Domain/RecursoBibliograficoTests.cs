@@ -103,7 +103,7 @@ namespace SIGEBI.Test.Domain
             var libro = new Libro(Guid.NewGuid(), "Clean Code", "Robert Martin", 1, 3, null,
                                   "978-01-323", "Prentice Hall", 2008);
 
-            libro.Desactivar();
+            libro.Desactivar("Motivo de prueba");
 
             libro.Estado.Should().Be(EstadoRecurso.Inactivo);
         }
@@ -113,7 +113,7 @@ namespace SIGEBI.Test.Domain
         {
             var libro = new Libro(Guid.NewGuid(), "Clean Code", "Robert Martin", 1, 3, null,
                                   "978-01-323", "Prentice Hall", 2008);
-            libro.Desactivar();
+            libro.Desactivar("Motivo de prueba");
 
             libro.Activar();
 
@@ -125,7 +125,7 @@ namespace SIGEBI.Test.Domain
         {
             var libro = new Libro(Guid.NewGuid(), "Clean Code", "Robert Martin", 1, 3, null,
                                   "978-01-323", "Prentice Hall", 2008);
-            libro.Desactivar();
+            libro.Desactivar("Motivo de prueba");
 
             var act = () => libro.DisminuirStock();
 

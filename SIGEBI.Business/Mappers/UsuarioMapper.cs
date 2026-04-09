@@ -15,8 +15,20 @@ namespace SIGEBI.Business.Mappers
                 Correo = usuario.Correo,
                 IdRol = (int)usuario.Rol,
                 Estado = (short)usuario.Estado,
-                ImagenUrl = usuario.ImagenUrl
+                ImagenUrl = usuario.ImagenUrl,
+                MotivoSancion = ObtenerMotivo(usuario),
+                FechaFinSancion = usuario.Penalizaciones?.FirstOrDefault(p => p.Estado == SIGEBI.Domain.Enums.Operacion.EstadoPenalizacion.Activa)?.FechaFin
             };
+        }
+
+        private static string? ObtenerMotivo(Usuario usuario)
+        {
+            if (usuario.Estado == SIGEBI.Domain.Enums.Seguridad.EstadoUsuario.Suspendido)
+            {
+                return usuario.Penalizaciones?.FirstOrDefault(p => p.Estado == SIGEBI.Domain.Enums.Operacion.EstadoPenalizacion.Activa)?.Motivo;
+            }
+            
+            return usuario.MotivoEstado;
         }
     }
 }

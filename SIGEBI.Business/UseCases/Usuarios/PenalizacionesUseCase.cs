@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces;
@@ -8,6 +11,8 @@ using SIGEBI.Business.Mappers;
 using SIGEBI.Business.Interfaces.Common;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Entities;
+using SIGEBI.Domain.Enums.Auditoria;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace SIGEBI.Business.UseCases.Usuarios
 {
@@ -17,24 +22,34 @@ namespace SIGEBI.Business.UseCases.Usuarios
         private readonly IPrestamoRepository _prestamoRepository;
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IPenalizacionRepository _penalizacionRepository;
+        private readonly INotificacionesUseCase _notificaciones;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IGuidGenerator _guidGenerator;
         private readonly ILogger<PenalizacionesUseCase> _logger;
+        private readonly IMemoryCache _cache;
+        private readonly IAuditService _audit;
+        private const string CachePrefix = "UserStatus_";
 
         public PenalizacionesUseCase(
-            IPrestamoRepository prestamoRepository,
-            IUsuarioRepository usuarioRepository,
             IPenalizacionRepository penalizacionRepository,
+            IUsuarioRepository usuarioRepository,
+            IPrestamoRepository prestamoRepository,
+            INotificacionesUseCase notificaciones,
             IUnitOfWork unitOfWork,
+            IAuditService audit,
             IGuidGenerator guidGenerator,
-            ILogger<PenalizacionesUseCase> logger)
+            ILogger<PenalizacionesUseCase> logger,
+            IMemoryCache cache)
         {
-            _prestamoRepository = prestamoRepository;
-            _usuarioRepository = usuarioRepository;
             _penalizacionRepository = penalizacionRepository;
+            _usuarioRepository = usuarioRepository;
+            _prestamoRepository = prestamoRepository;
+            _notificaciones = notificaciones;
             _unitOfWork = unitOfWork;
+            _audit = audit;
             _guidGenerator = guidGenerator;
             _logger = logger;
+            _cache = cache;
         }
 
         // Proceso por lotes que evalúa préstamos atrasados y genera las penalizaciones correspondientes.
@@ -61,6 +76,23 @@ namespace SIGEBI.Business.UseCases.Usuarios
 
                 var penalizacion = new Penalizacion(_guidGenerator.Create(), prestamo.UsuarioId, motivo, diasPenalizacion, DateTime.UtcNow, prestamo.Id);
                 await _penalizacionRepository.AddAsync(penalizacion);
+                
+                // Sincronizar estado del usuario
+                var usuario = await _usuarioRepository.GetByIdAsync(prestamo.UsuarioId);
+                if (usuario != null)
+                {
+                    usuario.Suspender();
+                    _usuarioRepository.Update(usuario);
+                    _cache.Remove($"{CachePrefix}{usuario.Id}");
+
+                    // Notificar al usuario sobre su nueva sanción
+                    await _notificaciones.EnviarNotificacionAsync(usuario.Id, 
+                        $"Su cuenta ha sido suspendida automáticamente por {diasPenalizacion} días. Motivo: {motivo}");
+
+                    await _audit.LogActionAsync(TipoAccionAuditoria.PenalizacionAplicada, "Penalizacion", 
+                        $"Aplicada sanción automática a {usuario.Nombre} por {diasPenalizacion} días. Razón: {motivo}");
+                }
+
                 _logger.LogInformation("Penalización aplicada al usuario {UsuarioId} por préstamo {PrestamoId} ({Dias} días de atraso).",
                     prestamo.UsuarioId, prestamo.Id, diasAtraso);
             }
@@ -75,6 +107,19 @@ namespace SIGEBI.Business.UseCases.Usuarios
 
             var penalizacion = new Penalizacion(_guidGenerator.Create(), dto.UsuarioId, dto.Motivo, dto.DiasPenalizacion, DateTime.UtcNow, dto.PrestamoId);
             await _penalizacionRepository.AddAsync(penalizacion);
+            
+            // Sincronizar estado del usuario
+            usuario.Suspender();
+            _usuarioRepository.Update(usuario);
+            _cache.Remove($"{CachePrefix}{usuario.Id}");
+
+            // Notificar al usuario
+            await _notificaciones.EnviarNotificacionAsync(dto.UsuarioId, 
+                $"Se le ha aplicado una sanción manual de {dto.DiasPenalizacion} días. Motivo: {dto.Motivo}");
+
+            await _audit.LogActionAsync(TipoAccionAuditoria.PenalizacionAplicada, "Penalizacion", 
+                $"Aplicada sanción manual a {usuario.Nombre} por {dto.DiasPenalizacion} días. Razón: {dto.Motivo}");
+
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -113,6 +158,20 @@ namespace SIGEBI.Business.UseCases.Usuarios
 
             penalizacion.Finalizar(DateTime.UtcNow);
             _penalizacionRepository.Update(penalizacion);
+
+            // Verificar si el usuario tiene otras penalizaciones activas
+            var usuario = await _usuarioRepository.GetByIdAsync(penalizacion.UsuarioId);
+            if (usuario != null)
+            {
+                var activas = await _penalizacionRepository.GetByUsuarioIdAsync(usuario.Id);
+                if (!activas.Any(p => p.Estado == SIGEBI.Domain.Enums.Operacion.EstadoPenalizacion.Activa && p.Id != id))
+                {
+                    usuario.Activar();
+                    _usuarioRepository.Update(usuario);
+                    _cache.Remove($"{CachePrefix}{usuario.Id}");
+                }
+            }
+
             await _unitOfWork.SaveChangesAsync();
         }
     }

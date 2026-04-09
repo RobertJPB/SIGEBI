@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using Refit;
 using SIGEBI.Web.Services;
+using SIGEBI.Web.Helpers;
 
 namespace SIGEBI.Web.Controllers
 {
@@ -66,7 +67,8 @@ namespace SIGEBI.Web.Controllers
             }
             catch (ApiException apiEx)
             {
-                model.ErrorMessage = $"Error al obtener datos de la API: {apiEx.ReasonPhrase}";
+                var error = await ApiErrorHelper.GetErrorMessageAsync(apiEx);
+                model.ErrorMessage = $"Error al obtener datos de la API: {error}";
             }
             catch (Exception ex)
             {

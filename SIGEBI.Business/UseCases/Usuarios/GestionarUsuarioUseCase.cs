@@ -4,6 +4,7 @@ using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.Interfaces.UseCases.Usuarios;
 using SIGEBI.Business.Mappers;
 using SIGEBI.Domain.Enums.Seguridad;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace SIGEBI.Business.UseCases.Usuarios
 {
@@ -11,19 +12,26 @@ namespace SIGEBI.Business.UseCases.Usuarios
     public class GestionarUsuarioUseCase : IGestionarUsuarioUseCase
     {
         private readonly IUsuarioRepository _usuarioRepository;
+        private readonly INotificacionesUseCase _notificaciones;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMemoryCache _cache;
+        private const string CachePrefix = "UserStatus_";
 
         public GestionarUsuarioUseCase(
             IUsuarioRepository usuarioRepository,
-            IUnitOfWork unitOfWork)
+            INotificacionesUseCase notificaciones,
+            IUnitOfWork unitOfWork,
+            IMemoryCache cache)
         {
             _usuarioRepository = usuarioRepository;
+            _notificaciones = notificaciones;
             _unitOfWork = unitOfWork;
+            _cache = cache;
         }
 
         public async Task<IEnumerable<UsuarioDTO>> ObtenerTodosAsync()
         {
-            var usuarios = await _usuarioRepository.GetAllAsync();
+            var usuarios = await _usuarioRepository.GetAllConPenalizacionesAsync();
             return usuarios.Select(UsuarioMapper.ToDTO);
         }
 
@@ -41,26 +49,48 @@ namespace SIGEBI.Business.UseCases.Usuarios
             usuario.Activar();
             _usuarioRepository.Update(usuario);
             await _unitOfWork.SaveChangesAsync();
+            
+            _cache.Remove($"{CachePrefix}{id}");
         }
 
-        public async Task DesactivarAsync(Guid id)
+        public async Task DesactivarAsync(Guid id, string motivo)
         {
             var usuario = await _usuarioRepository.GetByIdAsync(id)
                 ?? throw new InvalidOperationException("Usuario no encontrado.");
-            usuario.Desactivar();
+            usuario.Desactivar(motivo);
             _usuarioRepository.Update(usuario);
+            _cache.Remove($"{CachePrefix}{usuario.Id}");
+
+            // Notificar al usuario (aunque no pueda loguearse, queda el registro)
+            await _notificaciones.EnviarNotificacionAsync(id, $"Su cuenta ha sido desactivada administrativamente. Motivo: {motivo}");
+
             await _unitOfWork.SaveChangesAsync();
         }
 
-        // Restringe permanentemente el acceso de un usuario al sistema.
-        public async Task BloquearAsync(Guid id)
+        public async Task SuspenderAsync(Guid id)
         {
-            // TODO: Agregar motivo de bloqueo despues?
+            var usuario = await _usuarioRepository.GetByIdAsync(id)
+                ?? throw new InvalidOperationException("Usuario no encontrado.");
+            usuario.Suspender();
+            _usuarioRepository.Update(usuario);
+            await _unitOfWork.SaveChangesAsync();
+            
+            _cache.Remove($"{CachePrefix}{id}");
+        }
+
+        // Restringe permanentemente el acceso de un usuario al sistema.
+        public async Task BloquearAsync(Guid id, string motivo)
+        {
             var usuario = await _usuarioRepository.GetByIdAsync(id)
                 ?? throw new InvalidOperationException("Usuario no encontrado.");
             
-            usuario.Bloquear();
+            usuario.Bloquear(motivo);
             _usuarioRepository.Update(usuario);
+            _cache.Remove($"{CachePrefix}{usuario.Id}");
+
+            // Notificar al usuario
+            await _notificaciones.EnviarNotificacionAsync(id, $"Su cuenta ha sido bloqueada permanentemente por faltas graves. Motivo: {motivo}");
+
             await _unitOfWork.SaveChangesAsync();
         }
 

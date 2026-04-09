@@ -1,9 +1,13 @@
+using Microsoft.Extensions.Caching.Memory;
 using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Common;
 using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.Interfaces.UseCases.Prestamos;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Entities;
+using SIGEBI.Domain.Enums.Auditoria;
+using SIGEBI.Domain.Enums.Seguridad;
+using SIGEBI.Business.Mappers;
 
 namespace SIGEBI.Business.UseCases.Prestamos
 {
@@ -15,7 +19,9 @@ namespace SIGEBI.Business.UseCases.Prestamos
         private readonly IPenalizacionRepository _penalizacionRepository;
         private readonly INotificacionRepository _notificacionRepository;
         private readonly IListaDeseosRepository _listaDeseosRepository;
+        private readonly IAuditService _audit;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMemoryCache _cache;
         private readonly IGuidGenerator _guidGenerator;
 
         public DevolverPrestamoUseCase(
@@ -24,7 +30,9 @@ namespace SIGEBI.Business.UseCases.Prestamos
             IPenalizacionRepository penalizacionRepository,
             INotificacionRepository notificacionRepository,
             IListaDeseosRepository listaDeseosRepository,
+            IAuditService audit,
             IUnitOfWork unitOfWork,
+            IMemoryCache cache,
             IGuidGenerator guidGenerator)
         {
             _prestamoRepository = prestamoRepository;
@@ -32,7 +40,9 @@ namespace SIGEBI.Business.UseCases.Prestamos
             _penalizacionRepository = penalizacionRepository;
             _notificacionRepository = notificacionRepository;
             _listaDeseosRepository = listaDeseosRepository;
+            _audit = audit;
             _unitOfWork = unitOfWork;
+            _cache = cache;
             _guidGenerator = guidGenerator;
         }
 
@@ -88,7 +98,14 @@ namespace SIGEBI.Business.UseCases.Prestamos
 
             _prestamoRepository.Update(prestamo);
             _recursoRepository.Update(recurso);
+
+            await _audit.LogActionAsync(TipoAccionAuditoria.DevolucionRealizada, "Prestamo", 
+                $"Devolución procesada para el recurso '{recurso.Titulo}'. Usuario ID: {prestamo.UsuarioId}");
+
             await _unitOfWork.SaveChangesAsync();
+
+            // Sincronizamos el catálogo web de inmediato
+            _cache.Remove("RecursosDisponibles");
         }
     }
 }

@@ -117,15 +117,32 @@
             <Setter Property="Padding" Value="10,8"/>
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="Height" Value="36"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
-                        <Border Background="{TemplateBinding Background}"
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="7">
-                            <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+                                CornerRadius="7"
+                                SnapsToDevicePixels="True">
+                            <Grid>
+                                <ScrollViewer x:Name="PART_ContentHost" 
+                                              Focusable="false" 
+                                              HorizontalScrollBarVisibility="Hidden" 
+                                              VerticalScrollBarVisibility="Hidden"/>
+                            </Grid>
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="BorderBrush" Value="#1a5c2e"/>
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="true">
+                                <Setter Property="BorderBrush" Value="#1a5c2e"/>
+                                <Setter Property="BorderThickness" Value="2"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -135,10 +152,11 @@
 
     <Grid Margin="28,20,28,20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/> <!-- Cabecera -->
+            <RowDefinition Height="Auto"/> <!-- Separador -->
+            <RowDefinition Height="Auto"/> <!-- Buscador -->
+            <RowDefinition Height="Auto"/> <!-- Errores -->
+            <RowDefinition Height="*"/>    <!-- Tabla -->
         </Grid.RowDefinitions>
 
         <!-- ── HEADER ── -->
@@ -159,6 +177,7 @@
             </StackPanel>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Content="Actualizar" Style="{StaticResource BtnSecundario}" Command="{Binding VerTodosCommand}" Margin="0,0,8,0"/>
                 <Button Content="+ Agregar Libro"
                         Style="{StaticResource BtnPrimario}"
                         Margin="0,0,8,0"
@@ -209,9 +228,9 @@
                        VerticalAlignment="Center"/>
         </Grid>
 
-        <Border x:Name="MensajePanel" Grid.Row="2"
+        <Border x:Name="MensajePanel" Grid.Row="3"
                 Background="#fdecea" CornerRadius="7"
-                Padding="12,8" Margin="0,46,0,0"
+                Padding="12,8" Margin="0,0,0,10"
                 Visibility="{Binding TieneError, Converter={StaticResource BoolToVis}}" VerticalAlignment="Top">
             <TextBlock x:Name="MensajeText"
                        FontSize="12" Foreground="#c62828"
@@ -220,7 +239,7 @@
         </Border>
 
         <!-- ── TABLA ── -->
-        <Border Grid.Row="3"
+        <Border Grid.Row="4"
                 Background="White"
                 CornerRadius="10"
                 BorderBrush="#dde8e2"

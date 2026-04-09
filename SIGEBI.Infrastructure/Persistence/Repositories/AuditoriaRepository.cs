@@ -28,5 +28,15 @@ namespace SIGEBI.Infrastructure.Persistence.Repositories
                 .OrderByDescending(a => a.FechaRegistro)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Auditoria>> GetByEntidadAsync(string entidad, string entidadId)
+        {
+            // Nota: Como la entidad Auditoria actual no tiene EntidadId, solo filtramos por TablaAfectada
+            return await _dbSet
+                .Include(a => a.Usuario)
+                .Where(a => a.TablaAfectada == entidad)
+                .OrderByDescending(a => a.FechaRegistro)
+                .ToListAsync();
+        }
     }
 }

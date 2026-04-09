@@ -38,6 +38,7 @@ namespace SIGEBI.Infrastructure.IoC
             services.AddScoped<IJwtService, JwtService>();
             services.AddSingleton<AuditoriaInterceptor>();
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>(); // Registro del generador
+            services.AddScoped<IAuditService, AuditService>();
 
             return services;
         }

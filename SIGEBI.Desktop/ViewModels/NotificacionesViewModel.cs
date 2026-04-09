@@ -48,6 +48,22 @@ namespace SIGEBI.ViewModels
         }
 
         [RelayCommand]
+        public async Task MarcarLeidaAsync(Guid id)
+        {
+            try
+            {
+                IsBusy = true;
+                await _api.MarcarNotificacionLeidaAsync(id);
+                await CargarNotificacionesAsync();
+            }
+            catch (Exception ex)
+            {
+                await ManejarErrorAsync(ex, "marcar notificación como leída");
+                IsBusy = false;
+            }
+        }
+
+        [RelayCommand]
         public async Task EliminarAsync(Guid id)
         {
             try

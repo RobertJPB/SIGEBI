@@ -122,5 +122,8 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Bloqueo inmediato de usuarios no activos (Suspendidos/Bloqueados)
+app.UseMiddleware<UserStatusMiddleware>();
+
 app.MapControllers();
 app.Run();

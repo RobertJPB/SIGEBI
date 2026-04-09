@@ -32,6 +32,25 @@ namespace SIGEBI.API.Controllers
             throw new UnauthorizedAccessException("Usuario no identificado en el token.");
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpGet]
+        public async Task<IActionResult> ObtenerTodas()
+        {
+            var rol = User.ObtenerRolActual();
+            // Solo Administradores y Bibliotecarios pueden ver el feed global
+            if (!AccesoPolicy.PuedeGestionarUsuarios(rol))
+            {
+                return Forbid("No tiene permisos para ver todas las notificaciones.");
+            }
+
+            var notificaciones = await _notificacionesUseCase.ObtenerTodasAsync();
+            return Ok(notificaciones);
+        }
+
         // Recupera todas las notificaciones (leídas y no leídas) de un usuario.
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -42,7 +61,13 @@ namespace SIGEBI.API.Controllers
         public async Task<IActionResult> ObtenerPorUsuario(Guid usuarioId)
         {
             var rol = User.ObtenerRolActual();
-            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver notificaciones");
+            var currentUserId = ObtenerUsuarioIdActual();
+
+            // Un usuario solo puede ver sus propias notificaciones a menos que sea Admin
+            if (usuarioId != currentUserId && !AccesoPolicy.PuedeGestionarUsuarios(rol))
+            {
+                return Forbid("No tiene permiso para ver estas notificaciones.");
+            }
 
             var notificaciones = await _notificacionesUseCase.ObtenerPorUsuarioAsync(usuarioId);
             return Ok(notificaciones);
@@ -88,6 +113,27 @@ namespace SIGEBI.API.Controllers
 
             await _notificacionesUseCase.MarcarComoLeidaAsync(notificacionId);
             return Ok(new { message = "Notificación marcada como leída." });
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPut("usuario/{usuarioId}/leidas")]
+        public async Task<IActionResult> MarcarTodasComoLeidas(Guid usuarioId)
+        {
+            var rol = User.ObtenerRolActual();
+            var currentUserId = ObtenerUsuarioIdActual();
+            
+            // Solo el usuario dueño o un admin pueden marcar todas como leídas
+            if (usuarioId != currentUserId && !AccesoPolicy.PuedeGestionarUsuarios(rol))
+            {
+                return Forbid("No tienes permiso para modificar estas notificaciones.");
+            }
+
+            await _notificacionesUseCase.MarcarTodasComoLeidasAsync(usuarioId);
+            return Ok(new { message = "Todas las notificaciones marcadas como leídas." });
         }
 
         // Elimina una notificación. El usuario solo puede borrar las suyas.

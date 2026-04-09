@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using SIGEBI.Web.Helpers;
 
 namespace SIGEBI.Web.Controllers
 {
@@ -35,7 +36,8 @@ namespace SIGEBI.Web.Controllers
                 return RedirectToAction("Login", "Auth");
 
             var usuarioId = HttpContext.Session.GetString("UsuarioId");
-            if (string.IsNullOrWhiteSpace(usuarioId))
+            var rolStr = HttpContext.Session.GetString("UsuarioRol");
+            if (string.IsNullOrWhiteSpace(usuarioId) || string.IsNullOrWhiteSpace(rolStr))
                 return RedirectToAction("Login", "Auth");
 
             var model = new NotificacionesIndexViewModel();
@@ -46,7 +48,11 @@ namespace SIGEBI.Web.Controllers
                 client.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", token);
 
-                var response = await client.GetAsync($"api/Notificaciones/usuario/{usuarioId}");
+                // Si es Admin o Bibliotecario, cargamos TODAS las notificaciones del sistema
+                bool esAdmin = rolStr == "Administrador" || rolStr == "Bibliotecario";
+                var endpoint = esAdmin ? "api/Notificaciones" : $"api/Notificaciones/usuario/{usuarioId}";
+
+                var response = await client.GetAsync(endpoint);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -88,7 +94,7 @@ namespace SIGEBI.Web.Controllers
                 if (response.IsSuccessStatusCode)
                     return Json(new { success = true });
 
-                var error = await response.Content.ReadAsStringAsync();
+                var error = await ApiErrorHelper.GetErrorMessageAsync(response);
                 return Json(new { success = false, message = "No se pudo actualizar: " + error });
             }
             catch (Exception ex)

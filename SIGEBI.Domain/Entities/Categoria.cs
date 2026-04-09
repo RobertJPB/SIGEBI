@@ -28,7 +28,11 @@ namespace SIGEBI.Domain.Entities
             Nombre = nuevoNombre.Trim();
         }
 
-        public void Desactivar() => Estado = Enums.Biblioteca.EstadoCategoria.Inactiva;
+        public void Desactivar(string motivo)
+        {
+            if (string.IsNullOrWhiteSpace(motivo)) throw new ArgumentException("El motivo es obligatorio.");
+            Estado = Enums.Biblioteca.EstadoCategoria.Inactiva;
+        }
         public void Activar() => Estado = Enums.Biblioteca.EstadoCategoria.Activa;
     }
 }

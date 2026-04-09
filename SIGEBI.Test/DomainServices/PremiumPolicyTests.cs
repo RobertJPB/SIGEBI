@@ -85,7 +85,7 @@ namespace SIGEBI.Test.Domain
         {
             // Arrange
             var usuario = CrearUsuarioActivo();
-            usuario.Bloquear();
+            usuario.Bloquear("Motivo de prueba");
 
             // Act
             var resultado = PrestamoPolicy.PuedeRealizarPrestamo(usuario, new List<Prestamo>());

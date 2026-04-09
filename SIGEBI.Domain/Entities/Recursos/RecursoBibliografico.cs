@@ -62,7 +62,6 @@ namespace SIGEBI.Domain.Entities.Recursos
             if (Estado != Enums.Biblioteca.EstadoRecurso.Disponible)
                 throw new InvalidOperationException("El recurso no está disponible.");
             
-            // Si nos quedamos sin copias, tiramos error en vez de dejar stock negativo
             if (Stock <= 0)
                 throw new InvalidOperationException("No hay stock disponible.");
             
@@ -70,8 +69,13 @@ namespace SIGEBI.Domain.Entities.Recursos
         }
 
         public void AumentarStock() => Stock++;
-        public void Desactivar() => Estado = Enums.Biblioteca.EstadoRecurso.Inactivo;
+        
+        public virtual void Desactivar(string motivo) 
+        {
+            if (string.IsNullOrWhiteSpace(motivo)) throw new ArgumentException("El motivo es obligatorio.");
+            Estado = Enums.Biblioteca.EstadoRecurso.Inactivo;
+        }
+
         public void Activar() => Estado = Enums.Biblioteca.EstadoRecurso.Disponible;
     }
 }
-

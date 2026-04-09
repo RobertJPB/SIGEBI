@@ -55,13 +55,13 @@ namespace SIGEBI.ViewModels
         [RelayCommand]
         public async Task BuscarAsync()
         {
-            if (string.IsNullOrWhiteSpace(Busqueda)) return;
+            var query = Busqueda?.Trim() ?? string.Empty;
 
             try
             {
                 IsBusy = true;
                 LimpiarError();
-                var data = await _api.BuscarRecursosPorTituloAsync(Busqueda);
+                var data = await _api.BuscarRecursosPorTituloAsync(query);
                 Recursos = new ObservableCollection<RecursoDetalleDTO>(data);
                 Contador = $"{Recursos.Count} resultados";
             }

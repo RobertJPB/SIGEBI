@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using SIGEBI.Business.Interfaces;
 using SIGEBI.Business.Interfaces.Persistence;
@@ -37,7 +38,9 @@ namespace SIGEBI.Test.UseCases.Prestamos
                 _penalizacionRepo.Object,
                 _notificacionRepo.Object,
                 _listaDeseosRepo.Object,
+                new Mock<IAuditService>().Object,
                 _unitOfWork.Object,
+                new Mock<IMemoryCache>().Object,
                 new Mock<IGuidGenerator>().Object);
         }
 

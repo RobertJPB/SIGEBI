@@ -113,15 +113,23 @@ namespace SIGEBI.API.Controllers
         [HttpPost]
         public async Task<IActionResult> SolicitarPrestamo([FromBody] PrestamoRequestDTO dto)
         {
-            var rol = User.ObtenerRolActual();
-            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeSolicitarPrestamo(rol), "solicitar préstamo");
+            try
+            {
+                var rol = User.ObtenerRolActual();
+                AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeSolicitarPrestamo(rol), "solicitar préstamo");
 
-            // Validación de datos básicos de la solicitud
-            var errores = _validator.Validar(dto);
-            if (errores.Any()) return BadRequest(new { errores });
+                // Validación de datos básicos de la solicitud
+                var errores = _validator.Validar(dto);
+                if (errores.Any()) return BadRequest(new { errores });
 
-            var resultado = await _solicitarUseCase.EjecutarAsync(dto.UsuarioId, dto.RecursoId, dto.FechaDevolucionEstimada);
-            return Ok(resultado);
+                var resultado = await _solicitarUseCase.EjecutarAsync(dto.UsuarioId, dto.RecursoId, dto.FechaDevolucionEstimada);
+                return Ok(resultado);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Este catch captura errores de lógica de negocio (ej: límite de préstamos excedido)
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         // Registra el retorno físico de un libro al sistema, cerrando el ciclo del préstamo.

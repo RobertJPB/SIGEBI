@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces;
+using SIGEBI.Business.Interfaces.UseCases.Usuarios;
 using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.UseCases.Usuarios;
 using SIGEBI.Domain.Entities;
@@ -27,12 +28,15 @@ namespace SIGEBI.Test.UseCases.Usuarios
             _unitOfWork = new Mock<IUnitOfWork>();
 
             _useCase = new PenalizacionesUseCase(
-                _prestamoRepo.Object,
-                _usuarioRepo.Object,
                 _penalizacionRepo.Object,
+                _usuarioRepo.Object,
+                _prestamoRepo.Object,
+                new Mock<INotificacionesUseCase>().Object,
                 _unitOfWork.Object,
+                new Mock<IAuditService>().Object,
                 new Mock<IGuidGenerator>().Object,
-                Microsoft.Extensions.Logging.Abstractions.NullLogger<PenalizacionesUseCase>.Instance);
+                Microsoft.Extensions.Logging.Abstractions.NullLogger<PenalizacionesUseCase>.Instance,
+                new Mock<Microsoft.Extensions.Caching.Memory.IMemoryCache>().Object);
         }
 
         // ── APLICAR PENALIZACIONES AUTOMATICAS ──
