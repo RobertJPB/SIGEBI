@@ -67,11 +67,23 @@ namespace SIGEBI.Business.UseCases.Catalogo
 
         public async Task<RecursoDetalleDTO?> GetByIdAsync(Guid id)
         {
+            // 1. Obtener recurso desde el repositorio (Ya incluye categoría)
             var recurso = await _recursoRepository.GetByIdAsync(id);
             if (recurso == null) return null;
             
+            // 2. Mapear a DTO
             var dto = RecursoMapper.ToDTO(recurso);
-            dto.PromedioValoraciones = await _valoracionRepository.GetPromedioCalificacionAsync(recurso.Id);
+            
+            // 3. Obtener promedio de estrelllas (Encapsulado en try-catch por seguridad)
+            try 
+            {
+                dto.PromedioValoraciones = await _valoracionRepository.GetPromedioCalificacionAsync(recurso.Id);
+            }
+            catch 
+            {
+                dto.PromedioValoraciones = 0; // Si falla el cálculo, mostramos 0 estrellas
+            }
+
             return dto;
         }
     }

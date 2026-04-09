@@ -265,6 +265,7 @@ body {
     display: flex;
     flex-direction: column;
     animation: fadeUp 0.4s ease both;
+    height: 100%;
 }
 
     .recurso-card:hover {
@@ -276,6 +277,7 @@ body {
     text-decoration: none;
     color: inherit;
     display: block;
+    height: 100%;
 }
 
 @keyframes fadeUp {

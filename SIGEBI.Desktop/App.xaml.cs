@@ -50,7 +50,7 @@ public partial class App : Application
         .AddHttpMessageHandler<AuthHandler>();
 
         // ── ViewModels ──
-        services.AddTransient<MainViewModel>();
+        services.AddSingleton<MainViewModel>();
         services.AddTransient<LoginViewModel>();
         services.AddTransient<GestionBibliograficaViewModel>();
         services.AddTransient<GestionPrestamosViewModel>();

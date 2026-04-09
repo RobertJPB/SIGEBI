@@ -70,21 +70,29 @@ namespace SIGEBI.Web.Controllers
 
                 // 1. Obtener detalles del recurso mediante servicio
                 var dto = await _api.GetRecursoAsync(id, token);
+                if (dto == null) return RedirectToAction("Index");
+                
                 var recurso = MapDtoToViewModel(dto);
 
                 // 2. Obtener valoraciones mediante servicio
                 try 
                 {
-                    recurso.Valoraciones = await _api.GetValoracionesAsync(id, token);
+                    var valoraciones = await _api.GetValoracionesAsync(id, token);
+                    recurso.Valoraciones = valoraciones ?? new List<SIGEBI.Business.DTOs.ValoracionDTO>();
                 }
-                catch { /* Ignorar si no hay valoraciones */ }
+                catch (Exception ex)
+                { 
+                    // Mantenemos reporte de error pero sin traza técnica en la UI
+                    ViewBag.ErrorValoraciones = "El servicio de testimonios no pudo cargar los datos: " + ex.Message;
+                    recurso.Valoraciones = new List<SIGEBI.Business.DTOs.ValoracionDTO>();
+                }
 
                 ViewBag.ApiBaseUrl = _configuration["ApiSettings:BaseUrl"];
                 return View(recurso);
             }
-            catch
+            catch (Exception ex)
             {
-                return RedirectToAction("Index");
+                return Content($"Error al cargar el detalle: {ex.Message}");
             }
         }
 
@@ -162,9 +170,10 @@ namespace SIGEBI.Web.Controllers
                 await _api.ValorarAsync(request, token);
                 return RedirectToAction("Detalle", new { id = recursoId });
             }
-            catch
+            catch (Exception ex)
             {
-                return RedirectToAction("Detalle", new { id = recursoId });
+                // Mostramos el error para saber si es por el Índice Único (ya valoró) u otro motivo
+                return Content($"No se pudo registrar su valoración. Detalles: {ex.Message}. Importante: Solo se permite una valoración por recurso.");
             }
         }
 

@@ -177,7 +177,6 @@
             </StackPanel>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                <Button Content="Actualizar" Style="{StaticResource BtnSecundario}" Command="{Binding VerTodosCommand}" Margin="0,0,8,0"/>
                 <Button Content="+ Agregar Libro"
                         Style="{StaticResource BtnPrimario}"
                         Margin="0,0,8,0"

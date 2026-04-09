@@ -21,6 +21,9 @@ namespace SIGEBI.Infrastructure.Persistence.Repositories
                 .Where(r => r.IdCategoria == categoriaId)
                 .ToListAsync();
 
+        public override async Task<RecursoBibliografico?> GetByIdAsync(Guid id) // Obtener por ID con Categoría
+            => await _dbSet.Include(r => r.Categoria).FirstOrDefaultAsync(r => r.Id == id);
+
         public async Task<IEnumerable<RecursoBibliografico>> GetDisponiblesAsync() // Solo disponibles
         {
             return await _dbSet

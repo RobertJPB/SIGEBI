@@ -113,7 +113,7 @@
                     : recurso.TipoRecurso?.ToLower() == "documento" ? "bi-file-earmark-text"
                     : "bi-book";
 
-                    <a href="/Catalogo/Detalle?id=@recurso.Id" class="recurso-link">
+                    <a href="@Url.Action("Detalle", "Catalogo", new { id = recurso.Id })" class="recurso-link">
                         <div class="recurso-card">
                             <div class="card-cover @tipoClass">
                                 @if (!string.IsNullOrEmpty(recurso.ImagenUrl))
