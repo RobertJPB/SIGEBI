@@ -6,9 +6,9 @@ namespace SIGEBI.Web.Services
 {
     public class ListaDeseosService : IListaDeseosService
     {
-        private readonly ISigebiApi _api;
+        private readonly IListaDeseosApi _api;
 
-        public ListaDeseosService(ISigebiApi api)
+        public ListaDeseosService(IListaDeseosApi api)
         {
             _api = api;
         }

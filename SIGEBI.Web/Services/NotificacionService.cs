@@ -7,9 +7,9 @@ namespace SIGEBI.Web.Services
 {
     public class NotificacionService : INotificacionService
     {
-        private readonly ISigebiApi _api;
+        private readonly INotificacionesApi _api;
 
-        public NotificacionService(ISigebiApi api)
+        public NotificacionService(INotificacionesApi api)
         {
             _api = api;
         }

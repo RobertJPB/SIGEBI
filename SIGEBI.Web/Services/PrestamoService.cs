@@ -7,9 +7,9 @@ namespace SIGEBI.Web.Services
 {
     public class PrestamoService : IPrestamoService
     {
-        private readonly ISigebiApi _api;
+        private readonly IPrestamosApi _api;
 
-        public PrestamoService(ISigebiApi api)
+        public PrestamoService(IPrestamosApi api)
         {
             _api = api;
         }

@@ -5,9 +5,9 @@ namespace SIGEBI.Web.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly ISigebiApi _api;
+        private readonly IAuthApi _api;
 
-        public AuthService(ISigebiApi api)
+        public AuthService(IAuthApi api)
         {
             _api = api;
         }

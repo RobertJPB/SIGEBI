@@ -7,9 +7,9 @@ namespace SIGEBI.Web.Services
 {
     public class UsuarioService : IUsuarioService
     {
-        private readonly ISigebiApi _api;
+        private readonly IUsuariosApi _api;
 
-        public UsuarioService(ISigebiApi api)
+        public UsuarioService(IUsuariosApi api)
         {
             _api = api;
         }
