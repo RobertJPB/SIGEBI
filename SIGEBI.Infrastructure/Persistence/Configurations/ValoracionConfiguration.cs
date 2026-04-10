@@ -31,9 +31,6 @@ namespace SIGEBI.Infrastructure.Persistence.Configurations
 
             // Impedir que un usuario valore el mismo recurso mas de una vez
             builder.HasIndex(v => new { v.UsuarioId, v.RecursoId }).IsUnique();
-
-            // Ignoramos FechaRegistro porque aun no existe en la base de datos (Parche de emergencia)
-            builder.Ignore(v => v.FechaRegistro);
         }
     }
 }

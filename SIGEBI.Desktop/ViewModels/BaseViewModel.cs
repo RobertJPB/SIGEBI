@@ -39,7 +39,7 @@ namespace SIGEBI.ViewModels
             if (ex is ApiException apiEx)
             {
                 // Extrae el error de negocio enviado por la API (400, 404, 500, etc.)
-                string detalle = apiEx.ReasonPhrase;
+                string detalle = apiEx.ReasonPhrase ?? string.Empty;
                 
                 if (!string.IsNullOrWhiteSpace(apiEx.Content))
                 {

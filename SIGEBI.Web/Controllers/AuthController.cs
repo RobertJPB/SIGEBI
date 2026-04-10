@@ -20,11 +20,11 @@ namespace SIGEBI.Web.Controllers
 
     public class AuthController : Controller
     {
-        private readonly ISigebiApi _api;
+        private readonly IAuthService _authService;
 
-        public AuthController(ISigebiApi api)
+        public AuthController(IAuthService authService)
         {
-            _api = api;
+            _authService = authService;
         }
 
         [HttpGet]
@@ -44,10 +44,8 @@ namespace SIGEBI.Web.Controllers
 
             try
             {
-                var payload = new { correo = model.Correo, contrasena = model.Contrasena };
-                
-                // Consumo mediante Servicio (Punto 2 Actividades)
-                var result = await _api.LoginAsync(payload);
+                // Consumo mediante Servicio (Capa desacoplada)
+                var result = await _authService.LoginAsync(model.Correo, model.Contrasena);
 
                 if (!result.TryGetProperty("token", out var tokenElement))
                 {

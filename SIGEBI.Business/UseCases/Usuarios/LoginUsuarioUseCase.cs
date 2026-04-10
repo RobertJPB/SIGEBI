@@ -61,14 +61,14 @@ namespace SIGEBI.Business.UseCases.Usuarios
                     motivo = usuario.MotivoEstado;
                 }
 
-                await _audit.LogActionAsync(TipoAccionAuditoria.AccesoDenegado, "Seguridad", 
+                _audit.LogActionBackground(TipoAccionAuditoria.AccesoDenegado, "Seguridad", 
                     $"Acceso bloqueado para el usuario {usuario.Nombre}. Estado: {usuario.Estado}. Motivo: {motivo}", 
                     usuario.Id);
 
                 throw new UsuarioEstadoException(usuario.Estado, motivo, fechaFin);
             }
 
-            await _audit.LogActionAsync(TipoAccionAuditoria.Login, "Seguridad", 
+            _audit.LogActionBackground(TipoAccionAuditoria.Login, "Seguridad", 
                 $"Inicio de sesión exitoso para el usuario: {usuario.Nombre}", 
                 usuario.Id);
 

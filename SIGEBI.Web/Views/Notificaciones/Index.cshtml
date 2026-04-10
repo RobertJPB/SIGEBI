@@ -43,20 +43,20 @@
             box-shadow: 0 0 0 2px rgba(255,77,79,0.2);
         }
 
-        .page-header { background: linear-gradient(160deg, rgba(15,61,32,0.92) 0%, rgba(26,92,46,0.88) 60%, rgba(46,139,74,0.85) 100%); padding: 3rem 2.5rem 4rem; }
+        .page-header { background: linear-gradient(160deg, rgba(15,61,32,0.92) 0%, rgba(26,92,46,0.88) 60%, rgba(46,139,74,0.85) 100%); padding: 2rem 2.5rem 2rem; }
         .header-content { max-width: 900px; margin: 0 auto; }
         .header-eyebrow { font-size: 0.72rem; letter-spacing: 3px; text-transform: uppercase; color: var(--green-400); font-weight: 600; margin-bottom: 10px; }
         .header-title { font-size: 2.2rem; font-weight: 700; color: white; margin-bottom: 6px; }
         .header-subtitle { color: rgba(255,255,255,0.6); font-size: 0.95rem; font-weight: 300; }
 
-        .main-content { max-width: 900px; margin: 0 auto; padding: 2.5rem 2.5rem 4rem; }
+        .main-content { max-width: 900px; margin: 0 auto; padding: 1.5rem 2.5rem 4rem; }
 
-        .notif-list { display: flex; flex-direction: column; gap: 12px; }
+        .notif-list { display: flex; flex-direction: column; gap: 8px; }
         .notif-card {
             background: white;
             border-radius: 6px;
             border: 1px solid var(--border);
-            padding: 18px 20px;
+            padding: 12px 20px;
             display: flex;
             align-items: center;
             gap: 16px;
@@ -130,45 +130,8 @@
 </head>
 <body>
 
-@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
-@{
-    var apiBase = Configuration["ApiSettings:BaseUrl"];
-}
-    <nav class="navbar">
-        <a class="navbar-brand" href="/Catalogo/Index">
-            <div>
-                <span class="brand-text">SIGEBI</span>
-                <span class="brand-sub">Biblioteca</span>
-            </div>
-        </a>
-        <div class="nav-links">
-            <a class="nav-link" href="/Catalogo/Index"><i class="bi bi-grid"></i> Catálogo</a>
-            <a class="nav-link" href="/ListaDeseos/Index"><i class="bi bi-heart"></i> Lista de Deseos</a>
-            <a class="nav-link" href="/Prestamos/Index"><i class="bi bi-book"></i> Mis Préstamos</a>
-            <a class="nav-link active" href="/Notificaciones/Index">
-                <span style="position: relative; display: inline-flex;">
-                    <i class="bi bi-bell"></i>
-                    <span id="unread-dot" class="notification-dot"></span>
-                </span>
-                Notificaciones
-            </a>
-            <div class="nav-divider"></div>
-            <a class="nav-link" href="/Perfil/Index">
-                @{
-                    var userImg = Context.User.FindFirst("UsuarioImagen")?.Value;
-                }
-                @if (!string.IsNullOrEmpty(userImg))
-                {
-                    <img src="@(apiBase + userImg)" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.3);" />
-                }
-                else
-                {
-                    <i class="bi bi-person-circle"></i>
-                }
-                Perfil
-            </a>
-        </div>
-    </nav>
+    <!-- NAVBAR -->
+    @Html.Partial("_Navbar")
 
     <div class="page-header">
         <div class="header-content">
@@ -179,6 +142,15 @@
     </div>
 
     <div class="main-content">
+        @if (Model.Notificaciones.Any(n => !n.Leida))
+        {
+            <div style="margin-bottom: 1.5rem; display: flex; justify-content: flex-end;">
+                <button class="btn-action-read" style="padding: 10px 20px; font-size: 0.82rem; border-radius: 6px; box-shadow: 0 4px 12px rgba(15,61,32,0.12);" onclick="marcarTodasLeidas()">
+                    <i class="bi bi-check2-all"></i> Marcar todas como leídas
+                </button>
+            </div>
+        }
+
         @if (!Model.Notificaciones.Any())
         {
             <div class="empty-state">
@@ -192,20 +164,14 @@
             <div class="notif-list">
                 @foreach (var n in Model.Notificaciones)
                 {
-                    var iconClass = "bi-bell";
-                    if (n.Mensaje.Contains("vence", StringComparison.OrdinalIgnoreCase)) iconClass = "bi-calendar-event";
-                    if (n.Mensaje.Contains("disponible", StringComparison.OrdinalIgnoreCase)) iconClass = "bi-bookmark-check-fill";
-                    if (n.Mensaje.Contains("Préstamo", StringComparison.OrdinalIgnoreCase)) iconClass = "bi-book";
-
                     <div class="notif-card @(n.Leida ? "leida" : "no-leida")">
-                        <div class="notif-icon">
-                            <i class="bi @iconClass"></i>
-                        </div>
                         <div class="notif-body">
                             <p class="notif-mensaje">@n.Mensaje</p>
                             <p class="notif-fecha">
                                 <i class="bi bi-clock-history"></i>
-                                @n.Fecha.ToLocalTime().ToString("dd/MM/yyyy") a las @n.Fecha.ToLocalTime().ToString("HH:mm")
+                                <span class="local-time" data-utc="@n.Fecha.ToString("yyyy-MM-ddTHH:mm:ssZ")" data-format="full">
+                                    @n.Fecha.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                </span>
                             </p>
                         </div>
                         <div class="notif-actions">
@@ -228,6 +194,7 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="~/js/timeLocalization.js"></script>
     <script>
         function marcarLeida(id) {
             const btn = event.currentTarget;
@@ -239,6 +206,20 @@
                 } else {
                     alert('Error al actualizar: ' + data.message);
                     $(btn).prop('disabled', false).html('<i class="bi bi-check2-all"></i> Marcar leída');
+                }
+            });
+        }
+
+        function marcarTodasLeidas() {
+            const btn = event.currentTarget;
+            $(btn).prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Procesando...');
+
+            $.post('/Notificaciones/MarcarTodasLeidas', function(data) {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                    $(btn).prop('disabled', false).html('<i class="bi bi-check2-all me-1"></i> Marcar todas como leídas');
                 }
             });
         }

@@ -1,0 +1,73 @@
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
+using SIGEBI.Business.Interfaces.Services;
+
+namespace SIGEBI.Infrastructure.Services
+{
+    /// <summary>
+    /// Implementación de almacenamiento de imágenes en el sistema de archivos local (wwwroot).
+    /// </summary>
+    public class ImagenService : IImagenService
+    {
+        private readonly IWebHostEnvironment _env;
+
+        public ImagenService(IWebHostEnvironment env)
+        {
+            _env = env;
+        }
+
+        public async Task<string?> GuardarImagenAsync(Stream? stream, string nombreArchivoOriginal, string subCarpeta)
+        {
+            if (stream == null || stream.Length == 0) return null;
+
+            // Validaciones básicas antes de procesar
+            if (!EsExtensionValida(nombreArchivoOriginal)) return null;
+
+            // Definición de la ruta física
+            var carpetaBase = Path.Combine(_env.WebRootPath ?? _env.ContentRootPath, "imagenes", subCarpeta);
+            Directory.CreateDirectory(carpetaBase);
+
+            // Generación de nombre único
+            var extension = Path.GetExtension(nombreArchivoOriginal).ToLowerInvariant();
+            var nombreArchivo = $"{Guid.NewGuid()}{extension}";
+            var rutaCompleta = Path.Combine(carpetaBase, nombreArchivo);
+
+            using var fileStream = new FileStream(rutaCompleta, FileMode.Create);
+            await stream.CopyToAsync(fileStream);
+
+            // Retorno de la URL relativa para el cliente
+            return $"/imagenes/{subCarpeta}/{nombreArchivo}";
+        }
+
+        public void EliminarImagen(string? urlRelativa)
+        {
+            if (string.IsNullOrWhiteSpace(urlRelativa)) return;
+
+            try
+            {
+                // Convertimos URL relativa a ruta física
+                var rutaLimpia = urlRelativa.TrimStart('/').Replace('/', Path.DirectorySeparatorChar);
+                var rutaCompleta = Path.Combine(_env.WebRootPath ?? _env.ContentRootPath, rutaLimpia);
+
+                if (File.Exists(rutaCompleta))
+                {
+                    File.Delete(rutaCompleta);
+                }
+            }
+            catch
+            {
+                // Fallback silencioso
+            }
+        }
+
+        public bool EsExtensionValida(string fileName)
+        {
+            if (string.IsNullOrWhiteSpace(fileName)) return false;
+
+            var extensionesPermitidas = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            var extension = Path.GetExtension(fileName).ToLowerInvariant();
+
+            return extensionesPermitidas.Contains(extension);
+        }
+    }
+}

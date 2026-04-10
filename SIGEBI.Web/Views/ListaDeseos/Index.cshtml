@@ -90,41 +90,8 @@
 </head>
 <body>
 
-    <nav class="navbar">
-        <a class="navbar-brand" href="/Catalogo/Index">
-            <div>
-                <span class="brand-text">SIGEBI</span>
-                <span class="brand-sub">Biblioteca</span>
-            </div>
-        </a>
-        <div class="nav-links">
-            <a class="nav-link" href="/Catalogo/Index"><i class="bi bi-grid"></i> Catálogo</a>
-            <a class="nav-link active" href="/ListaDeseos/Index"><i class="bi bi-heart"></i> Lista de Deseos</a>
-            <a class="nav-link" href="/Prestamos/Index"><i class="bi bi-book"></i> Mis Préstamos</a>
-            <a class="nav-link" href="/Notificaciones/Index">
-                <span style="position: relative; display: inline-flex;">
-                    <i class="bi bi-bell"></i>
-                    <span id="unread-dot" class="notification-dot"></span>
-                </span>
-                Notificaciones
-            </a>
-            <div class="nav-divider"></div>
-            <a class="nav-link" href="/Perfil/Index">
-                @{
-                    var userImg = Context.User.FindFirst("UsuarioImagen")?.Value;
-                }
-                @if (!string.IsNullOrEmpty(userImg))
-                {
-                    <img src="@(Model.ApiBaseUrl.TrimEnd('/') + "/" + userImg.TrimStart('/'))" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.3);" />
-                }
-                else
-                {
-                    <i class="bi bi-person-circle"></i>
-                }
-                Perfil
-            </a>
-        </div>
-    </nav>
+    <!-- NAVBAR -->
+    @Html.Partial("_Navbar")
 
     <div class="page-header">
         <div class="header-content">

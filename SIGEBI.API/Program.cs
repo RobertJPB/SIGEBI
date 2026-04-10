@@ -11,6 +11,9 @@ using SIGEBI.Infrastructure.IoC;
 using SIGEBI.Infrastructure.Services;
 using System.Text;
 
+using FluentValidation.AspNetCore;
+using SIGEBI.Business.Validators;
+
 // configuracion de la aplicacion API
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,8 +21,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddBusiness();
 builder.Services.AddInfrastructure();
 
-// Registro de controladores y configuración de JSON para evitar ciclos en las relaciones de las entidades
+// Registro de controladores con FluentValidation automático
 builder.Services.AddControllers()
+    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<RegistrarUsuarioValidator>())
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler =

@@ -25,11 +25,11 @@ namespace SIGEBI.Web.Controllers
 
     public class PrestamosController : Controller
     {
-        private readonly ISigebiApi _api;
+        private readonly IPrestamoService _prestamoService;
 
-        public PrestamosController(ISigebiApi api)
+        public PrestamosController(IPrestamoService prestamoService)
         {
-            _api = api;
+            _prestamoService = prestamoService;
         }
 
         private string GetBearerToken()
@@ -53,7 +53,7 @@ namespace SIGEBI.Web.Controllers
             try
             {
                 // Consumo mediante Servicio Desacoplado (Punto 2 Actividades)
-                var dtos = await _api.GetPrestamosByUsuarioAsync(usuarioId, token);
+                var dtos = await _prestamoService.GetPrestamosByUsuarioAsync(usuarioId, token);
                 
                 model.Prestamos = dtos.Select(d => new PrestamoViewModel
                 {

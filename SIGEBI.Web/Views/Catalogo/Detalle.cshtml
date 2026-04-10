@@ -1,8 +1,10 @@
 @model SIGEBI.Web.Models.RecursoViewModel
 @{
-    ViewData["Title"] = Model.Titulo;
-    Layout = null; 
-    var apiBase = ViewBag.ApiBaseUrl as string;
+    ViewData["Title"] = "Detalle de Recurso";
+    ViewData["ActivePage"] = "Catalogo";
+    ViewBag.ApiBaseUrl = ViewBag.ApiBaseUrl; 
+    Layout = null;
+    var apiBaseUrl = ViewBag.ApiBaseUrl ?? "https://localhost:7047/";
     var avgRating = Math.Round(Model.PromedioValoraciones, 1);
 }
 
@@ -11,10 +13,11 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SIGEBI - @Model.Titulo</title>
+    <title>SIGEBI - Detalle</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="/css/catalogo.css?v=2" rel="stylesheet" />
     <style>
         :root {
             --green-900: #0f3d20;
@@ -243,27 +246,7 @@
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="container-fluid d-flex justify-content-between align-items-center">
-            <a class="navbar-brand" href="/Catalogo/Index">SIGEBI <span style="font-weight:300; font-size: 0.8rem; opacity: 0.6; display: block; line-height: 1;">Biblioteca</span></a>
-            <div class="d-flex align-items-center">
-                <a href="/Catalogo/Index" class="nav-link"><i class="bi bi-grid"></i> Catálogo</a>
-                <a href="/ListaDeseos/Index" class="nav-link"><i class="bi bi-heart"></i> Lista de Deseos</a>
-                <a href="/Prestamos/Index" class="nav-link"><i class="bi bi-book"></i> Mis Préstamos</a>
-                <a href="/Notificaciones/Index" class="nav-link">
-                    <span style="position: relative; display: inline-flex;">
-                        <i class="bi bi-bell"></i>
-                        <span id="unread-dot" class="notification-dot"></span>
-                    </span>
-                    Notificaciones
-                </a>
-                <a href="/Perfil/Index" class="nav-link d-flex align-items-center gap-2">
-                    <i class="bi bi-person-circle" style="font-size: 1.2rem;"></i>
-                    <span>@Context.Session.GetString("UsuarioNombre")</span>
-                </a>
-            </div>
-        </div>
-    </nav>
+    @Html.Partial("_Navbar")
 
     <div class="container-custom">
         <a href="/Catalogo/Index" class="btn-back">
@@ -275,7 +258,7 @@
             <div class="image-side">
                 @if (!string.IsNullOrEmpty(Model.ImagenUrl))
                 {
-                    <img class="resource-img shadow-lg" src="@(apiBase + Model.ImagenUrl)" alt="@Model.Titulo" />
+                    <img class="resource-img shadow-lg" src="@(apiBaseUrl + Model.ImagenUrl)" alt="@Model.Titulo" />
                 }
                 else
                 {
@@ -406,7 +389,7 @@
                         <div class="review-item">
                             @if (!string.IsNullOrEmpty(val.ImagenUrl))
                             {
-                                <img src="@($"{apiBase?.TrimEnd('/')}/{val.ImagenUrl.TrimStart('/')}")" class="review-avatar" alt="@val.NombreUsuario" />
+                                <img src="@($"{apiBaseUrl?.TrimEnd('/')}/{val.ImagenUrl.TrimStart('/')}")" class="review-avatar" alt="@val.NombreUsuario" />
                             }
                             else
                             {
@@ -419,7 +402,7 @@
                                 <div class="review-user">
                                     @(string.IsNullOrEmpty(val.NombreUsuario) ? "Usuario de SIGEBI" : val.NombreUsuario)
                                     <span style="font-size: 0.75rem; color: var(--muted); font-weight: 400; margin-left: 8px;">
-                                        &bull; @val.FechaRegistro.ToString("MMMM yyyy")
+                                        &bull; <span class="local-time" data-utc="@val.FechaRegistro.ToString("yyyy-MM-ddTHH:mm:ssZ")" data-format="full">@val.FechaRegistro.ToString("MMMM yyyy")</span>
                                     </span>
                                 </div>
                                 <div class="review-stars">
@@ -463,7 +446,7 @@
                     <p class="text-muted">¿Estás seguro de solicitar el préstamo de <strong>@Model.Titulo</strong>?</p>
                     <p class="mb-1">La fecha estimada de devolución es:</p>
                     <div class="confirm-date-badge">
-                        @DateTime.Now.AddDays(15).ToString("dd/MM/yyyy")
+                        <span class="local-time" data-utc="@DateTime.UtcNow.AddDays(15).ToString("yyyy-MM-ddTHH:mm:ssZ")" data-format="short">@DateTime.Now.AddDays(15).ToString("dd/MM/yyyy")</span>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -495,6 +478,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="~/js/timeLocalization.js"></script>
     <script>
         $(document).ready(function() {
             // Interactive Stars

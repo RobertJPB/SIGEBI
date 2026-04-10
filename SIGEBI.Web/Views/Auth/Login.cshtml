@@ -15,28 +15,71 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
     <style>
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            background: linear-gradient(135deg, #1a5c2e 0%, #2e8b4a 50%, #4caf7d 100%);
+            position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            overflow: hidden;
+            background-color: #0d2e18; /* Dark green fallback */
+        }
+
+        /* Library photo background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('/img/login_bg_v2.jpg');
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.9) contrast(1.1);
+            z-index: 0;
+        }
+
+        /* Dark green transparent overlay */
+        body::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(15, 61, 32, 0.65) 0%,
+                rgba(10, 45, 20, 0.55) 100%
+            );
+            z-index: 1;
         }
 
         .login-card {
-            width: 420px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.25);
-            border: none;
+            position: relative;
+            z-index: 2;
+            width: 480px;
+            border-radius: 6px;
+            box-shadow: 0 12px 48px rgba(0,0,0,0.5);
+            border: 0 !important;
             overflow: hidden;
+            background-color: #0f3d20; /* Matches header to prevent white bleeding at corners */
         }
 
         .login-header {
-            background-color: #1a5c2e;
+            background-color: #0f3d20;
             color: white;
-            padding: 36px 28px;
+            padding: 44px 36px;
             text-align: center;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
         }
 
             .login-header .logo-icon {
@@ -46,10 +89,10 @@
             }
 
             .login-header h3 {
-                font-size: 2rem;
+                font-size: 2.25rem;
                 font-weight: 700;
-                margin-bottom: 4px;
-                letter-spacing: 2px;
+                margin-bottom: 6px;
+                letter-spacing: 3px;
             }
 
             .login-header p {
@@ -59,12 +102,14 @@
             }
 
         .card-body {
-            padding: 36px 32px;
+            padding: 44px 40px;
             background-color: #ffffff;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
         }
 
         .form-control {
-            border-radius: 8px;
+            border-radius: 4px;
             border: 1.5px solid #c8e6c9;
             padding: 10px 14px;
         }
@@ -79,14 +124,14 @@
             border: none;
             color: white;
             font-weight: 600;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 1rem;
+            padding: 14px;
+            border-radius: 4px;
+            font-size: 1.1rem;
             transition: background-color 0.2s;
         }
 
             .btn-login:hover {
-                background-color: #1a5c2e;
+                background-color: #0f3d20;
                 color: white;
             }
 
@@ -143,6 +188,8 @@
                     <input asp-for="Correo"
                            type="email"
                            class="form-control"
+                           required
+                           maxlength="100"
                            placeholder="correo@ejemplo.com" />
 
                 </div>
@@ -155,6 +202,8 @@
                     <input asp-for="Contrasena"
                            type="password"
                            class="form-control"
+                           required
+                           maxlength="50"
                            placeholder="••••••••" />
 
                 </div>

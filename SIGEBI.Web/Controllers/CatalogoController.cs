@@ -17,12 +17,12 @@ namespace SIGEBI.Web.Controllers
 
     public class CatalogoController : Controller
     {
-        private readonly ISigebiApi _api;
+        private readonly ICatalogoService _catalogoService;
         private readonly IConfiguration _configuration;
 
-        public CatalogoController(ISigebiApi api, IConfiguration configuration)
+        public CatalogoController(ICatalogoService catalogoService, IConfiguration configuration)
         {
-            _api = api;
+            _catalogoService = catalogoService;
             _configuration = configuration;
         }
 
@@ -45,10 +45,8 @@ namespace SIGEBI.Web.Controllers
                 var token = GetBearerToken();
                 if (string.IsNullOrEmpty(token)) return RedirectToAction("Login", "Auth");
 
-                // Consumo mediante Servicio 
-                var dtos = string.IsNullOrWhiteSpace(busqueda)
-                    ? await _api.GetRecursosAsync(token)
-                    : await _api.BuscarRecursosAsync(busqueda, token);
+                // Consumo mediante Servicio (Capa desacoplada)
+                var dtos = await _catalogoService.GetRecursosAsync(token, busqueda);
 
                 model.Recursos = dtos.Select(MapDtoToViewModel).ToList();
 
@@ -68,8 +66,8 @@ namespace SIGEBI.Web.Controllers
                 var token = GetBearerToken();
                 if (string.IsNullOrEmpty(token)) return RedirectToAction("Login", "Auth");
 
-                // 1. Obtener detalles del recurso mediante servicio
-                var dto = await _api.GetRecursoAsync(id, token);
+                // 1. Obtener detalles del recurso mediante servicio (Capa desacoplada)
+                var dto = await _catalogoService.GetRecursoAsync(id, token);
                 if (dto == null) return RedirectToAction("Index");
                 
                 var recurso = MapDtoToViewModel(dto);
@@ -77,7 +75,7 @@ namespace SIGEBI.Web.Controllers
                 // 2. Obtener valoraciones mediante servicio
                 try 
                 {
-                    var valoraciones = await _api.GetValoracionesAsync(id, token);
+                    var valoraciones = await _catalogoService.GetValoracionesAsync(id, token);
                     recurso.Valoraciones = valoraciones ?? new List<SIGEBI.Business.DTOs.ValoracionDTO>();
                 }
                 catch (Exception ex)
@@ -127,13 +125,12 @@ namespace SIGEBI.Web.Controllers
             try
             {
                 var token = GetBearerToken();
-                var usuarioId = HttpContext.Session.GetString("UsuarioId");
+                var usuarioIdString = HttpContext.Session.GetString("UsuarioId");
 
-                if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(usuarioId))
+                if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(usuarioIdString))
                     return Json(new { success = false, message = "Sesión expirada" });
 
-                var request = new { UsuarioId = Guid.Parse(usuarioId), RecursoId = recursoId };
-                await _api.SolicitarPrestamoAsync(request, token);
+                await _catalogoService.SolicitarPrestamoAsync(Guid.Parse(usuarioIdString), recursoId, token);
 
                 return Json(new { success = true });
             }
@@ -154,20 +151,12 @@ namespace SIGEBI.Web.Controllers
             try
             {
                 var token = GetBearerToken();
-                var usuarioId = HttpContext.Session.GetString("UsuarioId");
+                var usuarioIdString = HttpContext.Session.GetString("UsuarioId");
 
-                if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(usuarioId))
+                if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(usuarioIdString))
                     return RedirectToAction("Login", "Auth");
 
-                var request = new
-                {
-                    UsuarioId = Guid.Parse(usuarioId),
-                    RecursoId = recursoId,
-                    Calificacion = calificacion,
-                    Comentario = comentario
-                };
-
-                await _api.ValorarAsync(request, token);
+                await _catalogoService.ValorarAsync(Guid.Parse(usuarioIdString), recursoId, calificacion, comentario, token);
                 return RedirectToAction("Detalle", new { id = recursoId });
             }
             catch (Exception ex)
@@ -186,13 +175,13 @@ namespace SIGEBI.Web.Controllers
                 if (string.IsNullOrEmpty(token))
                     return Json(new { success = false, message = "Sesión expirada" });
 
-                await _api.EliminarValoracionAsync(id, token);
+                await _catalogoService.EliminarValoracionAsync(id, token);
                 return Json(new { success = true });
             }
             catch (ApiException apiEx)
             {
-                var error = await apiEx.GetContentAsAsync<string>();
-                return Json(new { success = false, message = "No se pudo eliminar: " + (error ?? apiEx.ReasonPhrase) });
+                var error = await ApiErrorHelper.GetErrorMessageAsync(apiEx);
+                return Json(new { success = false, message = "No se pudo eliminar: " + error });
             }
             catch (Exception ex)
             {
@@ -206,12 +195,12 @@ namespace SIGEBI.Web.Controllers
             try
             {
                 var token = GetBearerToken();
-                var usuarioId = HttpContext.Session.GetString("UsuarioId");
+                var usuarioIdString = HttpContext.Session.GetString("UsuarioId");
 
-                if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(usuarioId))
+                if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(usuarioIdString))
                     return Json(new { success = false, message = "Sesión expirada" });
 
-                await _api.AgregarAListaDeseosAsync(Guid.Parse(usuarioId), recursoId, token);
+                await _catalogoService.AgregarAListaDeseosAsync(Guid.Parse(usuarioIdString), recursoId, token);
                 return Json(new { success = true });
             }
             catch (ApiException apiEx)

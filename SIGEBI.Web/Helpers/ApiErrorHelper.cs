@@ -1,4 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Refit;
 
 namespace SIGEBI.Web.Helpers
@@ -33,11 +37,26 @@ namespace SIGEBI.Web.Helpers
                 if (element.TryGetProperty("detail", out var detail))
                     return detail.GetString();
 
-                // Prioridad 2: Formato antiguo "message"
+                // Prioridad 2: FluentValidation / ASP.NET Validation Errors
+                if (element.TryGetProperty("errors", out var errors))
+                {
+                    var errorList = new List<string>();
+                    foreach (var error in errors.EnumerateObject())
+                    {
+                        foreach (var messageElement in error.Value.EnumerateArray())
+                        {
+                            errorList.Add(messageElement.GetString() ?? "");
+                        }
+                    }
+                    if (errorList.Any())
+                        return string.Join(" | ", errorList);
+                }
+
+                // Prioridad 3: Formato antiguo "message"
                 if (element.TryGetProperty("message", out var message))
                     return message.GetString();
 
-                // Prioridad 3: RFC 7807 Title
+                // Prioridad 4: RFC 7807 Title
                 if (element.TryGetProperty("title", out var title))
                     return title.GetString();
 

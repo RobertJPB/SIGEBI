@@ -1,8 +1,10 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ApiDTOs = SIGEBI.API.DTOs;
 using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Interfaces.UseCases.Catalogo;
+using SIGEBI.Business.Interfaces.Services;
 using SIGEBI.Business.Validators;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Enums.Seguridad;
@@ -10,10 +12,9 @@ using SIGEBI.API.Extensions;
 
 namespace SIGEBI.API.Controllers
 {
- 
+    /// <summary>
     /// Controlador para la gestión de recursos bibliográficos (Libros, Revistas, Documentos).
-    /// El acceso está protegido por [Authorize] y se valida el rol mediante AccesoPolicy.
- 
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
@@ -21,48 +22,34 @@ namespace SIGEBI.API.Controllers
     {
         private readonly IConsultarLibrosUseCase _consultarUseCase;
         private readonly IGestionarRecursosUseCase _gestionarUseCase;
+        private readonly IImagenService _imagenService;
         private readonly AgregarRecursoValidator _validator;
-        private readonly IWebHostEnvironment _env;
 
         public RecursosController(
             IConsultarLibrosUseCase consultarUseCase,
             IGestionarRecursosUseCase gestionarUseCase,
-            AgregarRecursoValidator validator,
-            IWebHostEnvironment env)
+            IImagenService imagenService,
+            AgregarRecursoValidator validator)
         {
             _consultarUseCase = consultarUseCase;
             _gestionarUseCase = gestionarUseCase;
+            _imagenService = imagenService;
             _validator = validator;
-            _env = env;
         }
 
-
-
         // ── GET ──
-        /// Obtiene todos los recursos disponibles en el catálogo.
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet]
-        public async Task<IActionResult> ObtenerTodos()
+        public async Task<ActionResult<IEnumerable<RecursoDetalleDTO>>> ObtenerTodos()
         {
             var rol = User.ObtenerRolActual();
-            // Validación de permisos centralizada en la capa de Dominio (AccesoPolicy)
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver catálogo");
 
             var recursos = await _consultarUseCase.EjecutarAsync();
             return Ok(recursos);
         }
 
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("buscar")]
-        public async Task<IActionResult> BuscarPorTitulo([FromQuery] string titulo)
+        public async Task<ActionResult<IEnumerable<RecursoDetalleDTO>>> BuscarPorTitulo([FromQuery] string titulo)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "buscar recursos");
@@ -71,13 +58,8 @@ namespace SIGEBI.API.Controllers
             return Ok(recursos);
         }
 
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [HttpGet("categoria/{categoriaId}")]
-        public async Task<IActionResult> ObtenerPorCategoria(int categoriaId)
+        [HttpGet("categoria/{categoriaId:int}")]
+        public async Task<ActionResult<IEnumerable<RecursoDetalleDTO>>> ObtenerPorCategoria(int categoriaId)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver por categoría");
@@ -86,277 +68,164 @@ namespace SIGEBI.API.Controllers
             return Ok(recursos);
         }
 
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [HttpGet("{id}")]
-        public async Task<IActionResult> ObtenerPorId(Guid id)
+        [HttpGet("{id:guid}", Name = "ObtenerRecursoPorId")]
+        public async Task<ActionResult<RecursoDetalleDTO>> ObtenerPorId(Guid id)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeVerCatalogo(rol), "ver detalle de recurso");
 
             var recurso = await _consultarUseCase.GetByIdAsync(id);
-            if (recurso == null) return NotFound("Recurso no encontrado.");
+            if (recurso == null) return NotFound(new { mensaje = "Recurso no encontrado." });
 
             return Ok(recurso);
         }
 
         // ── POST ──
-        /// Agrega un nuevo libro al sistema. Requiere permisos de Administrador o Bibliotecario.
-        /// Soporta carga de archivos (multipart/form-data) para la portada.
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("libro")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> AgregarLibro([FromForm] AgregarLibroRequest request)
+        public async Task<IActionResult> AgregarLibro([FromForm] ApiDTOs.AgregarLibroRequest request)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "agregar libro");
 
-            if (request == null) return BadRequest(new { mensaje = "Datos inválidos." });
-
-            // Validación con el validador de negocio
-            var validacionDto = new RecursoDetalleDTO
-            {
-                Titulo = request.Titulo,
-                Autor = request.Autor,
-                Stock = request.Stock,
-                TipoRecurso = "Libro",
-                ISBN = request.ISBN,
-                Editorial = request.Editorial,
-                Anio = request.Anio
-            };
+            // Validación de negocio simplificada
+            var validacionDto = new RecursoDetalleDTO { Titulo = request.Titulo, Autor = request.Autor, Stock = request.Stock, TipoRecurso = "Libro", ISBN = request.ISBN };
             var errores = _validator.Validar(validacionDto);
             if (errores.Any()) return BadRequest(new { errores });
             
-            // Guardado de la imagen en el servidor (si se proporciona)
-            var imagenUrl = await GuardarImagenAsync(request.Imagen);
+            // Guardado usando Streams
+            string? imagenUrl = null;
+            if (request.Imagen != null)
+            {
+                using var stream = request.Imagen.OpenReadStream();
+                imagenUrl = await _imagenService.GuardarImagenAsync(stream, request.Imagen.FileName, "recursos");
+            }
 
             var resultado = await _gestionarUseCase.AgregarLibroAsync(
                 request.Titulo, request.Autor, request.CategoriaId, request.Stock, request.Descripcion,
                 request.ISBN, request.Editorial, request.Anio, imagenUrl, request.Genero);
-            return Ok(resultado);
+
+            return CreatedAtAction(nameof(ObtenerPorId), new { id = resultado.Id }, resultado);
         }
 
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("revista")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> AgregarRevista([FromForm] AgregarRevistaRequest request)
+        public async Task<IActionResult> AgregarRevista([FromForm] ApiDTOs.AgregarRevistaRequest request)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "agregar revista");
 
-            if (request == null) return BadRequest(new { mensaje = "Datos inválidos." });
-
-            var validacionDto = new RecursoDetalleDTO
+            string? imagenUrl = null;
+            if (request.Imagen != null)
             {
-                Titulo = request.Titulo,
-                Autor = request.Autor,
-                Stock = request.Stock,
-                TipoRecurso = "Revista",
-                ISSN = request.ISSN,
-                NumeroEdicion = request.NumeroEdicion
-            };
-            var errores = _validator.Validar(validacionDto);
-            if (errores.Any()) return BadRequest(new { errores });
-            var imagenUrl = await GuardarImagenAsync(request.Imagen);
+                using var stream = request.Imagen.OpenReadStream();
+                imagenUrl = await _imagenService.GuardarImagenAsync(stream, request.Imagen.FileName, "recursos");
+            }
+
             var resultado = await _gestionarUseCase.AgregarRevistaAsync(
                 request.Titulo, request.Autor, request.CategoriaId, request.Stock, request.Descripcion,
                 request.NumeroEdicion, request.ISSN, request.Anio, request.Editorial, imagenUrl);
-            return Ok(resultado);
+
+            return CreatedAtAction(nameof(ObtenerPorId), new { id = resultado.Id }, resultado);
         }
 
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("documento")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> AgregarDocumento([FromForm] AgregarDocumentoRequest request)
+        public async Task<IActionResult> AgregarDocumento([FromForm] ApiDTOs.AgregarDocumentoRequest request)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "agregar documento");
 
-            if (request == null) return BadRequest(new { mensaje = "Datos inválidos." });
-
-            var validacionDto = new RecursoDetalleDTO
+            string? imagenUrl = null;
+            if (request.Imagen != null)
             {
-                Titulo = request.Titulo,
-                Autor = request.Autor,
-                Stock = request.Stock,
-                TipoRecurso = "Documento",
-                Formato = request.Formato,
-                Institucion = request.Institucion
-            };
-            var errores = _validator.Validar(validacionDto);
-            if (errores.Any()) return BadRequest(new { errores });
+                using var stream = request.Imagen.OpenReadStream();
+                imagenUrl = await _imagenService.GuardarImagenAsync(stream, request.Imagen.FileName, "recursos");
+            }
 
-            var imagenUrl = await GuardarImagenAsync(request.Imagen);
             var resultado = await _gestionarUseCase.AgregarDocumentoAsync(
                 request.Titulo, request.Autor, request.CategoriaId, request.Stock, request.Descripcion,
                 request.Formato, request.Institucion, request.Anio, imagenUrl);
-            return Ok(resultado);
+
+            return CreatedAtAction(nameof(ObtenerPorId), new { id = resultado.Id }, resultado);
         }
 
         // ── PUT ──
-
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [HttpPut("libro/{id}")]
+        [HttpPut("libro/{id:guid}")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> EditarLibro(Guid id, [FromForm] AgregarLibroRequest request)
+        public async Task<IActionResult> EditarLibro(Guid id, [FromForm] ApiDTOs.AgregarLibroRequest request)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "editar libro");
 
-            if (request == null) return BadRequest("Datos inválidos.");
-            var imagenUrl = await GuardarImagenAsync(request.Imagen);
+            string? imagenUrl = null;
+            if (request.Imagen != null)
+            {
+                using var stream = request.Imagen.OpenReadStream();
+                imagenUrl = await _imagenService.GuardarImagenAsync(stream, request.Imagen.FileName, "recursos");
+            }
+
             var resultado = await _gestionarUseCase.EditarLibroAsync(
                 id, request.Titulo, request.Autor, request.CategoriaId, request.Stock, request.Descripcion,
                 request.ISBN, request.Editorial, request.Anio, imagenUrl, request.Genero);
+
             return Ok(resultado);
         }
 
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [HttpPut("revista/{id}")]
+        [HttpPut("revista/{id:guid}")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> EditarRevista(Guid id, [FromForm] AgregarRevistaRequest request)
+        public async Task<IActionResult> EditarRevista(Guid id, [FromForm] ApiDTOs.AgregarRevistaRequest request)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "editar revista");
 
-            if (request == null) return BadRequest("Datos inválidos.");
-            var imagenUrl = await GuardarImagenAsync(request.Imagen);
+            string? imagenUrl = null;
+            if (request.Imagen != null)
+            {
+                using var stream = request.Imagen.OpenReadStream();
+                imagenUrl = await _imagenService.GuardarImagenAsync(stream, request.Imagen.FileName, "recursos");
+            }
             var resultado = await _gestionarUseCase.EditarRevistaAsync(
                 id, request.Titulo, request.Autor, request.CategoriaId, request.Stock, request.Descripcion,
                 request.NumeroEdicion, request.ISSN, request.Anio, request.Editorial, imagenUrl);
+
             return Ok(resultado);
         }
 
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [HttpPut("documento/{id}")]
+        [HttpPut("documento/{id:guid}")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> EditarDocumento(Guid id, [FromForm] AgregarDocumentoRequest request)
+        public async Task<IActionResult> EditarDocumento(Guid id, [FromForm] ApiDTOs.AgregarDocumentoRequest request)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "editar documento");
 
-            if (request == null) return BadRequest("Datos inválidos.");
-            var imagenUrl = await GuardarImagenAsync(request.Imagen);
+            string? imagenUrl = null;
+            if (request.Imagen != null)
+            {
+                using var stream = request.Imagen.OpenReadStream();
+                imagenUrl = await _imagenService.GuardarImagenAsync(stream, request.Imagen.FileName, "recursos");
+            }
             var resultado = await _gestionarUseCase.EditarDocumentoAsync(
                 id, request.Titulo, request.Autor, request.CategoriaId, request.Stock, request.Descripcion,
                 request.Formato, request.Institucion, request.Anio, imagenUrl);
+
             return Ok(resultado);
         }
 
         // ── DELETE ──
-
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Eliminar(Guid id)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarRecursos(rol), "eliminar recurso");
 
+            // Opcional: Podríamos borrar la imagen física aquí inyectando IImagenService.
+            // Para mantener la consistencia, el UseCase debería informarnos la URL a borrar.
+            var recurso = await _consultarUseCase.GetByIdAsync(id);
+            if (recurso != null) _imagenService.EliminarImagen(recurso.ImagenUrl);
+
             await _gestionarUseCase.EliminarRecursoAsync(id);
-            return Ok(new { mensaje = "Recurso eliminado correctamente." });
+            return NoContent(); // 204 es más adecuado para eliminaciones exitosas sin contenido
         }
-
-        // ── Helper ──
-        /// Lógica para procesar y guardar imágenes de portada en el sistema de archivos.
-
-        private async Task<string?> GuardarImagenAsync(IFormFile? imagen)
-        {
-            // Si no mandan imagen no pasa nada, devolvemos null y ya
-            if (imagen == null || imagen.Length == 0) return null;
-
-            // Validaciones básicas de seguridad para archivos
-            var extensionesPermitidas = new[] { ".jpg", ".jpeg", ".png", ".webp" };
-            var extension = Path.GetExtension(imagen.FileName).ToLowerInvariant();
-            if (!extensionesPermitidas.Contains(extension)) return null;
-            if (imagen.Length > 5 * 1024 * 1024) return null; // Límite de 5MB
-
-            // Definición de la ruta física donde se guardarán las imágenes
-            var carpeta = Path.Combine(_env.WebRootPath ?? _env.ContentRootPath, "imagenes", "recursos");
-            Directory.CreateDirectory(carpeta);
-
-            // Nombre único para evitar colisiones
-            var nombreArchivo = $"{Guid.NewGuid()}{extension}";
-            var rutaCompleta = Path.Combine(carpeta, nombreArchivo);
-
-            using var stream = new FileStream(rutaCompleta, FileMode.Create);
-            await imagen.CopyToAsync(stream);
-
-            // Retornamos la URL relativa para que el cliente pueda acceder a la imagen
-            return $"/imagenes/recursos/{nombreArchivo}";
-        }
-    }
-
-    // Estas clases definen la estructura de los datos que el cliente debe enviar en las peticiones POST/PUT.
-
-    public class AgregarLibroRequest
-    {
-        public string Titulo { get; set; } = string.Empty;
-        public string Autor { get; set; } = string.Empty;
-        public int CategoriaId { get; set; }
-        public int Stock { get; set; }
-        public string ISBN { get; set; } = string.Empty;
-        public string Editorial { get; set; } = string.Empty;
-        public int Anio { get; set; }
-        public string? Genero { get; set; }
-        public string? Descripcion { get; set; }
-        public IFormFile? Imagen { get; set; }
-    }
-
-    public class AgregarRevistaRequest
-    {
-        public string Titulo { get; set; } = string.Empty;
-        public string Autor { get; set; } = string.Empty;
-        public int CategoriaId { get; set; }
-        public int Stock { get; set; }
-        public int NumeroEdicion { get; set; }
-        public string ISSN { get; set; } = string.Empty;
-        public int Anio { get; set; }
-        public string? Editorial { get; set; }
-        public string? Descripcion { get; set; }
-        public IFormFile? Imagen { get; set; }
-    }
-
-    public class AgregarDocumentoRequest
-    {
-        public string Titulo { get; set; } = string.Empty;
-        public string Autor { get; set; } = string.Empty;
-        public int CategoriaId { get; set; }
-        public int Stock { get; set; }
-        public string Formato { get; set; } = string.Empty;
-        public string Institucion { get; set; } = string.Empty;
-        public int Anio { get; set; }
-        public string? Descripcion { get; set; }
-        public IFormFile? Imagen { get; set; }
     }
 }

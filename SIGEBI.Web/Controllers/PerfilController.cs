@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http.Headers;
-using System.Text.Json;
+using SIGEBI.Web.Services;
 using SIGEBI.Web.Helpers;
+using Refit;
 
 namespace SIGEBI.Web.Controllers
 {
@@ -27,24 +27,26 @@ namespace SIGEBI.Web.Controllers
 
     public class PerfilController : Controller
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IUsuarioService _usuarioService;
         private readonly IConfiguration _config;
 
-        public PerfilController(IHttpClientFactory httpClientFactory, IConfiguration config)
+        public PerfilController(IUsuarioService usuarioService, IConfiguration config)
         {
-            _httpClientFactory = httpClientFactory;
+            _usuarioService = usuarioService;
             _config = config;
+        }
+
+        private string GetBearerToken()
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            return string.IsNullOrWhiteSpace(token) ? string.Empty : $"Bearer {token}";
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var token = HttpContext.Session.GetString("JwtToken");
-            if (string.IsNullOrWhiteSpace(token))
-                return RedirectToAction("Login", "Auth");
-
-            var usuarioId = HttpContext.Session.GetString("UsuarioId");
-            if (string.IsNullOrWhiteSpace(usuarioId))
+            var token = GetBearerToken();
+            if (string.IsNullOrEmpty(token))
                 return RedirectToAction("Login", "Auth");
 
             var apiBaseUrl = _config["ApiSettings:BaseUrl"] ?? "https://localhost:7047/";
@@ -52,46 +54,33 @@ namespace SIGEBI.Web.Controllers
 
             try
             {
-                var client = _httpClientFactory.CreateClient("SIGEBIAPI");
-                client.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", token);
+                var usuario = await _usuarioService.GetPerfilAsync(token);
 
-                // Llamar al endpoint de perfil validado y seguro de la API
-                var response = await client.GetAsync("api/Usuarios/perfil");
-
-                if (response.IsSuccessStatusCode)
+                if (usuario != null)
                 {
-                    var json = await response.Content.ReadAsStringAsync();
-                    var usuario = JsonSerializer.Deserialize<SIGEBI.Business.DTOs.UsuarioDTO>(
-                        json,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    model.Nombre = usuario.Nombre;
+                    model.Correo = usuario.Correo;
+                    model.ImagenUrl = usuario.ImagenUrl;
 
-                    if (usuario != null)
+                    // Mapeo manual de Rol (basado en SIGEBI.Domain.Enums.Seguridad.RolUsuario)
+                    model.Rol = usuario.IdRol switch
                     {
-                        model.Nombre = usuario.Nombre;
-                        model.Correo = usuario.Correo;
-                        model.ImagenUrl = usuario.ImagenUrl;
+                        1 => "Administrador",
+                        2 => "Bibliotecario",
+                        3 => "Estudiante",
+                        4 => "Docente",
+                        _ => "Usuario"
+                    };
 
-                        // Mapeo manual de Rol (basado en SIGEBI.Domain.Enums.Seguridad.RolUsuario)
-                        model.Rol = usuario.IdRol switch
-                        {
-                            1 => "Administrador",
-                            2 => "Bibliotecario",
-                            3 => "Estudiante",
-                            4 => "Docente",
-                            _ => "Usuario"
-                        };
-
-                        // Mapeo manual de Estado (basado en SIGEBI.Domain.Enums.Seguridad.EstadoUsuario)
-                        model.Estado = usuario.Estado switch
-                        {
-                            1 => "Activo",
-                            2 => "Inactivo",
-                            3 => "Suspendido",
-                            4 => "Bloqueado",
-                            _ => "Desconocido"
-                        };
-                    }
+                    // Mapeo manual de Estado (basado en SIGEBI.Domain.Enums.Seguridad.EstadoUsuario)
+                    model.Estado = usuario.Estado switch
+                    {
+                        1 => "Activo",
+                        2 => "Inactivo",
+                        3 => "Suspendido",
+                        4 => "Bloqueado",
+                        _ => "Desconocido"
+                    };
                 }
             }
             catch { /* silencioso */ }
@@ -102,35 +91,24 @@ namespace SIGEBI.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> ActualizarFoto(IFormFile foto)
         {
-            var token = HttpContext.Session.GetString("JwtToken");
-            if (string.IsNullOrWhiteSpace(token)) return RedirectToAction("Login", "Auth");
+            var token = GetBearerToken();
+            if (string.IsNullOrEmpty(token)) return RedirectToAction("Login", "Auth");
 
             if (foto != null && foto.Length > 0)
             {
                 try
                 {
-                    var client = _httpClientFactory.CreateClient("SIGEBIAPI");
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-                    using var content = new MultipartFormDataContent();
-                    using var fileStream = foto.OpenReadStream();
-                    var fileContent = new StreamContent(fileStream);
-                    fileContent.Headers.ContentType = new MediaTypeHeaderValue(foto.ContentType);
-                    content.Add(fileContent, "foto", foto.FileName);
-
-                    var response = await client.PostAsync("api/Usuarios/perfil/foto", content);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        TempData["Success"] = "Foto de perfil actualizada correctamente.";
-                    }
-                    else
-                    {
-                        TempData["Error"] = "No se pudo actualizar la foto.";
-                    }
+                    await _usuarioService.ActualizarFotoAsync(foto, token);
+                    TempData["Success"] = "Foto de perfil actualizada correctamente.";
                 }
-                catch
+                catch (ApiException apiEx)
                 {
-                    TempData["Error"] = "Error de comunicación con el servidor.";
+                     var error = await ApiErrorHelper.GetErrorMessageAsync(apiEx);
+                     TempData["Error"] = "No se pudo actualizar la foto: " + error;
+                }
+                catch (Exception ex)
+                {
+                    TempData["Error"] = "Error inesperado: " + ex.Message;
                 }
             }
 
@@ -140,36 +118,24 @@ namespace SIGEBI.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> ActualizarDatos(string nombre, string correo)
         {
-            var token = HttpContext.Session.GetString("JwtToken");
-            if (string.IsNullOrWhiteSpace(token)) return RedirectToAction("Login", "Auth");
+            var token = GetBearerToken();
+            if (string.IsNullOrEmpty(token)) return RedirectToAction("Login", "Auth");
 
             try
             {
-                var client = _httpClientFactory.CreateClient("SIGEBIAPI");
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-                // Reutilizamos el DTO de la API o mandamos un objeto anónimo que coincida con ActualizarPerfilRequest
-                var requestBody = new { Nombre = nombre, Correo = correo };
-                var json = JsonSerializer.Serialize(requestBody);
-                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-
-                var response = await client.PutAsync("api/Usuarios/perfil", content);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    TempData["Success"] = "Perfil actualizado correctamente.";
-                    // Si cambió el nombre, lo actualizamos también en la sesión para que se vea bien en el Layout si se usa allí
-                    HttpContext.Session.SetString("NombreUsuario", nombre);
-                }
-                else
-                {
-                    var error = await ApiErrorHelper.GetErrorMessageAsync(response);
-                    TempData["Error"] = "No se pudo actualizar: " + error;
-                }
+                await _usuarioService.ActualizarDatosAsync(nombre, correo, token);
+                
+                TempData["Success"] = "Perfil actualizado correctamente.";
+                HttpContext.Session.SetString("UsuarioNombre", nombre);
             }
-            catch
+            catch (ApiException apiEx)
             {
-                TempData["Error"] = "Error de comunicación con el servidor.";
+                var error = await ApiErrorHelper.GetErrorMessageAsync(apiEx);
+                TempData["Error"] = "No se pudo actualizar: " + error;
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error inesperado: " + ex.Message;
             }
 
             return RedirectToAction("Index");

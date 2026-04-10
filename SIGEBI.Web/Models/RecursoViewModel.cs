@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace SIGEBI.Web.Models
 {
     public class RecursoViewModel

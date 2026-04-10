@@ -1,0 +1,47 @@
+@model SIGEBI.Web.Models.RecursoViewModel
+@{
+    var apiBase = ViewBag.ApiBaseUrl ?? "https://localhost:7047/";
+    var tipoClass = Model.TipoRecurso?.ToLower() == "revista" ? "tipo-revista"
+                    : Model.TipoRecurso?.ToLower() == "documento" ? "tipo-documento"
+                    : "tipo-libro";
+
+    var tipoIcon = Model.TipoRecurso?.ToLower() == "revista" ? "bi-journal-text"
+                    : Model.TipoRecurso?.ToLower() == "documento" ? "bi-file-earmark-text"
+                    : "bi-book";
+}
+
+<a href="@Url.Action("Detalle", "Catalogo", new { id = Model.Id })" class="recurso-link">
+    <div class="recurso-card">
+        <div class="card-cover @tipoClass">
+            @if (!string.IsNullOrEmpty(Model.ImagenUrl))
+            {
+                <img class="card-cover-img"
+                     src="@(apiBase + Model.ImagenUrl)"
+                     alt="@Model.Titulo"
+                     onerror="this.style.display='none'" />
+            }
+            else
+            {
+                <i class="bi @tipoIcon card-cover-icon"></i>
+            }
+            <span class="card-tipo-badge">@Model.TipoRecurso</span>
+        </div>
+        <div class="card-body">
+            <h3 class="card-title">@Model.Titulo</h3>
+            <p class="card-autor">@Model.Autor</p>
+            <p class="card-categoria">@Model.CategoriaNombre</p>
+            @if (!string.IsNullOrEmpty(Model.Descripcion))
+            {
+                <p class="card-description">@Model.Descripcion</p>
+            }
+        </div>
+        <div class="card-footer">
+            <span class="stock-badge @(Model.Stock == 0 ? "stock-agotado" : "stock-disponible")">
+                @(Model.Stock == 0 ? "Agotado" : $"{Model.Stock} disponibles")
+            </span>
+            <span class="btn-detalle">
+                Ver detalle <i class="bi bi-arrow-right"></i>
+            </span>
+        </div>
+    </div>
+</a>

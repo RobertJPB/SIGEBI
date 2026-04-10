@@ -18,6 +18,14 @@ builder.Services.AddRefitClient<ISigebiApi>()
         c.BaseAddress = new Uri("https://localhost:7047/");
     });
 
+// Capa de Servicios de la Capa de Presentación (Desacoplamiento)
+builder.Services.AddScoped<ICatalogoService, CatalogoService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IPrestamoService, PrestamoService>();
+builder.Services.AddScoped<IListaDeseosService, ListaDeseosService>();
+builder.Services.AddScoped<INotificacionService, NotificacionService>();
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+
 // HttpClient manual para controladores que no usan Refit directamente
 builder.Services.AddHttpClient("SIGEBIAPI", c =>
 {

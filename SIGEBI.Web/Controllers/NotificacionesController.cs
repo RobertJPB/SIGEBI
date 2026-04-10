@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http.Headers;
-using System.Text.Json;
+using SIGEBI.Web.Services;
 using SIGEBI.Web.Helpers;
+using Refit;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SIGEBI.Web.Controllers
 {
@@ -22,56 +25,52 @@ namespace SIGEBI.Web.Controllers
 
     public class NotificacionesController : Controller
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly INotificacionService _notificacionService;
 
-        public NotificacionesController(IHttpClientFactory httpClientFactory)
+        public NotificacionesController(INotificacionService notificacionService)
         {
-            _httpClientFactory = httpClientFactory;
+            _notificacionService = notificacionService;
+        }
+
+        private string GetBearerToken()
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            return string.IsNullOrWhiteSpace(token) ? string.Empty : $"Bearer {token}";
         }
 
         public async Task<IActionResult> Index()
         {
-            var token = HttpContext.Session.GetString("JwtToken");
-            if (string.IsNullOrWhiteSpace(token))
+            var token = GetBearerToken();
+            if (string.IsNullOrEmpty(token))
                 return RedirectToAction("Login", "Auth");
 
-            var usuarioId = HttpContext.Session.GetString("UsuarioId");
+            var usuarioIdStr = HttpContext.Session.GetString("UsuarioId");
             var rolStr = HttpContext.Session.GetString("UsuarioRol");
-            if (string.IsNullOrWhiteSpace(usuarioId) || string.IsNullOrWhiteSpace(rolStr))
+            if (string.IsNullOrEmpty(usuarioIdStr) || !Guid.TryParse(usuarioIdStr, out var usuarioId) || string.IsNullOrEmpty(rolStr))
                 return RedirectToAction("Login", "Auth");
 
             var model = new NotificacionesIndexViewModel();
 
             try
             {
-                var client = _httpClientFactory.CreateClient("SIGEBIAPI");
-                client.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", token);
-
                 // Si es Admin o Bibliotecario, cargamos TODAS las notificaciones del sistema
                 bool esAdmin = rolStr == "Administrador" || rolStr == "Bibliotecario";
-                var endpoint = esAdmin ? "api/Notificaciones" : $"api/Notificaciones/usuario/{usuarioId}";
+                
+                var dtos = esAdmin 
+                    ? await _notificacionService.GetAllNotificacionesAsync(token)
+                    : await _notificacionService.GetNotificacionesByUsuarioAsync(usuarioId, token);
 
-                var response = await client.GetAsync(endpoint);
-
-                if (!response.IsSuccessStatusCode)
+                model.Notificaciones = dtos.Select(d => new NotificacionViewModel
                 {
-                    model.ErrorMessage = "No se pudieron cargar las notificaciones.";
-                    return View(model);
-                }
-
-                var json = await response.Content.ReadAsStringAsync();
-                var list = JsonSerializer.Deserialize<List<NotificacionViewModel>>(
-                    json,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
-                    ?? new List<NotificacionViewModel>();
-
-                // Ordenamos por fecha descendente (más nuevas primero)
-                model.Notificaciones = list.OrderByDescending(n => n.Fecha).ToList();
+                    Id = d.Id,
+                    Mensaje = d.Mensaje,
+                    Estado = d.Estado,
+                    Fecha = d.Fecha
+                }).OrderByDescending(n => n.Fecha).ToList();
             }
-            catch
+            catch (Exception ex)
             {
-                model.ErrorMessage = "Error al conectar con el servidor.";
+                model.ErrorMessage = $"Error al obtener notificaciones: {ex.Message}";
             }
 
             return View(model);
@@ -82,20 +81,41 @@ namespace SIGEBI.Web.Controllers
         {
             try
             {
-                var token = HttpContext.Session.GetString("JwtToken");
-                if (string.IsNullOrWhiteSpace(token))
+                var token = GetBearerToken();
+                if (string.IsNullOrEmpty(token))
                     return Json(new { success = false, message = "Sesión expirada" });
 
-                var client = _httpClientFactory.CreateClient("SIGEBIAPI");
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-                var response = await client.PutAsync($"api/Notificaciones/{id}/leida", null);
-
-                if (response.IsSuccessStatusCode)
-                    return Json(new { success = true });
-
-                var error = await ApiErrorHelper.GetErrorMessageAsync(response);
+                await _notificacionService.MarcarLeidaAsync(id, token);
+                return Json(new { success = true });
+            }
+            catch (ApiException apiEx)
+            {
+                var error = await ApiErrorHelper.GetErrorMessageAsync(apiEx);
                 return Json(new { success = false, message = "No se pudo actualizar: " + error });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MarcarTodasLeidas()
+        {
+            try
+            {
+                var token = GetBearerToken();
+                var usuarioIdStr = HttpContext.Session.GetString("UsuarioId");
+                if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(usuarioIdStr) || !Guid.TryParse(usuarioIdStr, out var usuarioId))
+                    return Json(new { success = false, message = "Sesión expirada" });
+
+                await _notificacionService.MarcarTodasLeidasAsync(usuarioId, token);
+                return Json(new { success = true });
+            }
+            catch (ApiException apiEx)
+            {
+                var error = await ApiErrorHelper.GetErrorMessageAsync(apiEx);
+                return Json(new { success = false, message = "No se pudieron marcar todas: " + error });
             }
             catch (Exception ex)
             {
@@ -108,21 +128,13 @@ namespace SIGEBI.Web.Controllers
         {
             try
             {
-                var token = HttpContext.Session.GetString("JwtToken");
-                if (string.IsNullOrWhiteSpace(token)) return Json(new { count = 0 });
+                var token = GetBearerToken();
+                var usuarioIdStr = HttpContext.Session.GetString("UsuarioId");
+                if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(usuarioIdStr) || !Guid.TryParse(usuarioIdStr, out var usuarioId))
+                    return Json(new { count = 0 });
 
-                var usuarioId = HttpContext.Session.GetString("UsuarioId");
-                if (string.IsNullOrWhiteSpace(usuarioId)) return Json(new { count = 0 });
-
-                var client = _httpClientFactory.CreateClient("SIGEBIAPI");
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-                var response = await client.GetAsync($"api/Notificaciones/usuario/{usuarioId}/count");
-                if (response.IsSuccessStatusCode)
-                {
-                    var countStr = await response.Content.ReadAsStringAsync();
-                    return Json(new { count = int.Parse(countStr) });
-                }
+                int count = await _notificacionService.GetUnreadCountAsync(usuarioId, token);
+                return Json(new { count });
             }
             catch { }
             return Json(new { count = 0 });

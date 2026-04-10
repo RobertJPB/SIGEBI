@@ -14,6 +14,7 @@ namespace SIGEBI.Infrastructure.Persistence.Repositories
             return await _dbSet
                 .Include(v => v.Usuario)
                 .Where(v => v.RecursoId == recursoId)
+                .OrderByDescending(v => v.FechaRegistro)
                 .ToListAsync();
         }
 

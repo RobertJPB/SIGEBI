@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http.Headers;
-using System.Text.Json;
+using SIGEBI.Web.Services;
+using SIGEBI.Web.Helpers;
+using Refit;
 
 namespace SIGEBI.Web.Controllers
 {
@@ -22,55 +23,51 @@ namespace SIGEBI.Web.Controllers
 
     public class ListaDeseosController : Controller
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IListaDeseosService _wishlistService;
+        private readonly IConfiguration _configuration;
 
-        public ListaDeseosController(IHttpClientFactory httpClientFactory)
+        public ListaDeseosController(IListaDeseosService wishlistService, IConfiguration configuration)
         {
-            _httpClientFactory = httpClientFactory;
+            _wishlistService = wishlistService;
+            _configuration = configuration;
+        }
+
+        private string GetBearerToken()
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            return string.IsNullOrWhiteSpace(token) ? string.Empty : $"Bearer {token}";
         }
 
         public async Task<IActionResult> Index()
         {
-            var token = HttpContext.Session.GetString("JwtToken");
-            if (string.IsNullOrWhiteSpace(token))
+            var token = GetBearerToken();
+            if (string.IsNullOrEmpty(token))
                 return RedirectToAction("Login", "Auth");
 
             var usuarioIdStr = HttpContext.Session.GetString("UsuarioId");
-            if (string.IsNullOrWhiteSpace(usuarioIdStr))
+            if (string.IsNullOrEmpty(usuarioIdStr) || !Guid.TryParse(usuarioIdStr, out var usuarioId))
                 return RedirectToAction("Login", "Auth");
 
-            // Pasamos la URL base a la vista para las imagenes
             var model = new ListaDeseosViewModel 
             { 
                 Token = token,
-                ApiBaseUrl = "https://localhost:7047/" 
+                ApiBaseUrl = _configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7047/"
             };
 
             try
             {
-                var client = _httpClientFactory.CreateClient("SIGEBIAPI");
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var apiData = await _wishlistService.GetListaDeseosAsync(usuarioId, token);
 
-                var response = await client.GetAsync($"api/ListaDeseos/usuario/{usuarioIdStr}");
-
-                if (response.IsSuccessStatusCode)
+                if (apiData != null && apiData.Recursos != null)
                 {
-                    var json = await response.Content.ReadAsStringAsync();
-                    
-                    var apiData = JsonSerializer.Deserialize<ListaDeseosApiResponse>(json, 
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                    if (apiData != null && apiData.Recursos != null)
+                    model.Items = apiData.Recursos.Select(r => new ListaDeseosItemViewModel
                     {
-                        model.Items = apiData.Recursos.Select(r => new ListaDeseosItemViewModel
-                        {
-                            Id = r.Id,
-                            RecursoTitulo = r.Titulo,
-                            RecursoAutor = r.Autor,
-                            CategoriaNombre = r.CategoriaNombre,
-                            ImagenUrl = r.ImagenUrl
-                        }).ToList();
-                    }
+                        Id = r.Id,
+                        RecursoTitulo = r.Titulo,
+                        RecursoAutor = r.Autor,
+                        CategoriaNombre = r.CategoriaNombre,
+                        ImagenUrl = r.ImagenUrl
+                    }).ToList();
                 }
             }
             catch { /* Items queda vacío si hay error */ }
@@ -83,43 +80,24 @@ namespace SIGEBI.Web.Controllers
         {
             try
             {
-                var token = HttpContext.Session.GetString("JwtToken");
-                var usuarioId = HttpContext.Session.GetString("UsuarioId");
+                var token = GetBearerToken();
+                var usuarioIdStr = HttpContext.Session.GetString("UsuarioId");
 
-                if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(usuarioId))
-                    return Json(new { success = false, message = "Sesión expirada" });
+                if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(usuarioIdStr))
+                    return Json(new { success = false, message = "Sesiones expirada" });
 
-                var client = _httpClientFactory.CreateClient("SIGEBIAPI");
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-                // El API usa DELETE api/ListaDeseos/usuario/{u}/recurso/{r}
-                var response = await client.DeleteAsync($"api/ListaDeseos/usuario/{usuarioId}/recurso/{id}");
-
-                if (response.IsSuccessStatusCode)
-                    return Json(new { success = true });
-
-                var error = await response.Content.ReadAsStringAsync();
+                await _wishlistService.QuitarDeListaDeseosAsync(Guid.Parse(usuarioIdStr), id, token);
+                return Json(new { success = true });
+            }
+            catch (ApiException apiEx)
+            {
+                var error = await ApiErrorHelper.GetErrorMessageAsync(apiEx);
                 return Json(new { success = false, message = "No se pudo quitar: " + error });
             }
             catch (Exception ex)
             {
                 return Json(new { success = false, message = ex.Message });
             }
-        }
-
-        // Clases auxiliares para mapear la respuesta del API (ListaDeseosDTO)
-        private class ListaDeseosApiResponse
-        {
-            public List<RecursoApiItem> Recursos { get; set; } = new();
-        }
-
-        private class RecursoApiItem
-        {
-            public Guid Id { get; set; }
-            public string Titulo { get; set; } = string.Empty;
-            public string Autor { get; set; } = string.Empty;
-            public string CategoriaNombre { get; set; } = string.Empty;
-            public string? ImagenUrl { get; set; }
         }
     }
 }
