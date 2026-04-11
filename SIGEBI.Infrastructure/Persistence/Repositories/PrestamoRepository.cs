@@ -11,11 +11,15 @@ namespace SIGEBI.Infrastructure.Persistence.Repositories
         public PrestamoRepository(SIGEBIDbContext context) : base(context) { }
 
         public override async Task<IEnumerable<Prestamo>> GetAllAsync() // Todos con Usuario y Recurso
-            => await _dbSet.Include(p => p.Usuario).Include(p => p.Recurso).ToListAsync();
+            => await _dbSet.Include(p => p.Usuario).Include(p => p.Recurso)
+                .OrderByDescending(p => p.FechaInicio)
+                .ToListAsync();
 
         public async Task<IEnumerable<Prestamo>> GetByUsuarioIdAsync(Guid usuarioId) // Préstamos por usuario
             => await _dbSet.Include(p => p.Usuario).Include(p => p.Recurso)
-                .Where(p => p.UsuarioId == usuarioId).ToListAsync();
+                .Where(p => p.UsuarioId == usuarioId)
+                .OrderByDescending(p => p.FechaInicio)
+                .ToListAsync();
 
         public async Task<IEnumerable<Prestamo>> GetActivosByUsuarioIdAsync(Guid usuarioId) // Préstamos activos/atrasados por usuario
             => await _dbSet.Include(p => p.Usuario).Include(p => p.Recurso)
@@ -28,6 +32,7 @@ namespace SIGEBI.Infrastructure.Persistence.Repositories
         {
             return await _dbSet.Include(p => p.Usuario).Include(p => p.Recurso)
                 .Where(p => p.EstadoActual == EstadoPrestamo.Atrasado)
+                .OrderByDescending(p => p.FechaInicio)
                 .ToListAsync();
         }
 

@@ -10,6 +10,7 @@ using SIGEBI.Domain.Enums.Biblioteca;
 using SIGEBI.Domain.Enums.Seguridad;
 using SIGEBI.Business.Interfaces.Common;
 using SIGEBI.Domain.ValueObjects;
+using SIGEBI.Business.Interfaces.Services;
 using Xunit;
 
 namespace SIGEBI.Test.UseCases.Prestamos
@@ -22,6 +23,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
         private readonly Mock<INotificacionRepository> _notificacionRepo;
         private readonly Mock<IListaDeseosRepository> _listaDeseosRepo;
         private readonly Mock<IUnitOfWork> _unitOfWork;
+        private readonly Mock<IStockNotificationService> _stockNotification;
         private readonly DevolverPrestamoUseCase _useCase;
 
         public DevolverPrestamoUseCaseTests()
@@ -32,6 +34,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
             _notificacionRepo = new Mock<INotificacionRepository>();
             _listaDeseosRepo = new Mock<IListaDeseosRepository>();
             _unitOfWork = new Mock<IUnitOfWork>();
+            _stockNotification = new Mock<IStockNotificationService>();
 
             _useCase = new DevolverPrestamoUseCase(
                 _prestamoRepo.Object,
@@ -42,7 +45,8 @@ namespace SIGEBI.Test.UseCases.Prestamos
                 new Mock<IAuditService>().Object,
                 _unitOfWork.Object,
                 new Mock<IMemoryCache>().Object,
-                new Mock<IGuidGenerator>().Object);
+                new Mock<IGuidGenerator>().Object,
+                _stockNotification.Object);
         }
 
         // ── HELPERS ──

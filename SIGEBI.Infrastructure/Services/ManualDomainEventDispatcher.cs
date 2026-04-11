@@ -8,10 +8,7 @@ using SIGEBI.Domain.Common;
 
 namespace SIGEBI.Infrastructure.Services
 {
-    /// <summary>
-    /// Lightweight manual domain event dispatcher implementation.
-    /// Resolves handlers from the service provider and executes them.
-    /// </summary>
+ 
     public class ManualDomainEventDispatcher : IDomainEventDispatcher
     {
         private readonly IServiceProvider _serviceProvider;

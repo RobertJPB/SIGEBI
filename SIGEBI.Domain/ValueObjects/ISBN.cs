@@ -15,7 +15,7 @@ namespace SIGEBI.Domain.ValueObjects
 
         public string Value { get; private set; }
 
-        private ISBN() { } // Para EF Core
+        private ISBN() { Value = string.Empty; } // para ef core
 
         public ISBN(string value)
         {

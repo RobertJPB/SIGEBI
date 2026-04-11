@@ -45,6 +45,15 @@ namespace SIGEBI.Infrastructure.Persistence.Configurations
                 .WithMany(c => c.Recursos)
                 .HasForeignKey(r => r.IdCategoria)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // ── AUDITORÍA ──
+            builder.Property(r => r.FechaCreacion)
+                .IsRequired();
+
+            builder.HasOne(r => r.UsuarioCreador)
+                .WithMany()
+                .HasForeignKey(r => r.UsuarioCreadorId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

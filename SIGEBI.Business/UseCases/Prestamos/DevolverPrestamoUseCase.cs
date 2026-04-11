@@ -7,6 +7,7 @@ using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Enums.Auditoria;
 using SIGEBI.Domain.Enums.Seguridad;
+using SIGEBI.Business.Interfaces.Services;
 using SIGEBI.Business.Mappers;
 
 namespace SIGEBI.Business.UseCases.Prestamos
@@ -23,6 +24,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMemoryCache _cache;
         private readonly IGuidGenerator _guidGenerator;
+        private readonly IStockNotificationService _stockNotification;
 
         public DevolverPrestamoUseCase(
             IPrestamoRepository prestamoRepository,
@@ -33,7 +35,8 @@ namespace SIGEBI.Business.UseCases.Prestamos
             IAuditService audit,
             IUnitOfWork unitOfWork,
             IMemoryCache cache,
-            IGuidGenerator guidGenerator)
+            IGuidGenerator guidGenerator,
+            IStockNotificationService stockNotification)
         {
             _prestamoRepository = prestamoRepository;
             _recursoRepository = recursoRepository;
@@ -44,6 +47,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
             _unitOfWork = unitOfWork;
             _cache = cache;
             _guidGenerator = guidGenerator;
+            _stockNotification = stockNotification;
         }
 
         // Registra la devolución real, repone el stock y genera multas si el plazo venció.
@@ -60,18 +64,10 @@ namespace SIGEBI.Business.UseCases.Prestamos
             prestamo.Devolver(DateTime.UtcNow);
             recurso.AumentarStock(); // el libro vuelve a estar disponible
 
-            // Si estaba agotado y ahora hay stock, avisamos a los interesados de la lista de deseos
+            // si no habia stock y ahora si, avisar a los de la lista de deseos
             if (estabaAgotado && recurso.Stock > 0)
             {
-                var usuariosInteresados = await _listaDeseosRepository.GetUsuariosInteresadosAsync(recurso.Id);
-                foreach (var usuarioId in usuariosInteresados)
-                {
-                    // No avisamos al que lo acaba de devolver (innecesario)
-                    if (usuarioId == prestamo.UsuarioId) continue;
-
-                    var notiDisponibilidad = NotificacionFactory.CrearNotificacionDisponibilidad(_guidGenerator.Create(), usuarioId, recurso.Titulo);
-                    await _notificacionRepository.AddAsync(notiDisponibilidad);
-                }
+                await _stockNotification.NotificarDisponibilidadAsync(recurso.Id);
             }
 
             // Notificación de devolución exitosa

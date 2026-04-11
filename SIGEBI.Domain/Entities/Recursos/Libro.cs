@@ -3,7 +3,7 @@ using SIGEBI.Domain.ValueObjects;
 
 namespace SIGEBI.Domain.Entities.Recursos
 {
-    // Extiende de RecursoBibliografico (OCP) y puede usarse donde se espere la base (LSP).
+    
     public class Libro : RecursoBibliografico
     {
         public ISBN ISBN { get; private set; } = null!; // Identificador internacional
@@ -14,8 +14,8 @@ namespace SIGEBI.Domain.Entities.Recursos
         private Libro() { }
 
         public Libro(Guid id, string titulo, string autor, int idCategoria, int stockInicial, string? descripcion,
-                     ISBN isbn, string editorial, int anio, string? genero = null)
-            : base(id, titulo, autor, idCategoria, stockInicial, descripcion)
+                     ISBN isbn, string editorial, int anio, string? genero = null, Guid? usuarioCreadorId = null)
+            : base(id, titulo, autor, idCategoria, stockInicial, descripcion, usuarioCreadorId)
         {
             // Validaciones especificas del libro (adicionales a las del recurso base)
             if (string.IsNullOrWhiteSpace(editorial))

@@ -30,21 +30,23 @@ namespace SIGEBI.Business.UseCases.Usuarios
             _guidGenerator = guidGenerator;
         }
 
-        // Crea un nuevo usuario encriptando su clave y validando que el correo sea único.
+        // Crea un nuevo usuario encriptando su clave.
         public async Task<Guid> EjecutarAsync(UsuarioDTO dto)
         {
-            // Ojo: validar que el correo no este repetido
-            var existente = await _usuarioRepository.GetByCorreoAsync(dto.Correo);
+            // chequear correo otra vez por seguridad
+            var emailVo = new Email(dto.Correo);
+            var existente = await _usuarioRepository.GetByCorreoAsync(emailVo.Value);
             if (existente != null)
                 throw new InvalidOperationException("Ya existe un usuario con ese correo.");
 
-            // encriptamos la clave antes de guardarla
-            var hash = _hashService.Hash(dto.Contrasena);
+            // validar formato antes de hashear
+            var contrasenaVo = new Contrasena(dto.Contrasena);
+            var hash = _hashService.Hash(contrasenaVo.Value);
 
             var usuario = new Usuario(
                 _guidGenerator.Create(),
                 dto.Nombre,
-                new Email(dto.Correo),
+                emailVo,
                 hash,
                 (RolUsuario)dto.IdRol
             );
@@ -55,7 +57,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
             }
 
             await _usuarioRepository.AddAsync(usuario);
-            await _unitOfWork.SaveChangesAsync(); // ← Este era el problema (ya arreglado)
+            await _unitOfWork.SaveChangesAsync();
 
             return usuario.Id;
         }

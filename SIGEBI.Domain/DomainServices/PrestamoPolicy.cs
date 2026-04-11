@@ -21,10 +21,7 @@ namespace SIGEBI.Domain.DomainServices
 
         public const int MaxDiasPrestamoTotal = 30;
 
-        // COMENTARIO PARA EXPLICACIÓN:
-        // Centralizamos los roles de "Personal" (Docentes, Admins, Bibliotecarios) 
-        // para aplicarles los mismos beneficios de plazos y límites superiores,
-        // separándolos de la lógica base de los Estudiantes.
+        
         private bool EsRolPersonal(RolUsuario rol)
         {
             return rol == RolUsuario.Docente || 

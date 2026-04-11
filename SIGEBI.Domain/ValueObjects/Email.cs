@@ -13,7 +13,7 @@ namespace SIGEBI.Domain.ValueObjects
 
         public string Value { get; private set; }
 
-        private Email() { } // Para EF Core
+        private Email() { Value = string.Empty; } // para ef core
 
         public Email(string value)
         {

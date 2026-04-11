@@ -20,14 +20,13 @@ namespace SIGEBI.Infrastructure.Persistence
         public DbSet<Valoracion> Valoraciones { get; set; } 
         public DbSet<Notificacion> Notificaciones { get; set; } 
         public DbSet<ListaDeseos> ListasDeseos { get; set; } 
-        public DbSet<Auditoria> Auditorias { get; set; } 
-        public DbSet<SolicitudAcceso> SolicitudesAcceso { get; set; } 
+        public DbSet<SolicitudAcceso> SolicitudesAcceso { get; private set; } 
+        public DbSet<Auditoria> Auditorias { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             
-           
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(SIGEBIDbContext).Assembly);
 
             // Seed del Usuario Administrador para Pruebas Iniciales
@@ -38,7 +37,8 @@ namespace SIGEBI.Infrastructure.Persistence
                 Correo = (Email)"admin@sigebi.com",
                 ContrasenaHash = "JAvlGPu9JyTdtvBO6x2llnRI1+gxwIyPqCKAn3THIKk=", // admin123
                 Rol = Domain.Enums.Seguridad.RolUsuario.Bibliotecario,
-                Estado = Domain.Enums.Seguridad.EstadoUsuario.Activo
+                Estado = Domain.Enums.Seguridad.EstadoUsuario.Activo,
+                FechaRegistro = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             });
 
             // Seed del Usuario del Sistema para Auditoría
@@ -49,7 +49,8 @@ namespace SIGEBI.Infrastructure.Persistence
                 Correo = (Email)"sistema@sigebi.com",
                 ContrasenaHash = Usuario.SistemaHashCentinela,
                 Rol = Domain.Enums.Seguridad.RolUsuario.Bibliotecario,
-                Estado = Domain.Enums.Seguridad.EstadoUsuario.Activo
+                Estado = Domain.Enums.Seguridad.EstadoUsuario.Activo,
+                FechaRegistro = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             });
 
             // Exclusión explícita del flujo de consultas (para evitar login y visibilidad)

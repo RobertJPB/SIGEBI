@@ -3,7 +3,7 @@ using SIGEBI.Business.DTOs;
 using SIGEBI.Business.Exceptions;
 using SIGEBI.Business.Interfaces.Services;
 using SIGEBI.Business.Interfaces.UseCases.Usuarios;
-using SIGEBI.Business.Validators;
+using SIGEBI.Business.Interfaces.Validators;
 
 // Este controlador gestiona los procesos de autenticación y registro de nuevos usuarios.
 // Es la puerta de entrada para obtener acceso seguro al sistema a través de JWT.
@@ -15,13 +15,13 @@ namespace SIGEBI.API.Controllers
     {
         private readonly ILoginUsuarioUseCase _loginUseCase;
         private readonly IRegistrarUsuarioUseCase _registrarUseCase;
-        private readonly RegistrarUsuarioValidator _validator;
+        private readonly IRegistrarUsuarioValidator _validator;
         private readonly IJwtService _jwtService;
 
         public AuthController(
             ILoginUsuarioUseCase loginUseCase,
             IRegistrarUsuarioUseCase registrarUseCase,
-            RegistrarUsuarioValidator validator,
+            IRegistrarUsuarioValidator validator,
             IJwtService jwtService)
         {
             _loginUseCase = loginUseCase;
@@ -84,7 +84,7 @@ namespace SIGEBI.API.Controllers
                 return BadRequest("Datos inválidos.");
 
             // Verifica que el DTO cumpla con las reglas de negocio definidas.
-            var errores = _validator.Validar(dto);
+            var errores = await _validator.ValidarAsync(dto);
 
             if (errores.Any())
                 return BadRequest(errores);

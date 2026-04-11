@@ -96,6 +96,7 @@ namespace SIGEBI.Services
             form.Add(new StringContent(request.ISBN ?? ""), "ISBN");
             form.Add(new StringContent(request.Editorial ?? ""), "Editorial");
             form.Add(new StringContent(request.Anio?.ToString() ?? "0"), "Anio");
+            form.Add(new StringContent(request.NumeroPaginas?.ToString() ?? "0"), "NumeroPaginas");
             if (request.Descripcion != null)
                 form.Add(new StringContent(request.Descripcion), "Descripcion");
             if (request.Genero != null)
@@ -116,6 +117,7 @@ namespace SIGEBI.Services
             form.Add(new StringContent(request.NumeroEdicion.ToString()), "NumeroEdicion");
             form.Add(new StringContent(request.Anio.ToString()), "Anio");
             form.Add(new StringContent(request.Editorial ?? ""), "Editorial");
+            form.Add(new StringContent(request.NumeroPaginas?.ToString() ?? "0"), "NumeroPaginas");
             if (request.Descripcion != null)
                 form.Add(new StringContent(request.Descripcion), "Descripcion");
             if (request.ImagenBytes != null && request.ImagenNombre != null)
@@ -133,6 +135,7 @@ namespace SIGEBI.Services
             form.Add(new StringContent(request.Formato ?? ""), "Formato");
             form.Add(new StringContent(request.Institucion ?? ""), "Institucion");
             form.Add(new StringContent(request.Anio?.ToString() ?? "0"), "Anio");
+            form.Add(new StringContent(request.NumeroPaginas?.ToString() ?? "0"), "NumeroPaginas");
             if (request.Descripcion != null)
                 form.Add(new StringContent(request.Descripcion), "Descripcion");
             if (request.ImagenBytes != null && request.ImagenNombre != null)

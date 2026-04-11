@@ -69,6 +69,20 @@ namespace SIGEBI.API.Controllers
             return Ok(recurso);
         }
 
+        [HttpGet("autores")]
+        public async Task<ActionResult<IEnumerable<string>>> ObtenerAutores()
+        {
+            var autores = await _gestionarUseCase.ObtenerAutoresAsync();
+            return Ok(autores);
+        }
+
+        [HttpGet("editoriales")]
+        public async Task<ActionResult<IEnumerable<string>>> ObtenerEditoriales()
+        {
+            var editoriales = await _gestionarUseCase.ObtenerEditorialesAsync();
+            return Ok(editoriales);
+        }
+
         // ── POST ──
         [HttpPost("libro")]
         [Consumes("multipart/form-data")]
@@ -83,7 +97,7 @@ namespace SIGEBI.API.Controllers
                 request.ImagenNombre = imagen.FileName;
             }
 
-            var resultado = await _gestionarUseCase.AgregarLibroAsync(request);
+            var resultado = await _gestionarUseCase.AgregarLibroAsync(request, User.ObtenerIdActual());
             return CreatedAtAction(nameof(ObtenerPorId), new { id = resultado.Id }, resultado);
         }
 
@@ -100,7 +114,7 @@ namespace SIGEBI.API.Controllers
                 request.ImagenNombre = imagen.FileName;
             }
 
-            var resultado = await _gestionarUseCase.AgregarRevistaAsync(request);
+            var resultado = await _gestionarUseCase.AgregarRevistaAsync(request, User.ObtenerIdActual());
             return CreatedAtAction(nameof(ObtenerPorId), new { id = resultado.Id }, resultado);
         }
 
@@ -117,7 +131,7 @@ namespace SIGEBI.API.Controllers
                 request.ImagenNombre = imagen.FileName;
             }
 
-            var resultado = await _gestionarUseCase.AgregarDocumentoAsync(request);
+            var resultado = await _gestionarUseCase.AgregarDocumentoAsync(request, User.ObtenerIdActual());
             return CreatedAtAction(nameof(ObtenerPorId), new { id = resultado.Id }, resultado);
         }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using SIGEBI.Domain.Entities.Recursos;
+using SIGEBI.Domain.Common;
 
 namespace SIGEBI.Domain.Entities
 {

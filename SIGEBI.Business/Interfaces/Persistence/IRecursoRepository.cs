@@ -6,9 +6,11 @@ namespace SIGEBI.Business.Interfaces.Persistence
     {
         Task<IEnumerable<RecursoBibliografico>> GetByCategoriaAsync(int categoriaId);
         Task<IEnumerable<RecursoBibliografico>> GetDisponiblesAsync();
-        Task<IEnumerable<RecursoBibliografico>> BuscarPorTituloAsync(string titulo);
+        Task<IEnumerable<RecursoBibliografico>> BuscarPorTituloAsync(string query);
         Task<IEnumerable<Libro>> GetLibrosAsync();
         Task<IEnumerable<Revista>> GetRevistasAsync();
         Task<IEnumerable<Documento>> GetDocumentosAsync();
+        Task<IEnumerable<string>> GetAutoresUnicosAsync();
+        Task<IEnumerable<string>> GetEditorialesUnicasAsync();
     }
 }

@@ -11,6 +11,8 @@ namespace SIGEBI.Views.GestionUsuarios
         public UsuarioDialog()
         {
             InitializeComponent();
+            // asegurar que empiece vacio (cero riesgos de hash)
+            TxtPass.Password = string.Empty;
         }
 
         private void BtnCancelar_Click(object sender, RoutedEventArgs e)

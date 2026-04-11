@@ -9,9 +9,9 @@ namespace SIGEBI.Business.Interfaces.UseCases.Catalogo
     public interface IGestionarRecursosUseCase
     {
         // ── AGREGAR ──
-        Task<RecursoDetalleDTO> AgregarLibroAsync(LibroRequestDTO request);
-        Task<RecursoDetalleDTO> AgregarRevistaAsync(RevistaRequestDTO request);
-        Task<RecursoDetalleDTO> AgregarDocumentoAsync(DocumentoRequestDTO request);
+        Task<RecursoDetalleDTO> AgregarLibroAsync(LibroRequestDTO request, Guid usuarioCreadorId);
+        Task<RecursoDetalleDTO> AgregarRevistaAsync(RevistaRequestDTO request, Guid usuarioCreadorId);
+        Task<RecursoDetalleDTO> AgregarDocumentoAsync(DocumentoRequestDTO request, Guid usuarioCreadorId);
 
         // ── EDITAR ──
         Task<RecursoDetalleDTO> EditarLibroAsync(Guid id, LibroRequestDTO request);
@@ -19,8 +19,11 @@ namespace SIGEBI.Business.Interfaces.UseCases.Catalogo
         Task<RecursoDetalleDTO> EditarDocumentoAsync(Guid id, DocumentoRequestDTO request);
 
         Task ActualizarImagenAsync(Guid recursoId, string imagenUrl);
+        Task EliminarRecursoAsync(Guid id);
 
-        // ── ELIMINAR ──
-        Task EliminarRecursoAsync(Guid recursoId);
+        // ── UTILIDADES ──
+        Task<IEnumerable<string>> ObtenerAutoresAsync();
+        Task<IEnumerable<string>> ObtenerEditorialesAsync();
     }
 }
+

@@ -41,6 +41,9 @@ namespace SIGEBI.Infrastructure.Persistence.Configurations
             builder.Property(u => u.ImagenUrl)
                 .HasMaxLength(500);
 
+            builder.Property(u => u.FechaRegistro)
+                .IsRequired();
+
             builder.HasMany(u => u.Prestamos)
                 .WithOne(p => p.Usuario)
                 .HasForeignKey(p => p.UsuarioId)

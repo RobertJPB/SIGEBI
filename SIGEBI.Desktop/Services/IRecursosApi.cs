@@ -11,11 +11,20 @@ namespace SIGEBI.Services
         [Get("/api/Recursos")]
         Task<List<RecursoDetalleDTO>> GetRecursosAsync();
 
+        [Get("/api/Recursos/{id}")]
+        Task<RecursoDetalleDTO> GetRecursoAsync(Guid id);
+
         [Get("/api/Recursos/buscar")]
         Task<List<RecursoDetalleDTO>> BuscarRecursosPorTituloAsync([Query] string titulo);
 
         [Delete("/api/Recursos/{id}")]
         Task EliminarRecursoAsync(Guid id);
+
+        [Get("/api/Recursos/autores")]
+        Task<List<string>> GetAutoresAsync();
+
+        [Get("/api/Recursos/editoriales")]
+        Task<List<string>> GetEditorialesAsync();
     }
 
     public interface ICategoriasApi
@@ -24,3 +33,4 @@ namespace SIGEBI.Services
         Task<List<CategoriaDTO>> GetCategoriasAsync();
     }
 }
+

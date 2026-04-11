@@ -1,34 +1,64 @@
 using SIGEBI.Business.DTOs;
+using SIGEBI.Business.Interfaces.Persistence;
+using SIGEBI.Business.Interfaces.Validators;
+using SIGEBI.Domain.ValueObjects;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SIGEBI.Business.Validators
 {
-    // Solo se encarga de verificar que los datos crudos del usuario sean correctos antes del registro.
-    public class RegistrarUsuarioValidator
+    // validador: para reglas de afuera (bd, unicidad, etc)
+    public class RegistrarUsuarioValidator : IRegistrarUsuarioValidator
     {
-        public List<string> Validar(UsuarioDTO dto)
+        private readonly IUsuarioRepository _usuarioRepository;
+
+        public RegistrarUsuarioValidator(IUsuarioRepository usuarioRepository)
+        {
+            _usuarioRepository = usuarioRepository;
+        }
+
+        public async Task<List<string>> ValidarAsync(UsuarioDTO dto)
         {
             var errores = new List<string>();
 
+            // Validar Nombre
             if (string.IsNullOrWhiteSpace(dto.Nombre))
                 errores.Add("El nombre es obligatorio.");
             else if (dto.Nombre.Length > 100)
                 errores.Add("El nombre no puede superar los 100 caracteres.");
 
-            if (string.IsNullOrWhiteSpace(dto.Correo))
-                errores.Add("El correo es obligatorio.");
-            else if (!dto.Correo.Contains("@"))
-                errores.Add("El correo no es válido.");
+            // Validar Correo usando el Value Object
+            try
+            {
+                var emailVo = new Email(dto.Correo);
+                // la unicidad es de negocio, no de formato (por eso va aca)
+                var existente = await _usuarioRepository.GetByCorreoAsync(emailVo.Value);
+                if (existente != null)
+                    errores.Add("Ya existe un usuario registrado con este correo electrónico.");
+            }
+            catch (ArgumentException ex)
+            {
+                errores.Add(ex.Message);
+            }
 
-            if (string.IsNullOrWhiteSpace(dto.Contrasena))
-                errores.Add("La contraseña es obligatoria.");
-            else if (dto.Contrasena.Length < 6)
-                // TODO: Habría que agregar verificacion de mayusculas y numeros
-                errores.Add("La contraseña debe tener al menos 6 caracteres.");
+            // Validar Contraseña usando el Value Object
+            try
+            {
+                var contrasenaVo = new Contrasena(dto.Contrasena);
+            }
+            catch (ArgumentException ex)
+            {
+                errores.Add(ex.Message);
+            }
 
             return errores;
         }
 
-        public bool EsValido(UsuarioDTO dto)
-            => Validar(dto).Count == 0;
+        public async Task<bool> EsValidoAsync(UsuarioDTO dto)
+        {
+            var errores = await ValidarAsync(dto);
+            return errores.Count == 0;
+        }
     }
 }

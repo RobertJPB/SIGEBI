@@ -4,6 +4,8 @@ using System.Windows;
 using SIGEBI.Services;
 using SIGEBI.Business.DTOs;
 
+
+
 namespace SIGEBI.Views.GestionBibliografica
 {
     public partial class EditarLibroDialog : Window

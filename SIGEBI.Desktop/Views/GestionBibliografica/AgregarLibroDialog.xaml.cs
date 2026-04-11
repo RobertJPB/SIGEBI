@@ -1,32 +1,74 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows;
-using SIGEBI.Services;
+using System.Windows.Media.Imaging;
+using Microsoft.Win32;
 using SIGEBI.Business.DTOs;
+using SIGEBI.Services;
+
 
 namespace SIGEBI.Views.GestionBibliografica
 {
     public partial class AgregarLibroDialog : Window
     {
         private readonly ResourceUploadService _api;
+        private readonly IRecursosApi _recursosApi; 
         private readonly ICategoriasApi _categoriasApi;
-        private readonly IRecursosApi _recursosApi;
         private byte[]? _imagenBytes;
         private string? _imagenNombre;
-
-        public AgregarLibroDialog() : this(
-            (ResourceUploadService)SIGEBI.App.Current.Services.GetService(typeof(ResourceUploadService))!, 
-            (ICategoriasApi)SIGEBI.App.Current.Services.GetService(typeof(ICategoriasApi))!,
-            (IRecursosApi)SIGEBI.App.Current.Services.GetService(typeof(IRecursosApi))!) { }
 
         public AgregarLibroDialog(ResourceUploadService api, ICategoriasApi categoriasApi, IRecursosApi recursosApi)
         {
             InitializeComponent();
             _api = api;
-            _categoriasApi = categoriasApi;
             _recursosApi = recursosApi;
+            _categoriasApi = categoriasApi;
+
             Loaded += async (s, e) =>
             {
+                try
+                {
+                    var autoresDb = await _recursosApi.GetAutoresAsync();
+                    var sugerencias = new List<string> { 
+                        "Gabriel García Márquez", "Isabel Allende", "Jorge Luis Borges", 
+                        "Julio Cortázar", "Mario Vargas Llosa", "Pablo Neruda", 
+                        "Gabriela Mistral", "Paulo Coelho", "Miguel de Cervantes", 
+                        "J.K. Rowling", "Stephen King" 
+                    };
+
+                    foreach (var autor in autoresDb)
+                    {
+                        if (!sugerencias.Contains(autor)) sugerencias.Add(autor);
+                    }
+                    CmbAutor.ItemsSource = sugerencias;
+                }
+                catch
+                {
+                    CmbAutor.ItemsSource = new[] { "Gabriel García Márquez", "Miguel de Cervantes", "J.K. Rowling" };
+                }
+
+                try
+                {
+                    var editorialesDb = await _recursosApi.GetEditorialesAsync();
+                    var sugerenciasEds = new List<string> { 
+                        "Planeta", "Santillana", "Alfaguara", 
+                        "Anagrama", "Siglo XXI", "Fondo de Cultura Económica",
+                        "Penguin Random House", "Oxford University Press", "Pearson"
+                    };
+
+                    foreach (var ed in editorialesDb)
+                    {
+                        if (!sugerenciasEds.Contains(ed)) sugerenciasEds.Add(ed);
+                    }
+                    CmbEditorial.ItemsSource = sugerenciasEds;
+                }
+                catch
+                {
+                    CmbEditorial.ItemsSource = new[] { "Planeta", "Santillana", "Oxford" };
+                }
+
                 try
                 {
                     var categorias = await _categoriasApi.GetCategoriasAsync();
@@ -42,26 +84,29 @@ namespace SIGEBI.Views.GestionBibliografica
 
         private void BtnSeleccionarImagen_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new Microsoft.Win32.OpenFileDialog
+            var openFileDialog = new OpenFileDialog
             {
-                Filter = "Imagenes|*.jpg;*.jpeg;*.png;*.bmp;*.gif",
-                Title = "Seleccionar imagen de portada"
+                Filter = "Archivos de Imagen (*.jpg;*.jpeg;*.png)|*.jpg;*.jpeg;*.png"
             };
-            if (dialog.ShowDialog() == true)
+
+            if (openFileDialog.ShowDialog() == true)
             {
-                _imagenBytes = File.ReadAllBytes(dialog.FileName);
-                _imagenNombre = Path.GetFileName(dialog.FileName);
-                TxtRutaImagen.Text = _imagenNombre;
-                ImgPreview.Source = new System.Windows.Media.Imaging.BitmapImage(new Uri(dialog.FileName));
+                _imagenNombre = Path.GetFileName(openFileDialog.FileName);
+                _imagenBytes = File.ReadAllBytes(openFileDialog.FileName);
+                TxtRutaImagen.Text = openFileDialog.FileName;
+
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri(openFileDialog.FileName);
+                bitmap.EndInit();
+                ImgPreview.Source = bitmap;
             }
         }
 
         private async void BtnGuardar_Click(object sender, RoutedEventArgs e)
         {
-            ErrorPanel.Visibility = Visibility.Collapsed;
-
-            if (string.IsNullOrWhiteSpace(TxtTitulo.Text) ||
-                string.IsNullOrWhiteSpace(TxtAutor.Text) ||
+            if (string.IsNullOrWhiteSpace(TxtTitulo.Text) || 
+                string.IsNullOrWhiteSpace(CmbAutor.Text) ||
                 string.IsNullOrWhiteSpace(TxtStock.Text) ||
                 CmbCategoria.SelectedValue == null)
             {
@@ -82,12 +127,13 @@ namespace SIGEBI.Views.GestionBibliografica
                 await _api.AgregarLibroAsync(new AgregarLibroRequest
                 {
                     Titulo = TxtTitulo.Text.Trim(),
-                    Autor = TxtAutor.Text.Trim(),
+                    Autor = CmbAutor.Text.Trim(),
                     CategoriaId = (int)CmbCategoria.SelectedValue,
                     Descripcion = string.IsNullOrWhiteSpace(TxtDescripcion.Text) ? null : TxtDescripcion.Text.Trim(),
                     ISBN = TxtISBN.Text.Trim(),
-                    Editorial = TxtEditorial.Text.Trim(),
+                    Editorial = CmbEditorial.Text.Trim(),
                     Anio = int.TryParse(TxtAnio.Text, out int anio) ? anio : null,
+                    NumeroPaginas = int.TryParse(TxtPaginas.Text, out int paginas) ? paginas : null,
                     Genero = string.IsNullOrWhiteSpace(TxtGenero.Text) ? null : TxtGenero.Text.Trim(),
                     Stock = stock,
                     ImagenBytes = _imagenBytes,
@@ -103,6 +149,8 @@ namespace SIGEBI.Views.GestionBibliografica
         }
 
         private void BtnCancelar_Click(object sender, RoutedEventArgs e)
-            => DialogResult = false;
+        {
+            DialogResult = false;
+        }
     }
 }

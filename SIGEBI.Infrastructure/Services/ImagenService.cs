@@ -4,9 +4,7 @@ using SIGEBI.Business.Interfaces.Services;
 
 namespace SIGEBI.Infrastructure.Services
 {
-    /// <summary>
-    /// Implementación de almacenamiento de imágenes en el sistema de archivos local (wwwroot).
-    /// </summary>
+
     public class ImagenService : IImagenService
     {
         private readonly IWebHostEnvironment _env;

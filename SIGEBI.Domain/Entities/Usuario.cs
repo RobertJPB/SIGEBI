@@ -7,6 +7,7 @@ using SIGEBI.Domain.Events;
 
 namespace SIGEBI.Domain.Entities
 {
+    // entidad: aqui si importa el id (identidad)
     public class Usuario : BaseEntity, IDesactivable
     {
         public const string SistemaHashCentinela = "SYSTEM_ACCOUNT_NO_LOGIN";
@@ -17,6 +18,7 @@ namespace SIGEBI.Domain.Entities
         public RolUsuario Rol { get; private set; }
         public EstadoUsuario Estado { get; private set; }
         public string? MotivoEstado { get; private set; }
+        public DateTime FechaRegistro { get; private set; }
 
         public ICollection<Prestamo> Prestamos { get; private set; } = new List<Prestamo>();
         public ICollection<Penalizacion> Penalizaciones { get; private set; } = new List<Penalizacion>();
@@ -30,12 +32,14 @@ namespace SIGEBI.Domain.Entities
 
         public Usuario(Guid id, string nombre, Email correo, string contrasenaHash, RolUsuario rol)
         {
+            // el id es lo que lo hace unico
             Id = id;
             Nombre = nombre ?? throw new ArgumentNullException(nameof(nombre));
             Correo = correo ?? throw new ArgumentNullException(nameof(correo));
             ContrasenaHash = contrasenaHash ?? throw new ArgumentNullException(nameof(contrasenaHash));
             Rol = rol;
             Estado = EstadoUsuario.Activo;
+            FechaRegistro = DateTime.UtcNow;
         }
 
         public void Activar() 

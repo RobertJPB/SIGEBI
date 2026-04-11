@@ -13,5 +13,13 @@ namespace SIGEBI.API.Extensions
                 return rol;
             throw new UnauthorizedAccessException("Rol no identificado en el token.");
         }
+
+        public static Guid ObtenerIdActual(this ClaimsPrincipal user)
+        {
+            var idClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (Guid.TryParse(idClaim, out var id))
+                return id;
+            throw new UnauthorizedAccessException("ID de usuario no identificado en el token.");
+        }
     }
 }

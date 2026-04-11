@@ -220,7 +220,7 @@
                         </div>
                         <div class="campo">
                             <label>Correo electrónico</label>
-                            <input type="email" id="inputCorreo" name="correo" value="@Model.Correo" class="form-input" required readonly />
+                            <input type="email" id="inputCorreo" name="correo" value="@Model.Correo" class="form-input always-readonly" required readonly />
                         </div>
                     </div>
                     <div class="campo-grupo">
@@ -263,12 +263,13 @@
             if (editing) {
                 document.body.classList.add('is-editing');
                 document.getElementById('inputNombre').removeAttribute('readonly');
-                document.getElementById('inputCorreo').removeAttribute('readonly');
+                // el correo no se debe poder editar
+                // document.getElementById('inputCorreo').removeAttribute('readonly');
                 document.getElementById('inputNombre').focus();
             } else {
                 document.body.classList.remove('is-editing');
                 document.getElementById('inputNombre').setAttribute('readonly', true);
-                document.getElementById('inputCorreo').setAttribute('readonly', true);
+                // document.getElementById('inputCorreo').setAttribute('readonly', true);
                 // Restaurar valores originales (opcional si no se recarga)
                 location.reload(); 
             }

@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Infrastructure.Persistence;
 using SIGEBI.Domain.Entities;
+using SIGEBI.Domain.Common;
+
 
 namespace SIGEBI.Infrastructure.Persistence.Base
 {

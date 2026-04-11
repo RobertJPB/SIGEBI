@@ -19,7 +19,10 @@ namespace SIGEBI.Business.Mappers
                 CategoriaId = recurso.IdCategoria,
                 CategoriaNombre = recurso.Categoria?.Nombre ?? string.Empty,
                 ImagenUrl = recurso.ImagenUrl,
-                Descripcion = recurso.Descripcion
+                Descripcion = recurso.Descripcion,
+                NumeroPaginas = recurso.NumeroPaginas,
+                UsuarioCreadorNombre = recurso.UsuarioCreador?.Nombre,
+                FechaCreacion = recurso.FechaCreacion
             };
 
             if (recurso is Libro libro)

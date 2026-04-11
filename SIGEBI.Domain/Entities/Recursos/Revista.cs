@@ -2,7 +2,6 @@ using System;
 
 namespace SIGEBI.Domain.Entities.Recursos
 {
-    // Una revista es un tipo de recurso mas. Cumple el contrato base de RecursoBibliografico.
     public class Revista : RecursoBibliografico
     {
         public int NumeroEdicion { get; private set; } // Número de entrega/volumen
@@ -13,8 +12,8 @@ namespace SIGEBI.Domain.Entities.Recursos
         private Revista() { }
 
         public Revista(Guid id, string titulo, string autor, int idCategoria, int stockInicial, string? descripcion,
-                       int numeroEdicion, string issn, int anio, string? editorial = null)
-            : base(id, titulo, autor, idCategoria, stockInicial, descripcion)
+                       int numeroEdicion, string issn, int anio, string? editorial = null, Guid? usuarioCreadorId = null)
+            : base(id, titulo, autor, idCategoria, stockInicial, descripcion, usuarioCreadorId)
         {
             // Validaciones especificas de la revista
             if (numeroEdicion <= 0)

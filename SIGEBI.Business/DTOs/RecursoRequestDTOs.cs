@@ -14,6 +14,7 @@ namespace SIGEBI.Business.DTOs
         public string? Descripcion { get; set; }
         public Stream? ImagenStream { get; set; }
         public string? ImagenNombre { get; set; }
+        public int? NumeroPaginas { get; set; }
     }
 
     public class LibroRequestDTO : RecursoBaseRequest

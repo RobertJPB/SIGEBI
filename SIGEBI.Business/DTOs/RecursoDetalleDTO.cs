@@ -14,6 +14,9 @@ namespace SIGEBI.Business.DTOs
         public string TipoRecurso { get; set; } = string.Empty;
         public string? ImagenUrl { get; set; }
         public string? Descripcion { get; set; }
+        public int? NumeroPaginas { get; set; }
+        public string? UsuarioCreadorNombre { get; set; }
+        public DateTime FechaCreacion { get; set; }
         public double PromedioValoraciones { get; set; }
         public double? PromedioValoracionesNullable => PromedioValoraciones; // Alias para Desktop
         // Libro

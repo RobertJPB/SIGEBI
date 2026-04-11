@@ -8,8 +8,7 @@ using SIGEBI.Domain.Entities;
 
 namespace SIGEBI.Infrastructure.Services
 {
-    // La única razon de existir de esta clase es generar el Token JWT con los Claims. 
-    // No hace login, no busca en la base de datos, solo encripta la pulsera VIP.
+
     public class JwtService : IJwtService
     {
         private readonly IConfiguration _configuration;

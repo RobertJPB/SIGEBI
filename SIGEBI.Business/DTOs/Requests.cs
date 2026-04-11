@@ -14,6 +14,7 @@ namespace SIGEBI.Business.DTOs
         public string? ISBN { get; set; }
         public string? Editorial { get; set; }
         public int? Anio { get; set; }
+        public int? NumeroPaginas { get; set; }
         public string? Genero { get; set; }
         public byte[]? ImagenBytes { get; set; }
         public string? ImagenNombre { get; set; }
@@ -30,6 +31,7 @@ namespace SIGEBI.Business.DTOs
         public string? ISSN { get; set; }
         public int Anio { get; set; }
         public string? Editorial { get; set; }
+        public int? NumeroPaginas { get; set; }
         public byte[]? ImagenBytes { get; set; }
         public string? ImagenNombre { get; set; }
     }
@@ -44,6 +46,7 @@ namespace SIGEBI.Business.DTOs
         public string? Formato { get; set; }
         public string? Institucion { get; set; }
         public int? Anio { get; set; }
+        public int? NumeroPaginas { get; set; }
         public byte[]? ImagenBytes { get; set; }
         public string? ImagenNombre { get; set; }
     }

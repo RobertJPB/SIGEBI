@@ -1,4 +1,4 @@
-namespace SIGEBI.Domain.Entities
+namespace SIGEBI.Domain.Common
 {
     public interface IDesactivable
     {

@@ -13,11 +13,15 @@ namespace SIGEBI.Domain.Entities.Recursos
         public string? Descripcion { get; private set; } // Resumen/Descripción
         public string? ImagenUrl { get; private set; } // URL de la carátula
         public Enums.Biblioteca.EstadoRecurso Estado { get; private set; } // Estado (Disponible/Inactivo)
+        public Guid? UsuarioCreadorId { get; private set; } // id del bibliotecario
+        public DateTime FechaCreacion { get; private set; } // cuando se registro
+        public int? NumeroPaginas { get; private set; } // número de páginas
         public Categoria Categoria { get; private set; } = null!; // Navegación a categoría
+        public Usuario? UsuarioCreador { get; private set; } // navegacion al creador
 
         protected RecursoBibliografico() { }
 
-        public RecursoBibliografico(Guid id, string titulo, string autor, int idCategoria, int stockInicial, string? descripcion)
+        public RecursoBibliografico(Guid id, string titulo, string autor, int idCategoria, int stockInicial, string? descripcion, Guid? usuarioCreadorId = null)
         {
             Id = id;
             if (string.IsNullOrWhiteSpace(titulo))
@@ -35,6 +39,9 @@ namespace SIGEBI.Domain.Entities.Recursos
             Stock = stockInicial;
             Descripcion = descripcion?.Trim();
             Estado = Enums.Biblioteca.EstadoRecurso.Disponible;
+            UsuarioCreadorId = usuarioCreadorId;
+            FechaCreacion = DateTime.UtcNow;
+            NumeroPaginas = null; // Se establecerá opcionalmente o mediante sobrecarga
         }
 
         public void ActualizarDatosBase(string titulo, string autor, int idCategoria, int stock, string? descripcion)
@@ -53,6 +60,12 @@ namespace SIGEBI.Domain.Entities.Recursos
             IdCategoria = idCategoria;
             Stock = stock;
             Descripcion = descripcion?.Trim();
+        }
+
+        public void CambiarNumeroPaginas(int? paginas)
+        {
+            if (paginas < 0) throw new ArgumentOutOfRangeException(nameof(paginas), "El número de páginas no puede ser negativo.");
+            NumeroPaginas = paginas;
         }
 
         public void ActualizarImagen(string? imagenUrl) => ImagenUrl = imagenUrl;

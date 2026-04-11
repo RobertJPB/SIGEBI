@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 using SIGEBI.Services;
 using SIGEBI.Business.DTOs;
+
 
 namespace SIGEBI.Views.GestionBibliografica
 {
@@ -27,6 +29,27 @@ namespace SIGEBI.Views.GestionBibliografica
             _recursosApi = recursosApi;
             Loaded += async (s, e) =>
             {
+                try
+                {
+                    var autoresDb = await _recursosApi.GetAutoresAsync();
+                    var sugerencias = new List<string> { 
+                        "Gabriel García Márquez", "Isabel Allende", "Jorge Luis Borges", 
+                        "Julio Cortázar", "Mario Vargas Llosa", "Pablo Neruda", 
+                        "Gabriela Mistral", "Paulo Coelho", "Miguel de Cervantes", 
+                        "J.K. Rowling", "Stephen King" 
+                    };
+
+                    foreach (var autor in autoresDb)
+                    {
+                        if (!sugerencias.Contains(autor)) sugerencias.Add(autor);
+                    }
+                    CmbAutor.ItemsSource = sugerencias;
+                }
+                catch
+                {
+                    CmbAutor.ItemsSource = new[] { "Gabriel García Márquez", "Miguel de Cervantes", "J.K. Rowling" };
+                }
+
                 try
                 {
                     var categorias = await _categoriasApi.GetCategoriasAsync();
@@ -61,7 +84,7 @@ namespace SIGEBI.Views.GestionBibliografica
             ErrorPanel.Visibility = Visibility.Collapsed;
 
             if (string.IsNullOrWhiteSpace(TxtTitulo.Text) ||
-                string.IsNullOrWhiteSpace(TxtAutor.Text) ||
+                string.IsNullOrWhiteSpace(CmbAutor.Text) ||
                 string.IsNullOrWhiteSpace(TxtStock.Text) ||
                 CmbCategoria.SelectedValue == null)
             {
@@ -82,12 +105,13 @@ namespace SIGEBI.Views.GestionBibliografica
                 await _api.AgregarDocumentoAsync(new AgregarDocumentoRequest
                 {
                     Titulo = TxtTitulo.Text.Trim(),
-                    Autor = TxtAutor.Text.Trim(),
+                    Autor = CmbAutor.Text.Trim(),
                     CategoriaId = (int)CmbCategoria.SelectedValue,
                     Descripcion = string.IsNullOrWhiteSpace(TxtDescripcion.Text) ? null : TxtDescripcion.Text.Trim(),
                     Formato = TxtFormato.Text.Trim(),
                     Institucion = TxtInstitucion.Text.Trim(),
                     Anio = int.TryParse(TxtAnio.Text, out int anio) ? anio : null,
+                    NumeroPaginas = int.TryParse(TxtPaginas.Text, out int paginas) ? paginas : null,
                     Stock = stock,
                     ImagenBytes = _imagenBytes,
                     ImagenNombre = _imagenNombre

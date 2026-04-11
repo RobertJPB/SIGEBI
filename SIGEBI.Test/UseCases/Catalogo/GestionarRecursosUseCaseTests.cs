@@ -23,6 +23,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
         private readonly Mock<IUnitOfWork> _unitOfWork;
         private readonly Mock<IImagenService> _imagenService;
         private readonly IMemoryCache _cache;
+        private readonly Mock<IStockNotificationService> _stockNotification;
         private readonly GestionarRecursosUseCase _useCase;
 
         public GestionarRecursosUseCaseTests()
@@ -33,6 +34,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
             _unitOfWork = new Mock<IUnitOfWork>();
             _imagenService = new Mock<IImagenService>();
             _cache = new MemoryCache(new MemoryCacheOptions());
+            _stockNotification = new Mock<IStockNotificationService>();
 
             _useCase = new GestionarRecursosUseCase(
                 _recursoRepo.Object,
@@ -41,7 +43,8 @@ namespace SIGEBI.Test.UseCases.Catalogo
                 _unitOfWork.Object,
                 _cache,
                 new Mock<IGuidGenerator>().Object,
-                _imagenService.Object);
+                _imagenService.Object,
+                _stockNotification.Object);
         }
 
         // â”€â”€ AGREGAR LIBRO â”€â”€
@@ -73,7 +76,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
                 ISBN = "9781234567890",
                 Editorial = "Editorial X",
                 Anio = 1943
-            });
+            }, Guid.NewGuid());
 
             // Assert
             resultado.Should().NotBeNull();
@@ -100,7 +103,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
                     ISBN = "9781234567890",
                     Editorial = "Editorial X",
                     Anio = 1943
-                }));
+                }, Guid.NewGuid()));
         }
 
         [Fact]
@@ -134,7 +137,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
                 Editorial = "Editorial X",
                 Anio = 1943,
                 ImagenStream = new MemoryStream()
-            });
+            }, Guid.NewGuid());
 
             // Assert
             resultado.ImagenUrl.Should().Be("/imagenes/recursos/portada.jpg");
@@ -235,7 +238,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
             _prestamoRepo.Setup(r => r.GetActivosByRecursoIdAsync(libro.Id)).ReturnsAsync(prestamos);
 
             // Act & Assert
-            var action = () => _useCase.EliminarRecursoAsync(libro.Id);
+            Func<Task> action = () => _useCase.EliminarRecursoAsync(libro.Id);
             await action.Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("*tiene préstamos activos*");
         }

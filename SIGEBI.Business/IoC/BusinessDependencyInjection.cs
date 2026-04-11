@@ -6,9 +6,12 @@ using SIGEBI.Business.Services;
 using SIGEBI.Business.UseCases.Catalogo;
 using SIGEBI.Business.UseCases.Prestamos;
 using SIGEBI.Business.UseCases.Usuarios;
+using SIGEBI.Business.Interfaces.Validators;
 using SIGEBI.Business.Validators;
 using SIGEBI.Domain.Interfaces.Services;
 using SIGEBI.Domain.DomainServices;
+using SIGEBI.Business.Interfaces.Services;
+using SIGEBI.Business.Services;
 
 namespace SIGEBI.Business.IoC
 {
@@ -43,9 +46,10 @@ namespace SIGEBI.Business.IoC
 
             // ── Servicios de Aplicación ──
             services.AddScoped<GenerarReportesService>();
+            services.AddScoped<IStockNotificationService, StockNotificationService>();
 
             // ── Validadores ──
-            services.AddScoped<RegistrarUsuarioValidator>();
+            services.AddScoped<IRegistrarUsuarioValidator, RegistrarUsuarioValidator>();
             services.AddScoped<AgregarRecursoValidator>();
             services.AddScoped<SolicitarPrestamoValidator>();
             services.AddScoped<ValoracionValidator>();
