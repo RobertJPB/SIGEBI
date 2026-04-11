@@ -9,30 +9,14 @@ namespace SIGEBI.Business.Interfaces.UseCases.Catalogo
     public interface IGestionarRecursosUseCase
     {
         // ── AGREGAR ──
-        Task<RecursoDetalleDTO> AgregarLibroAsync(string titulo, string autor,
-            int categoriaId, int stock, string? descripcion, string isbn,
-            string editorial, int anio, string? imagenUrl = null, string? genero = null);
-
-        Task<RecursoDetalleDTO> AgregarRevistaAsync(string titulo, string autor,
-            int categoriaId, int stock, string? descripcion, int numeroEdicion,
-            string issn, int anio, string? editorial, string? imagenUrl = null);
-
-        Task<RecursoDetalleDTO> AgregarDocumentoAsync(string titulo, string autor,
-            int categoriaId, int stock, string? descripcion, string formato,
-            string institucion, int anio, string? imagenUrl = null);
+        Task<RecursoDetalleDTO> AgregarLibroAsync(LibroRequestDTO request);
+        Task<RecursoDetalleDTO> AgregarRevistaAsync(RevistaRequestDTO request);
+        Task<RecursoDetalleDTO> AgregarDocumentoAsync(DocumentoRequestDTO request);
 
         // ── EDITAR ──
-        Task<RecursoDetalleDTO> EditarLibroAsync(Guid id, string titulo, string autor,
-            int categoriaId, int stock, string? descripcion, string isbn,
-            string editorial, int anio, string? imagenUrl = null, string? genero = null);
-
-        Task<RecursoDetalleDTO> EditarRevistaAsync(Guid id, string titulo, string autor,
-            int categoriaId, int stock, string? descripcion, int numeroEdicion,
-            string issn, int anio, string? editorial, string? imagenUrl = null);
-
-        Task<RecursoDetalleDTO> EditarDocumentoAsync(Guid id, string titulo, string autor,
-            int categoriaId, int stock, string? descripcion, string formato,
-            string institucion, int anio, string? imagenUrl = null);
+        Task<RecursoDetalleDTO> EditarLibroAsync(Guid id, LibroRequestDTO request);
+        Task<RecursoDetalleDTO> EditarRevistaAsync(Guid id, RevistaRequestDTO request);
+        Task<RecursoDetalleDTO> EditarDocumentoAsync(Guid id, DocumentoRequestDTO request);
 
         Task ActualizarImagenAsync(Guid recursoId, string imagenUrl);
 

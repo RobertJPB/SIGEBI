@@ -1,16 +1,18 @@
 using System;
 using System.Collections.Generic;
 using SIGEBI.Domain.Enums.Seguridad;
+using SIGEBI.Domain.ValueObjects;
+using SIGEBI.Domain.Common;
+using SIGEBI.Domain.Events;
 
 namespace SIGEBI.Domain.Entities
 {
-    public class Usuario : IDesactivable
+    public class Usuario : BaseEntity, IDesactivable
     {
         public const string SistemaHashCentinela = "SYSTEM_ACCOUNT_NO_LOGIN";
 
-        public Guid Id { get; private set; }
         public string Nombre { get; private set; } = null!;
-        public string Correo { get; private set; } = null!;
+        public Email Correo { get; private set; } = null!;
         public string ContrasenaHash { get; private set; } = null!;
         public RolUsuario Rol { get; private set; }
         public EstadoUsuario Estado { get; private set; }
@@ -26,7 +28,7 @@ namespace SIGEBI.Domain.Entities
 
         private Usuario() { }
 
-        public Usuario(Guid id, string nombre, string correo, string contrasenaHash, RolUsuario rol)
+        public Usuario(Guid id, string nombre, Email correo, string contrasenaHash, RolUsuario rol)
         {
             Id = id;
             Nombre = nombre ?? throw new ArgumentNullException(nameof(nombre));
@@ -56,11 +58,13 @@ namespace SIGEBI.Domain.Entities
             if (string.IsNullOrWhiteSpace(motivo)) throw new ArgumentException("El motivo es obligatorio.");
             Estado = EstadoUsuario.Bloqueado;
             MotivoEstado = motivo;
+
+            AddDomainEvent(new UsuarioBloqueadoEvent(Id, Nombre, Correo.Value, motivo));
         }
 
         public void CambiarRol(RolUsuario nuevoRol) => Rol = nuevoRol;
         public void CambiarNombre(string n) => Nombre = n;
-        public void CambiarCorreo(string c) => Correo = c;
+        public void CambiarCorreo(Email c) => Correo = c;
         public void CambiarContrasenaHash(string h) => ContrasenaHash = h;
         public void ActualizarImagen(string? u) => ImagenUrl = u;
     }

@@ -8,6 +8,7 @@ using SIGEBI.Business.UseCases.Usuarios;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Enums.Seguridad;
 using SIGEBI.Business.Interfaces.Common;
+using SIGEBI.Domain.ValueObjects;
 using Xunit;
 
 namespace SIGEBI.Test.UseCases.Usuarios
@@ -69,7 +70,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
         {
             // Arrange
             var dto = CrearDTO();
-            var existente = new Usuario(Guid.NewGuid(), "Juan Perez", "juan@test.com", "hash123", RolUsuario.Estudiante);
+            var existente = new Usuario(Guid.NewGuid(), "Juan Perez", new Email("juan@test.com"), "hash123", RolUsuario.Estudiante);
 
             _usuarioRepo.Setup(r => r.GetByCorreoAsync(dto.Correo)).ReturnsAsync(existente);
 
@@ -101,7 +102,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
         {
             // Arrange
             var dto = CrearDTO();
-            var existente = new Usuario(Guid.NewGuid(), "Juan Perez", "juan@test.com", "hash123", RolUsuario.Estudiante);
+            var existente = new Usuario(Guid.NewGuid(), "Juan Perez", new Email("juan@test.com"), "hash123", RolUsuario.Estudiante);
 
             _usuarioRepo.Setup(r => r.GetByCorreoAsync(dto.Correo)).ReturnsAsync(existente);
 

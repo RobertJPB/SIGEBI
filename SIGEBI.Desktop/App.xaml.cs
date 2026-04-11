@@ -10,7 +10,7 @@ namespace SIGEBI;
 /// <summary>
 /// Punto de entrada de SIGEBI.Desktop.
 /// Configura el contenedor de inversión de control (IoC) con:
-/// - ISigebiApi vía Refit (cliente REST tipado + AuthHandler JWT)
+/// - Clientes API por dominio vía Refit (IAuthApi, IRecursosApi, etc.)
 /// - ResourceUploadService (operaciones multipart/form-data)
 /// - Todos los ViewModels bajo patrón IsBusy / ManejarErrorAsync
 /// </summary>
@@ -31,16 +31,34 @@ public partial class App : Application
         // ── Middleware ──
         services.AddTransient<AuthHandler>();
 
-        // ── ISigebiApi (Refit) — Todos los endpoints REST tipados ──
-        services.AddRefitClient<ISigebiApi>(new RefitSettings
+        var refitSettings = new RefitSettings
         {
             ContentSerializer = new SystemTextJsonContentSerializer(new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             })
-        })
-        .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://localhost:7047/"))
-        .AddHttpMessageHandler<AuthHandler>();
+        };
+
+        void ConfigureClient<T>(IServiceCollection services) where T : class
+        {
+            services.AddRefitClient<T>(refitSettings)
+                .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://localhost:7047/"))
+                .AddHttpMessageHandler<AuthHandler>();
+        }
+
+        ConfigureClient<IAuthApi>(services);
+        ConfigureClient<IUsuariosApi>(services);
+        ConfigureClient<IRecursosApi>(services);
+        ConfigureClient<ICategoriasApi>(services);
+        ConfigureClient<IPrestamosApi>(services);
+        ConfigureClient<IPenalizacionesApi>(services);
+        ConfigureClient<INotificacionesApi>(services);
+        ConfigureClient<IAuditoriaApi>(services);
+        ConfigureClient<IValoracionesApi>(services);
+        ConfigureClient<IListaDeseosApi>(services);
+
+        // ── Facade ──
+        services.AddTransient<ISigebiApiFacade, SigebiApiFacade>();
 
         // ── ResourceUploadService — Operaciones multipart (imágenes de recursos) ──
         services.AddHttpClient<ResourceUploadService>(client =>

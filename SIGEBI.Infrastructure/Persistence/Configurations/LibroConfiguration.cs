@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SIGEBI.Domain.Entities.Recursos;
+using SIGEBI.Domain.ValueObjects;
 
 namespace SIGEBI.Infrastructure.Persistence.Configurations
 {
@@ -11,7 +12,10 @@ namespace SIGEBI.Infrastructure.Persistence.Configurations
             builder.Property(l => l.ISBN)
                 .HasColumnName("ISBN")
                 .HasMaxLength(20)
-                .IsRequired(false);
+                .IsRequired()
+                .HasConversion(
+                    v => v.Value,
+                    v => new ISBN(v));
 
             builder.Property(l => l.Editorial)
                 .HasColumnName("Editorial")

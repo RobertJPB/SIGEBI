@@ -1,0 +1,100 @@
+@{
+    Layout = null;
+    ViewData["Title"] = "Mantenimiento";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIGEBI - Mantenimiento</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --green-900: #0f3d20; --green-800: #1a5c2e; --green-600: #2e8b4a;
+            --green-400: #4caf7d; --green-100: #e8f5ee; --cream: #faf8f4;
+            --ink: #1a1f1c; --muted: #5a6b60; --border: #dde8e2;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            background-color: var(--cream); 
+            font-family: 'Outfit', sans-serif; 
+            color: var(--ink); 
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .maintenance-container {
+            text-align: center;
+            max-width: 500px;
+            padding: 3rem;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(15,61,32,0.08);
+            border: 1px solid var(--border);
+            margin: 20px;
+            animation: fadeIn 0.8s ease-out;
+        }
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .icon-box {
+            width: 80px; height: 80px;
+            background: var(--green-100);
+            color: var(--green-600);
+            border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 1.5rem;
+        }
+        h1 { font-size: 1.8rem; font-weight: 700; color: var(--green-900); margin-bottom: 1rem; }
+        p { color: var(--muted); line-height: 1.6; margin-bottom: 2rem; font-size: 1.05rem; }
+        .btn-retry {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: var(--green-600); color: white;
+            padding: 12px 30px; border-radius: 12px;
+            text-decoration: none; font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-retry:hover { 
+            background: var(--green-800); 
+            transform: translateY(-2px); 
+            box-shadow: 0 5px 15px rgba(46,139,74,0.3);
+        }
+        .decoration {
+            position: absolute;
+            z-index: -1;
+            opacity: 0.4;
+        }
+        .dec-1 { top: -5%; left: -5%; width: 30%; }
+        .dec-2 { bottom: -5%; right: -5%; width: 25%; transform: rotate(180deg); }
+    </style>
+</head>
+<body>
+    
+    <svg class="decoration dec-1" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#e8f5ee" d="M44.7,-76.4C58.8,-69.2,71.8,-59.1,79.6,-46.5C87.4,-33.8,90.1,-18.6,89.3,-3.8C88.5,11,84.1,25.4,75.9,38.1C67.7,50.8,55.8,61.8,42.2,69.5C28.6,77.2,13.3,81.6,-2.4,85.8C-18.1,89.9,-34.2,93.8,-48.6,88.4C-63,82.9,-75.6,68.2,-83.1,52.2C-90.6,36.2,-93.1,19,-92.9,2.1C-92.7,-14.8,-89.9,-31.4,-81.9,-45.7C-73.9,-60,-60.7,-72,-45.8,-78.7C-30.9,-85.4,-14.3,-86.8,1.1,-88.7C16.5,-90.6,30.6,-83.6,44.7,-76.4Z" transform="translate(100 100)" />
+    </svg>
+
+    <div class="maintenance-container">
+        <div class="icon-box">
+            <i class="bi bi-gear-wide-connected"></i>
+        </div>
+        <h1>Estamos trabajando en el sistema</h1>
+        <p>El sistema se encuentra en mantenimiento para mejorar tu experiencia. Por favor, regrese más tarde.</p>
+        <a href="/" class="btn-retry">
+            <i class="bi bi-arrow-clockwise"></i> Reintentar ahora
+        </a>
+    </div>
+
+    <svg class="decoration dec-2" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#e8f5ee" d="M44.7,-76.4C58.8,-69.2,71.8,-59.1,79.6,-46.5C87.4,-33.8,90.1,-18.6,89.3,-3.8C88.5,11,84.1,25.4,75.9,38.1C67.7,50.8,55.8,61.8,42.2,69.5C28.6,77.2,13.3,81.6,-2.4,85.8C-18.1,89.9,-34.2,93.8,-48.6,88.4C-63,82.9,-75.6,68.2,-83.1,52.2C-90.6,36.2,-93.1,19,-92.9,2.1C-92.7,-14.8,-89.9,-31.4,-81.9,-45.7C-73.9,-60,-60.7,-72,-45.8,-78.7C-30.9,-85.4,-14.3,-86.8,1.1,-88.7C16.5,-90.6,30.6,-83.6,44.7,-76.4Z" transform="translate(100 100)" />
+    </svg>
+
+</body>
+</html>

@@ -6,6 +6,7 @@ using SIGEBI.Business.Interfaces.Common;
 using SIGEBI.Business.Interfaces.UseCases.Usuarios;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Enums.Seguridad;
+using SIGEBI.Domain.ValueObjects;
 
 namespace SIGEBI.Business.UseCases.Usuarios
 {
@@ -43,7 +44,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
             var usuario = new Usuario(
                 _guidGenerator.Create(),
                 dto.Nombre,
-                dto.Correo,
+                new Email(dto.Correo),
                 hash,
                 (RolUsuario)dto.IdRol
             );

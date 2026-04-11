@@ -9,7 +9,7 @@ namespace SIGEBI.ViewModels
 {
     public partial class LoginViewModel : BaseViewModel
     {
-        private readonly ISigebiApi _api;
+        private readonly IAuthApi _api;
 
         [ObservableProperty]
         private string _correo = string.Empty;
@@ -17,7 +17,7 @@ namespace SIGEBI.ViewModels
         // Callback para cerrar la ventana desde la vista
         public Action? OnLoginSuccess { get; set; }
 
-        public LoginViewModel(ISigebiApi api)
+        public LoginViewModel(IAuthApi api)
         {
             _api = api;
             Title = "SIGEBI - Acceso Administrativo";

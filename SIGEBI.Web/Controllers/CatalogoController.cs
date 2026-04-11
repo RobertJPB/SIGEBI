@@ -40,58 +40,43 @@ namespace SIGEBI.Web.Controllers
                 ApiBaseUrl = _configuration["ApiSettings:BaseUrl"]!
             };
 
-            try
-            {
-                var token = GetBearerToken();
-                if (string.IsNullOrEmpty(token)) return RedirectToAction("Login", "Auth");
+            var token = GetBearerToken();
+            if (string.IsNullOrEmpty(token)) return RedirectToAction("Login", "Auth");
 
-                // Consumo mediante Servicio (Capa desacoplada)
-                var dtos = await _catalogoService.GetRecursosAsync(token, busqueda);
+            // Consumo mediante Servicio (Capa desacoplada)
+            var dtos = await _catalogoService.GetRecursosAsync(token, busqueda);
 
-                model.Recursos = dtos.Select(MapDtoToViewModel).ToList();
+            model.Recursos = dtos.Select(MapDtoToViewModel).ToList();
 
-                return View(model);
-            }
-            catch (Exception)
-            {
-                // En producción registraríamos el error
-                return View(model);
-            }
+            return View(model);
         }
 
         public async Task<IActionResult> Detalle(Guid id)
         {
-            try
+            var token = GetBearerToken();
+            if (string.IsNullOrEmpty(token)) return RedirectToAction("Login", "Auth");
+
+            // 1. Obtener detalles del recurso mediante servicio (Capa desacoplada)
+            var dto = await _catalogoService.GetRecursoAsync(id, token);
+            if (dto == null) return RedirectToAction("Index");
+            
+            var recurso = MapDtoToViewModel(dto);
+
+            // 2. Obtener valoraciones mediante servicio
+            try 
             {
-                var token = GetBearerToken();
-                if (string.IsNullOrEmpty(token)) return RedirectToAction("Login", "Auth");
-
-                // 1. Obtener detalles del recurso mediante servicio (Capa desacoplada)
-                var dto = await _catalogoService.GetRecursoAsync(id, token);
-                if (dto == null) return RedirectToAction("Index");
-                
-                var recurso = MapDtoToViewModel(dto);
-
-                // 2. Obtener valoraciones mediante servicio
-                try 
-                {
-                    var valoraciones = await _catalogoService.GetValoracionesAsync(id, token);
-                    recurso.Valoraciones = valoraciones ?? new List<SIGEBI.Business.DTOs.ValoracionDTO>();
-                }
-                catch (Exception ex)
-                { 
-                    // Mantenemos reporte de error pero sin traza técnica en la UI
-                    ViewBag.ErrorValoraciones = "El servicio de testimonios no pudo cargar los datos: " + ex.Message;
-                    recurso.Valoraciones = new List<SIGEBI.Business.DTOs.ValoracionDTO>();
-                }
-
-                ViewBag.ApiBaseUrl = _configuration["ApiSettings:BaseUrl"];
-                return View(recurso);
+                var valoraciones = await _catalogoService.GetValoracionesAsync(id, token);
+                recurso.Valoraciones = valoraciones ?? new List<SIGEBI.Business.DTOs.ValoracionDTO>();
             }
             catch (Exception ex)
-            {
-                return Content($"Error al cargar el detalle: {ex.Message}");
+            { 
+                // Mantenemos reporte de error pero sin traza técnica en la UI
+                ViewBag.ErrorValoraciones = "El servicio de testimonios no pudo cargar los datos: " + ex.Message;
+                recurso.Valoraciones = new List<SIGEBI.Business.DTOs.ValoracionDTO>();
             }
+
+            ViewBag.ApiBaseUrl = _configuration["ApiSettings:BaseUrl"];
+            return View(recurso);
         }
 
         private RecursoViewModel MapDtoToViewModel(SIGEBI.Business.DTOs.RecursoDetalleDTO dto)

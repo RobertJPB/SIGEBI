@@ -8,6 +8,7 @@ using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.UseCases.Usuarios;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Business.Interfaces.Common;
+using SIGEBI.Domain.ValueObjects;
 using Xunit;
 
 namespace SIGEBI.Test.UseCases.Usuarios
@@ -75,7 +76,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
                 Motivo = "Mal comportamiento",
                 DiasPenalizacion = 5
             };
-            var usuario = new SIGEBI.Domain.Entities.Usuario(Guid.NewGuid(), "T", "t@t.com", "h", SIGEBI.Domain.Enums.Seguridad.RolUsuario.Estudiante);
+            var usuario = new SIGEBI.Domain.Entities.Usuario(Guid.NewGuid(), "T", new Email("t@t.com"), "h", SIGEBI.Domain.Enums.Seguridad.RolUsuario.Estudiante);
             _usuarioRepo.Setup(r => r.GetByIdAsync(dto.UsuarioId)).ReturnsAsync(usuario);
             _unitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
 

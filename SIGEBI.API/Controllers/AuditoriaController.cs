@@ -22,8 +22,6 @@ namespace SIGEBI.API.Controllers
             _auditoriaUseCase = auditoriaUseCase;
         }
 
-
-
         // Obtiene la lista completa de todas las auditorías registradas.
         // Solo accesible para usuarios con permisos elevados (validado por AccesoPolicy).
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -57,7 +55,6 @@ namespace SIGEBI.API.Controllers
             var auditorias = await _auditoriaUseCase.ObtenerPorUsuarioAsync(usuarioId);
             return Ok(auditorias);
         }
-
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

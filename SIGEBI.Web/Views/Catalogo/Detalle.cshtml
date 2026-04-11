@@ -6,6 +6,14 @@
     Layout = null;
     var apiBaseUrl = ViewBag.ApiBaseUrl ?? "https://localhost:7047/";
     var avgRating = Math.Round(Model.PromedioValoraciones, 1);
+
+    // COMENTARIO PARA EXPLICACIÓN:
+    // Esta lógica determina el plazo de devolución directamente en la interfaz (UI).
+    // Si el rol es Docente/Admin/Bibliotecario, se otorgan 30 días; de lo contrario, 15 (Estudiantes).
+    // Esto asegura que el usuario vea la información correcta antes de confirmar su préstamo.
+    var userRole = Context.Session.GetString("UsuarioRol");
+    var loanDays = (userRole == "Docente" || userRole == "Administrador" || userRole == "Bibliotecario") ? 30 : 15;
+    var roleText = (loanDays == 30) ? "Docente/Personal" : "Estudiante";
 }
 
 <!DOCTYPE html>
@@ -38,24 +46,7 @@
             padding-bottom: 5rem;
         }
 
-        .navbar {
-            background-color: #0d2e18;
-            padding: 0.8rem 2.5rem;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
-        }
-
-        .navbar-brand {
-            color: white;
-            font-weight: 700;
-            font-size: 1.5rem;
-            text-decoration: none;
-        }
-
-        .nav-link { color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-left: 1.5rem; text-decoration: none; transition: color 0.2s; }
-        .nav-link:hover { color: white; }
+        /* Se eliminaron estilos locales del navbar para usar los de catalogo.css (centralizados) */
 
         .container-custom {
             max-width: 1100px;
@@ -230,23 +221,12 @@
         .modal-footer { border-top: none; padding: 0 2rem 2rem; justify-content: space-between; }
         .confirm-date-badge { background: var(--green-100); color: var(--green-800); padding: 8px 16px; border-radius: 10px; font-weight: 700; display: inline-block; margin: 1rem 0; }
 
-        .notification-dot {
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            width: 8px;
-            height: 8px;
-            background-color: #ff4d4f;
-            border-radius: 50%;
-            border: 1.5px solid #0d2e18;
-            display: none;
-            box-shadow: 0 0 0 2px rgba(255,77,79,0.2);
-        }
+        /* El punto de notificación ya está en catalogo.css */
     </style>
 </head>
 <body>
 
-    @Html.Partial("_Navbar")
+    <partial name="_Navbar" />
 
     <div class="container-custom">
         <a href="/Catalogo/Index" class="btn-back">
@@ -332,7 +312,7 @@
                 </div>
 
                 <div style="font-size: 0.85rem; color: var(--muted); margin-bottom: 2rem;">
-                    Nota: Plazo de devolución de 15 días.
+                    <i class="bi bi-info-circle me-1"></i> Nota: Su plazo de devolución es de <strong>@loanDays días</strong> (Rol: @roleText).
                 </div>
 
                 <div class="action-buttons">
@@ -444,9 +424,9 @@
                 </div>
                 <div class="modal-body">
                     <p class="text-muted">¿Estás seguro de solicitar el préstamo de <strong>@Model.Titulo</strong>?</p>
-                    <p class="mb-1">La fecha estimada de devolución es:</p>
+                    <p class="mb-1">La fecha estimada de devolución es (@loanDays días para su rol):</p>
                     <div class="confirm-date-badge">
-                        <span class="local-time" data-utc="@DateTime.UtcNow.AddDays(15).ToString("yyyy-MM-ddTHH:mm:ssZ")" data-format="short">@DateTime.Now.AddDays(15).ToString("dd/MM/yyyy")</span>
+                        <span class="local-time" data-utc="@DateTime.UtcNow.AddDays(loanDays).ToString("yyyy-MM-ddTHH:mm:ssZ")" data-format="short">@DateTime.Now.AddDays(loanDays).ToString("dd/MM/yyyy")</span>
                     </div>
                 </div>
                 <div class="modal-footer">

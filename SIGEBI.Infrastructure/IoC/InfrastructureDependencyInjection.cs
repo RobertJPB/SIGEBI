@@ -40,6 +40,7 @@ namespace SIGEBI.Infrastructure.IoC
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>(); // Registro del generador
             services.AddScoped<IAuditService, AuditService>();
             services.AddScoped<IImagenService, ImagenService>();
+            services.AddScoped<IDomainEventDispatcher, ManualDomainEventDispatcher>();
 
             return services;
         }

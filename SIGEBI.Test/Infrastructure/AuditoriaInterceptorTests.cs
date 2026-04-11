@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using SIGEBI.Domain.Entities;
+using SIGEBI.Domain.ValueObjects;
 using SIGEBI.Infrastructure.Persistence;
 using SIGEBI.Infrastructure.Persistence.Interceptors;
 using Xunit;
@@ -52,7 +53,7 @@ namespace SIGEBI.Test.Infrastructure
 
             // Arrange: Crear un usuario para evitar error de FK
             var userId = Guid.NewGuid();
-            var user = new Usuario(userId, "Test", "test@mail.com", "pass", SIGEBI.Domain.Enums.Seguridad.RolUsuario.Estudiante);
+            var user = new Usuario(userId, "Test", new Email("test@mail.com"), "pass", SIGEBI.Domain.Enums.Seguridad.RolUsuario.Estudiante);
             context.Usuarios.Add(user);
             await context.SaveChangesAsync();
 
@@ -87,7 +88,7 @@ namespace SIGEBI.Test.Infrastructure
 
             // Arrange: Crear el usuario que viene en el claim
             var userId = Guid.Parse(testUserId);
-            var user = new Usuario(userId, "Test", "test@mail.com", "pass", SIGEBI.Domain.Enums.Seguridad.RolUsuario.Estudiante);
+            var user = new Usuario(userId, "Test", new Email("test@mail.com"), "pass", SIGEBI.Domain.Enums.Seguridad.RolUsuario.Estudiante);
             context.Usuarios.Add(user);
             await context.SaveChangesAsync();
 

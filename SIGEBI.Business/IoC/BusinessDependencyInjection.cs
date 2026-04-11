@@ -7,6 +7,8 @@ using SIGEBI.Business.UseCases.Catalogo;
 using SIGEBI.Business.UseCases.Prestamos;
 using SIGEBI.Business.UseCases.Usuarios;
 using SIGEBI.Business.Validators;
+using SIGEBI.Domain.Interfaces.Services;
+using SIGEBI.Domain.DomainServices;
 
 namespace SIGEBI.Business.IoC
 {
@@ -14,6 +16,9 @@ namespace SIGEBI.Business.IoC
     {
         public static IServiceCollection AddBusiness(this IServiceCollection services)
         {
+            // ── Políticas de Dominio ──
+            services.AddScoped<IPrestamoPolicy, PrestamoPolicy>();
+
             // ── Casos de Uso: Usuarios ──
             services.AddScoped<ILoginUsuarioUseCase, LoginUsuarioUseCase>();
             services.AddScoped<IRegistrarUsuarioUseCase, RegistrarUsuarioUseCase>();

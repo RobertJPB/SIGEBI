@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Windows;
 using SIGEBI.Services;
@@ -9,22 +9,27 @@ namespace SIGEBI.Views.GestionBibliografica
     public partial class AgregarLibroDialog : Window
     {
         private readonly ResourceUploadService _api;
-        private readonly ISigebiApi _sigebiApi;
+        private readonly ICategoriasApi _categoriasApi;
+        private readonly IRecursosApi _recursosApi;
         private byte[]? _imagenBytes;
         private string? _imagenNombre;
 
-        public AgregarLibroDialog() : this((ResourceUploadService)SIGEBI.App.Current.Services.GetService(typeof(ResourceUploadService))!, (ISigebiApi)SIGEBI.App.Current.Services.GetService(typeof(ISigebiApi))!) { }
+        public AgregarLibroDialog() : this(
+            (ResourceUploadService)SIGEBI.App.Current.Services.GetService(typeof(ResourceUploadService))!, 
+            (ICategoriasApi)SIGEBI.App.Current.Services.GetService(typeof(ICategoriasApi))!,
+            (IRecursosApi)SIGEBI.App.Current.Services.GetService(typeof(IRecursosApi))!) { }
 
-        public AgregarLibroDialog(ResourceUploadService api, ISigebiApi sigebiApi)
+        public AgregarLibroDialog(ResourceUploadService api, ICategoriasApi categoriasApi, IRecursosApi recursosApi)
         {
             InitializeComponent();
             _api = api;
-            _sigebiApi = sigebiApi;
+            _categoriasApi = categoriasApi;
+            _recursosApi = recursosApi;
             Loaded += async (s, e) =>
             {
                 try
                 {
-                    var categorias = await _sigebiApi.GetCategoriasAsync();
+                    var categorias = await _categoriasApi.GetCategoriasAsync();
                     CmbCategoria.ItemsSource = categorias;
                 }
                 catch

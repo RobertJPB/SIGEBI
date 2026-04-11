@@ -4,6 +4,7 @@ using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.Interfaces.UseCases.Usuarios;
 using SIGEBI.Business.Mappers;
 using SIGEBI.Domain.Enums.Seguridad;
+using SIGEBI.Domain.ValueObjects;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace SIGEBI.Business.UseCases.Usuarios
@@ -108,7 +109,9 @@ namespace SIGEBI.Business.UseCases.Usuarios
         {
             var usuario = await _usuarioRepository.GetByIdAsync(id)
                 ?? throw new InvalidOperationException("Usuario no encontrado.");
-            _usuarioRepository.Delete(usuario);
+            
+            // Usamos HardDelete para asegurar el borrado físico de la base de datos
+            _usuarioRepository.HardDelete(usuario);
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -127,7 +130,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
                 ?? throw new InvalidOperationException("Usuario no encontrado.");
             
             usuario.CambiarNombre(nuevoNombre);
-            usuario.CambiarCorreo(nuevoCorreo);
+            usuario.CambiarCorreo(new Email(nuevoCorreo));
             
             _usuarioRepository.Update(usuario);
             await _unitOfWork.SaveChangesAsync();

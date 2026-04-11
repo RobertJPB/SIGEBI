@@ -9,29 +9,32 @@ namespace SIGEBI.Views.GestionBibliografica
     public partial class EditarLibroDialog : Window
     {
         private readonly ResourceUploadService _api;
-        private readonly ISigebiApi _sigebiApi;
+        private readonly ICategoriasApi _categoriasApi;
+        private readonly IRecursosApi _recursosApi;
         private readonly RecursoDetalleDTO _recurso;
         private byte[]? _imagenBytes;
         private string? _imagenNombre;
 
-        public EditarLibroDialog() : this(
+        public EditarLibroDialog(RecursoDetalleDTO recurso) : this(
+            recurso,
             (ResourceUploadService)SIGEBI.App.Current.Services.GetService(typeof(ResourceUploadService))!,
-            (ISigebiApi)SIGEBI.App.Current.Services.GetService(typeof(ISigebiApi))!,
-            new RecursoDetalleDTO()) { }
+            (ICategoriasApi)SIGEBI.App.Current.Services.GetService(typeof(ICategoriasApi))!,
+            (IRecursosApi)SIGEBI.App.Current.Services.GetService(typeof(IRecursosApi))!) { }
 
-        public EditarLibroDialog(ResourceUploadService api, ISigebiApi sigebiApi, RecursoDetalleDTO recurso)
+        public EditarLibroDialog(RecursoDetalleDTO recurso, ResourceUploadService api, ICategoriasApi categoriasApi, IRecursosApi recursosApi)
         {
             InitializeComponent();
-            _api = api;
-            _sigebiApi = sigebiApi;
             _recurso = recurso;
+            _api = api;
+            _categoriasApi = categoriasApi;
+            _recursosApi = recursosApi;
             Loaded += async (s, e) =>
             {
                 try
                 {
-                    var categorias = await _sigebiApi.GetCategoriasAsync();
+                    var categorias = await _categoriasApi.GetCategoriasAsync();
                     CmbCategoria.ItemsSource = categorias;
-                    CmbCategoria.SelectedValue = recurso.CategoriaId;
+                    CmbCategoria.SelectedValue = _recurso.CategoriaId;
                 }
                 catch
                 {

@@ -4,6 +4,7 @@ using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.UseCases.Prestamos;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Enums.Seguridad;
+using SIGEBI.Domain.ValueObjects;
 using Xunit;
 
 namespace SIGEBI.Test.UseCases.Prestamos
@@ -27,7 +28,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
         // ── HELPERS ──
 
         private Usuario CrearUsuario()
-            => new Usuario(Guid.NewGuid(), "Juan Perez", "juan@test.com", "hash123", RolUsuario.Estudiante);
+            => new Usuario(Guid.NewGuid(), "Juan Perez", new Email("juan@test.com"), "hash123", RolUsuario.Estudiante);
 
         private Prestamo CrearPrestamo(Guid usuarioId)
             => new Prestamo(Guid.NewGuid(), usuarioId, Guid.NewGuid(), 7, DateTime.UtcNow);

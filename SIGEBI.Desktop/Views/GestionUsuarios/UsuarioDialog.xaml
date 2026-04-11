@@ -123,10 +123,10 @@
 
         <TextBlock Text="Rol de Usuario *" Style="{StaticResource Etiqueta}"/>
         <ComboBox x:Name="CmbRol" Style="{StaticResource CampoCombo}">
-            <ComboBoxItem Content="Estudiante" Tag="1"/>
-            <ComboBoxItem Content="Docente" Tag="2"/>
-            <ComboBoxItem Content="Bibliotecario" Tag="3"/>
-            <ComboBoxItem Content="Administrador" Tag="4"/>
+            <ComboBoxItem Content="Estudiante" Tag="3"/>
+            <ComboBoxItem Content="Bibliotecario" Tag="2"/>
+            <ComboBoxItem Content="Docente" Tag="4"/>
+            <ComboBoxItem Content="Administrador" Tag="1"/>
         </ComboBox>
 
         <Border x:Name="ErrorPanel" Background="#fdecea" CornerRadius="7"

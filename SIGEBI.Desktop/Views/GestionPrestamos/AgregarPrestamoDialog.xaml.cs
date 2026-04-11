@@ -8,15 +8,22 @@ namespace SIGEBI.Views.GestionPrestamos
 {
     public partial class AgregarPrestamoDialog : Window
     {
-        private readonly ISigebiApi _api;
+        private readonly IUsuariosApi _usuariosApi;
+        private readonly IRecursosApi _recursosApi;
+        private readonly IPrestamosApi _prestamosApi;
 
         public AgregarPrestamoDialog()
-            : this((ISigebiApi)SIGEBI.App.Current.Services.GetService(typeof(ISigebiApi))!) { }
+            : this(
+                (IUsuariosApi)SIGEBI.App.Current.Services.GetService(typeof(IUsuariosApi))!,
+                (IRecursosApi)SIGEBI.App.Current.Services.GetService(typeof(IRecursosApi))!,
+                (IPrestamosApi)SIGEBI.App.Current.Services.GetService(typeof(IPrestamosApi))!) { }
 
-        public AgregarPrestamoDialog(ISigebiApi api)
+        public AgregarPrestamoDialog(IUsuariosApi usuariosApi, IRecursosApi recursosApi, IPrestamosApi prestamosApi)
         {
             InitializeComponent();
-            _api = api;
+            _usuariosApi = usuariosApi;
+            _recursosApi = recursosApi;
+            _prestamosApi = prestamosApi;
             Loaded += AgregarPrestamoDialog_Loaded;
         }
 
@@ -24,10 +31,10 @@ namespace SIGEBI.Views.GestionPrestamos
         {
             try
             {
-                var usuarios = await _api.GetUsuariosAsync();
-                CmbUsuarios.ItemsSource = usuarios.Where(u => u.Estado == 1).ToList();
+                var usuarios = await _usuariosApi.GetUsuariosAsync();
+                CmbUsuarios.ItemsSource = usuarios.Where(u => u.Estado == (int)SIGEBI.Domain.Enums.Seguridad.EstadoUsuario.Activo).ToList();
 
-                var recursos = await _api.GetRecursosAsync();
+                var recursos = await _recursosApi.GetRecursosAsync();
                 CmbRecursos.ItemsSource = recursos.Where(r => r.Stock > 0).ToList();
             }
             catch (Exception ex)
@@ -59,7 +66,7 @@ namespace SIGEBI.Views.GestionPrestamos
                     FechaDevolucionEstimada = DpFechaDevolucion.SelectedDate
                 };
 
-                await _api.SolicitarPrestamoAsync(request);
+                await _prestamosApi.SolicitarPrestamoAsync(request);
                 MessageBox.Show("Préstamo registrado correctamente.", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
                 this.DialogResult = true;
                 this.Close();

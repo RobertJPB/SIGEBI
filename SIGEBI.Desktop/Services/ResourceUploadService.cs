@@ -10,7 +10,7 @@ namespace SIGEBI.Services
     /// Servicio especializado para operaciones de subida de archivos (multipart/form-data).
     /// Gestiona los recursos bibliográficos que requieren imágenes adjuntas.
     /// 
-    /// Separado de ISigebiApi porque Refit no soporta constructores dinámicos
+    /// Separado de los clientes Refit porque éstos no soportan constructores dinámicos
     /// de MultipartFormDataContent con campos condicionales.
     /// </summary>
     public class ResourceUploadService

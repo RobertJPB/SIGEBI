@@ -14,6 +14,7 @@ namespace SIGEBI.Business.Interfaces.Persistence
         Task<bool> ExistsAsync(TId id);     // Verificar existencia
         Task AddAsync(T entity);            // Agregar nuevo
         void Update(T entity);              // Actualizar existente
-        void Delete(T entity);              // Eliminar
+        void Delete(T entity);              // Eliminar (Soporta borrado lógico si la entidad es IDesactivable)
+        void HardDelete(T entity);          // Eliminar permanentemente de la BD
     }
 }

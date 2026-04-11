@@ -1,19 +1,20 @@
 using FluentAssertions;
 using SIGEBI.Domain.Entities.Recursos;
 using SIGEBI.Domain.Enums.Biblioteca;
+using SIGEBI.Domain.ValueObjects;
 using Xunit;
 
 namespace SIGEBI.Test.Domain
 {
     public class RecursoBibliograficoTests
     {
-        // â”€â”€ CONSTRUCTOR â”€â”€
+        // ── CONSTRUCTOR ──
 
         [Fact]
         public void Crear_RecursoValido_CreaCorrectamente()
         {
             var libro = new Libro(Guid.NewGuid(), "Clean Code", "Robert Martin", 1, 10, null,
-                                  "978-01-323", "Prentice Hall", 2008);
+                                  new ISBN("9780132312345"), "Prentice Hall", 2008);
 
             libro.Titulo.Should().Be("Clean Code");
             libro.Autor.Should().Be("Robert Martin");
@@ -25,7 +26,7 @@ namespace SIGEBI.Test.Domain
         public void Crear_TituloVacio_LanzaExcepcion()
         {
             var act = () => new Libro(Guid.NewGuid(), "", "Robert Martin", 1, 10, null,
-                                      "978-01-323", "Prentice Hall", 2008);
+                                      new ISBN("9780132312345"), "Prentice Hall", 2008);
 
             act.Should().Throw<ArgumentException>()
                .WithMessage("*título*");
@@ -35,7 +36,7 @@ namespace SIGEBI.Test.Domain
         public void Crear_AutorVacio_LanzaExcepcion()
         {
             var act = () => new Libro(Guid.NewGuid(), "Clean Code", "", 1, 10, null,
-                                      "978-01-323", "Prentice Hall", 2008);
+                                      new ISBN("9780132312345"), "Prentice Hall", 2008);
 
             act.Should().Throw<ArgumentException>()
                .WithMessage("*autor*");
@@ -45,7 +46,7 @@ namespace SIGEBI.Test.Domain
         public void Crear_CategoriaInvalida_LanzaExcepcion()
         {
             var act = () => new Libro(Guid.NewGuid(), "Clean Code", "Robert Martin", 0, 10, null,
-                                      "978-01-323", "Prentice Hall", 2008);
+                                      new ISBN("9780132312345"), "Prentice Hall", 2008);
 
             act.Should().Throw<ArgumentException>()
                .WithMessage("*ategoría*");
@@ -55,18 +56,18 @@ namespace SIGEBI.Test.Domain
         public void Crear_StockNegativo_LanzaExcepcion()
         {
             var act = () => new Libro(Guid.NewGuid(), "Clean Code", "Robert Martin", 1, -1, null,
-                                      "978-01-323", "Prentice Hall", 2008);
+                                      new ISBN("9780132312345"), "Prentice Hall", 2008);
 
             act.Should().Throw<ArgumentOutOfRangeException>();
         }
 
-        // â”€â”€ STOCK â”€â”€
+        // ── STOCK ──
 
         [Fact]
         public void DisminuirStock_StockDisponible_DisminuyeUno()
         {
             var libro = new Libro(Guid.NewGuid(), "Clean Code", "Robert Martin", 1, 3, null,
-                                  "978-01-323", "Prentice Hall", 2008);
+                                  new ISBN("9780132312345"), "Prentice Hall", 2008);
 
             libro.DisminuirStock();
 
@@ -77,7 +78,7 @@ namespace SIGEBI.Test.Domain
         public void AumentarStock_Siempre_AumentaUno()
         {
             var libro = new Libro(Guid.NewGuid(), "Clean Code", "Robert Martin", 1, 3, null,
-                                  "978-01-323", "Prentice Hall", 2008);
+                                  new ISBN("9780132312345"), "Prentice Hall", 2008);
 
             libro.AumentarStock();
 
@@ -88,20 +89,20 @@ namespace SIGEBI.Test.Domain
         public void DisminuirStock_StockCero_LanzaExcepcion()
         {
             var libro = new Libro(Guid.NewGuid(), "Clean Code", "Robert Martin", 1, 0, null,
-                                  "978-01-323", "Prentice Hall", 2008);
+                                  new ISBN("9780132312345"), "Prentice Hall", 2008);
 
             var act = () => libro.DisminuirStock();
 
             act.Should().Throw<InvalidOperationException>();
         }
 
-        // â”€â”€ ESTADO â”€â”€
+        // ── ESTADO ──
 
         [Fact]
         public void Desactivar_RecursoActivo_CambiaAInactivo()
         {
             var libro = new Libro(Guid.NewGuid(), "Clean Code", "Robert Martin", 1, 3, null,
-                                  "978-01-323", "Prentice Hall", 2008);
+                                  new ISBN("9780132312345"), "Prentice Hall", 2008);
 
             libro.Desactivar("Motivo de prueba");
 
@@ -112,7 +113,7 @@ namespace SIGEBI.Test.Domain
         public void Activar_RecursoInactivo_CambiaADisponible()
         {
             var libro = new Libro(Guid.NewGuid(), "Clean Code", "Robert Martin", 1, 3, null,
-                                  "978-01-323", "Prentice Hall", 2008);
+                                  new ISBN("9780132312345"), "Prentice Hall", 2008);
             libro.Desactivar("Motivo de prueba");
 
             libro.Activar();
@@ -124,7 +125,7 @@ namespace SIGEBI.Test.Domain
         public void DisminuirStock_RecursoInactivo_LanzaExcepcion()
         {
             var libro = new Libro(Guid.NewGuid(), "Clean Code", "Robert Martin", 1, 3, null,
-                                  "978-01-323", "Prentice Hall", 2008);
+                                  new ISBN("9780132312345"), "Prentice Hall", 2008);
             libro.Desactivar("Motivo de prueba");
 
             var act = () => libro.DisminuirStock();
@@ -132,13 +133,13 @@ namespace SIGEBI.Test.Domain
             act.Should().Throw<InvalidOperationException>();
         }
 
-        // â”€â”€ IMAGEN â”€â”€
+        // ── IMAGEN ──
 
         [Fact]
         public void ActualizarImagen_UrlValida_GuardaCorrectamente()
         {
             var libro = new Libro(Guid.NewGuid(), "Clean Code", "Robert Martin", 1, 3, null,
-                                  "978-01-323", "Prentice Hall", 2008);
+                                  new ISBN("9780132312345"), "Prentice Hall", 2008);
 
             libro.ActualizarImagen("/imagenes/recursos/portada.jpg");
 
@@ -149,7 +150,7 @@ namespace SIGEBI.Test.Domain
         public void ActualizarImagen_UrlNula_GuardaNulo()
         {
             var libro = new Libro(Guid.NewGuid(), "Clean Code", "Robert Martin", 1, 3, null,
-                                  "978-01-323", "Prentice Hall", 2008);
+                                  new ISBN("9780132312345"), "Prentice Hall", 2008);
 
             libro.ActualizarImagen(null);
 

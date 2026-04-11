@@ -12,7 +12,7 @@ namespace SIGEBI.ViewModels
 {
     public partial class AuditoriaViewModel : BaseViewModel
     {
-        private readonly ISigebiApi _api;
+        private readonly IAuditoriaApi _api;
         private List<AuditoriaDTO> _allAuditorias = new();
 
         [ObservableProperty] private ObservableCollection<AuditoriaDTO> _auditorias = new();
@@ -20,7 +20,7 @@ namespace SIGEBI.ViewModels
         [ObservableProperty] private string _filtroUsuario = string.Empty;
         [ObservableProperty] private DateTime? _filtroFecha;
 
-        public AuditoriaViewModel(ISigebiApi api)
+        public AuditoriaViewModel(IAuditoriaApi api)
         {
             _api = api;
             Title = "Auditoría del Sistema";

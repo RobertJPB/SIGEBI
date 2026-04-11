@@ -1,11 +1,11 @@
 using System;
 using SIGEBI.Domain.Entities;
+using SIGEBI.Domain.Common;
 
 namespace SIGEBI.Domain.Entities.Recursos
 {
-    public abstract class RecursoBibliografico : IDesactivable
+    public abstract class RecursoBibliografico : BaseEntity, IDesactivable
     {
-        public Guid Id { get; private set; } // ID único
         public string Titulo { get; private set; } = null!; // Título del material
         public string Autor { get; private set; } = null!; // Autor principal
         public int IdCategoria { get; private set; } // ID de categoría

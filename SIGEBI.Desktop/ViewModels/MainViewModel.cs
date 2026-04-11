@@ -16,9 +16,9 @@ namespace SIGEBI.ViewModels
 
         public bool TienePendientes => NotificacionesPendientes > 0;
 
-        private readonly ISigebiApi _api;
+        private readonly INotificacionesApi _api;
 
-        public MainViewModel(ISigebiApi api)
+        public MainViewModel(INotificacionesApi api)
         {
             _api = api;
             Title = "SIGEBI MVVM - Panel Administrativo";

@@ -57,7 +57,7 @@ namespace SIGEBI.API.Controllers
         {
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
-                return Unauthorized("No se pudo identificar al usuario desde el token.");
+                return Unauthorized(new { message = "No se pudo identificar al usuario desde el token." });
 
             var usuario = await _gestionarUsuario.ObtenerPorIdAsync(userId);
             if (usuario == null)
@@ -211,7 +211,7 @@ namespace SIGEBI.API.Controllers
         {
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
-                return Unauthorized("No se pudo identificar al usuario desde el token.");
+                return Unauthorized(new { message = "No se pudo identificar al usuario desde el token." });
 
             var imagenUrl = await GuardarImagenAsync(foto);
             if (imagenUrl == null) return BadRequest("Error al procesar la imagen.");
@@ -230,7 +230,7 @@ namespace SIGEBI.API.Controllers
         {
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
-                return Unauthorized("No se pudo identificar al usuario desde el token.");
+                return Unauthorized(new { message = "No se pudo identificar al usuario desde el token." });
 
             await _gestionarUsuario.ActualizarPerfilAsync(userId, request.Nombre, request.Correo);
             return Ok(new { Mensaje = "Perfil actualizado correctamente." });

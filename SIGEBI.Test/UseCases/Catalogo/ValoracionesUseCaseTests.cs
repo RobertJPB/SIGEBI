@@ -6,8 +6,9 @@ using SIGEBI.Business.UseCases.Catalogo;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Entities.Recursos;
 using SIGEBI.Domain.Enums.Seguridad;
-using Xunit;
 using SIGEBI.Business.Interfaces.Common;
+using SIGEBI.Domain.ValueObjects;
+using Xunit;
 
 namespace SIGEBI.Test.UseCases.Catalogo
 {
@@ -37,10 +38,10 @@ namespace SIGEBI.Test.UseCases.Catalogo
         // ── HELPERS ──
 
         private Usuario CrearUsuario()
-            => new Usuario(Guid.NewGuid(), "Juan Perez", "juan@test.com", "hash123", RolUsuario.Estudiante);
+            => new Usuario(Guid.NewGuid(), "Juan Perez", new Email("juan@test.com"), "hash123", RolUsuario.Estudiante);
 
         private Libro CrearLibro()
-            => new Libro(Guid.NewGuid(), "El Quijote", "Cervantes", 1, 10, null, "123456", "Editorial", 1605);
+            => new Libro(Guid.NewGuid(), "El Quijote", "Cervantes", 1, 10, null, new ISBN("1234567890"), "Editorial", 1605);
 
         // ── AGREGAR VALORACION ──
 

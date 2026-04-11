@@ -10,7 +10,7 @@ namespace SIGEBI.ViewModels
 {
     public partial class GestionPrestamosViewModel : BaseViewModel
     {
-        private readonly ISigebiApi _api;
+        private readonly IPrestamosApi _api;
 
         private IEnumerable<PrestamoResponseDTO> _todosLosPrestamos = Array.Empty<PrestamoResponseDTO>();
 
@@ -47,7 +47,7 @@ namespace SIGEBI.ViewModels
             Contador = $"{Prestamos.Count} préstamos visualizados";
         }
 
-        public GestionPrestamosViewModel(ISigebiApi api)
+        public GestionPrestamosViewModel(IPrestamosApi api)
         {
             _api = api;
             Title = "Gestión de Préstamos";

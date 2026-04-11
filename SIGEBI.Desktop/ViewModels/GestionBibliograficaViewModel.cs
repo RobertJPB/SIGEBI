@@ -10,7 +10,7 @@ namespace SIGEBI.ViewModels
 {
     public partial class GestionBibliograficaViewModel : BaseViewModel
     {
-        private readonly ISigebiApi _api;
+        private readonly IRecursosApi _api;
         private readonly ResourceUploadService _uploadService;
 
         [ObservableProperty]
@@ -22,14 +22,14 @@ namespace SIGEBI.ViewModels
         [ObservableProperty]
         private string _contador = "0 recursos";
 
-        public GestionBibliograficaViewModel(ISigebiApi api, ResourceUploadService uploadService)
+        public GestionBibliograficaViewModel(IRecursosApi api, ResourceUploadService uploadService)
         {
             _api = api;
             _uploadService = uploadService;
             Title = "Gestión Bibliográfica";
         }
 
-        // ── Consultas via ISigebiApi (Refit) ──
+        // ── Consultas via IRecursosApi (Refit) ──
 
         [RelayCommand]
         public async Task CargarRecursosAsync()

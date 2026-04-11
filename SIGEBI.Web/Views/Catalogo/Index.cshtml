@@ -20,7 +20,7 @@
 <body>
 
     <!-- NAVBAR -->
-    @Html.Partial("_Navbar")
+    <partial name="_Navbar" />
 
     <!-- HERO -->
     <div class="page-header">
@@ -74,7 +74,7 @@
             <div class="recursos-grid">
                 @foreach (var recurso in Model.Recursos)
                 {
-                    @Html.Partial("_RecursoCard", recurso)
+                    <partial name="_RecursoCard" model="recurso" />
                 }
             </div>
         }

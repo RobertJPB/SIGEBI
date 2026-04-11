@@ -194,10 +194,10 @@
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
                                                     <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IdRol}" Value="1"><Setter Property="Text" Value="ESTUDIANTE"/></DataTrigger>
-                                                        <DataTrigger Binding="{Binding IdRol}" Value="2"><Setter Property="Text" Value="DOCENTE"/></DataTrigger>
-                                                        <DataTrigger Binding="{Binding IdRol}" Value="3"><Setter Property="Text" Value="BIBLIOTECARIO"/></DataTrigger>
-                                                        <DataTrigger Binding="{Binding IdRol}" Value="4"><Setter Property="Text" Value="ADMIN"/></DataTrigger>
+                                                        <DataTrigger Binding="{Binding IdRol}" Value="1"><Setter Property="Text" Value="ADMIN"/></DataTrigger>
+                                                        <DataTrigger Binding="{Binding IdRol}" Value="2"><Setter Property="Text" Value="BIBLIOTECARIO"/></DataTrigger>
+                                                        <DataTrigger Binding="{Binding IdRol}" Value="3"><Setter Property="Text" Value="ESTUDIANTE"/></DataTrigger>
+                                                        <DataTrigger Binding="{Binding IdRol}" Value="4"><Setter Property="Text" Value="DOCENTE"/></DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
                                             </TextBlock.Style>

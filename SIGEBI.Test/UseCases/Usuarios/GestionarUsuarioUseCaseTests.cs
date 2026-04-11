@@ -6,6 +6,7 @@ using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.UseCases.Usuarios;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Enums.Seguridad;
+using SIGEBI.Domain.ValueObjects;
 using Xunit;
 
 namespace SIGEBI.Test.UseCases.Usuarios
@@ -35,7 +36,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
         // ── HELPER ──
 
         private Usuario CrearUsuario()
-            => new Usuario(Guid.NewGuid(), "Juan Perez", "juan@test.com", "hash123", RolUsuario.Estudiante);
+            => new Usuario(Guid.NewGuid(), "Juan Perez", new Email("juan@test.com"), "hash123", RolUsuario.Estudiante);
 
         // ── OBTENER TODOS ──
 
@@ -44,7 +45,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
         {
             // Arrange
             var usuarios = new List<Usuario> { CrearUsuario(), CrearUsuario() };
-            _usuarioRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(usuarios);
+            _usuarioRepo.Setup(r => r.GetAllConPenalizacionesAsync()).ReturnsAsync(usuarios);
 
             // Act
             var resultado = await _useCase.ObtenerTodosAsync();

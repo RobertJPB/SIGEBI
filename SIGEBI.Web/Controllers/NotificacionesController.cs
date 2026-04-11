@@ -53,12 +53,11 @@ namespace SIGEBI.Web.Controllers
 
             try
             {
-                // Si es Admin o Bibliotecario, cargamos TODAS las notificaciones del sistema
-                bool esAdmin = rolStr == "Administrador" || rolStr == "Bibliotecario";
-                
-                var dtos = esAdmin 
-                    ? await _notificacionService.GetAllNotificacionesAsync(token)
-                    : await _notificacionService.GetNotificacionesByUsuarioAsync(usuarioId, token);
+                // COMENTARIO PARA EXPLICACIÓN:
+                // Anteriormente, si el usuario era Admin, se cargaban todas las notificaciones del sistema.
+                // Se ha corregido para que cada usuario (independientemente de su rol) vea ÚNICAMENTE
+                // sus mensajes personales, garantizando la privacidad y consistencia del panel.
+                var dtos = await _notificacionService.GetNotificacionesByUsuarioAsync(usuarioId, token);
 
                 model.Notificaciones = dtos.Select(d => new NotificacionViewModel
                 {

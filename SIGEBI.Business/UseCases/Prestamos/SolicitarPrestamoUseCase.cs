@@ -11,6 +11,7 @@ using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.Interfaces.Services;
 using SIGEBI.Business.Interfaces.UseCases.Prestamos;
 using SIGEBI.Business.Mappers;
+using SIGEBI.Domain.Interfaces.Services;
 using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Entities.Recursos;
@@ -31,6 +32,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
         private readonly IGuidGenerator _guidGenerator;
         private readonly ILogger<SolicitarPrestamoUseCase> _logger;
         private readonly IAuditService _audit;
+        private readonly IPrestamoPolicy _prestamoPolicy;
 
         public SolicitarPrestamoUseCase(
             IPrestamoRepository prestamoRepository,
@@ -43,7 +45,8 @@ namespace SIGEBI.Business.UseCases.Prestamos
             IMemoryCache cache,
             IGuidGenerator guidGenerator,
             ILogger<SolicitarPrestamoUseCase> logger,
-            IAuditService audit)
+            IAuditService audit,
+            IPrestamoPolicy prestamoPolicy)
         {
             _prestamoRepository = prestamoRepository;
             _usuarioRepository = usuarioRepository;
@@ -56,6 +59,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
             _guidGenerator = guidGenerator;
             _logger = logger;
             _audit = audit;
+            _prestamoPolicy = prestamoPolicy;
         }
 
         // Ejecuta el flujo de préstamo: valida usuario/recurso, comprueba disponibilidad y persiste el registro.
@@ -76,14 +80,14 @@ namespace SIGEBI.Business.UseCases.Prestamos
             try
             {
                 // 2. Aplicación Centralizada de Reglas
-                PrestamoPolicy.ValidarPrestamo(usuario, recurso, historialUsuario, penalizaciones);
+                _prestamoPolicy.ValidarPrestamo(usuario, recurso, historialUsuario, penalizaciones);
 
                 // 3. Registro de Solicitud Exitosa (Trazabilidad)
                 var solicitudExito = SolicitudAcceso.RegistrarExito(_guidGenerator.Create(), usuarioId, recursoId, fechaActual);
                 await _unitOfWork.SolicitudesAcceso.AddAsync(solicitudExito);
 
                 // 4. Creación del Préstamo
-                int diasPlazo = PrestamoPolicy.ObtenerDiasPlazo(usuario.Rol);
+                int diasPlazo = _prestamoPolicy.ObtenerDiasPlazo(usuario.Rol);
                 var prestamo = new Prestamo(_guidGenerator.Create(), usuarioId, recursoId, diasPlazo, fechaActual, fechaDevolucionEstimada);
 
                 recurso.DisminuirStock(); 
@@ -107,7 +111,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
                 // Obtenemos correos de bibliotecarios ANTES de disparar el segundo plano
                 // para evitar problemas con la resolución de alcances (scope) del repositorio.
                 var bibliotecarios = await _usuarioRepository.GetByRolAsync(SIGEBI.Domain.Enums.Seguridad.RolUsuario.Bibliotecario);
-                var listaCorreosBiblio = bibliotecarios.Select(b => b.Correo).ToList();
+                var listaCorreosBiblio = bibliotecarios.Select(b => b.Correo.Value).ToList();
 
                 // 6. Notificaciones Proactivas (Email en segundo plano)
                 // Usamos _ = Task.Run para no bloquear la respuesta al usuario.
@@ -115,7 +119,7 @@ namespace SIGEBI.Business.UseCases.Prestamos
                 {
                     await EnviarNotificacionesEmailBackgroundAsync(
                         usuario.Nombre, 
-                        usuario.Correo, 
+                        usuario.Correo.Value, 
                         recurso.Titulo, 
                         prestamo.FechaDevolucionEstimada, 
                         listaCorreosBiblio);

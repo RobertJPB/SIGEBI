@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Entities.Recursos;
+using SIGEBI.Domain.ValueObjects;
 
 namespace SIGEBI.Infrastructure.Persistence
 {
@@ -29,12 +30,23 @@ namespace SIGEBI.Infrastructure.Persistence
            
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(SIGEBIDbContext).Assembly);
 
+            // Seed del Usuario Administrador para Pruebas Iniciales
+            modelBuilder.Entity<Usuario>().HasData(new
+            {
+                Id = Guid.Parse("00000000-0000-0000-0000-000000000002"),
+                Nombre = "Administrador",
+                Correo = (Email)"admin@sigebi.com",
+                ContrasenaHash = "JAvlGPu9JyTdtvBO6x2llnRI1+gxwIyPqCKAn3THIKk=", // admin123
+                Rol = Domain.Enums.Seguridad.RolUsuario.Bibliotecario,
+                Estado = Domain.Enums.Seguridad.EstadoUsuario.Activo
+            });
+
             // Seed del Usuario del Sistema para Auditoría
             modelBuilder.Entity<Usuario>().HasData(new
             {
                 Id = UsuarioIdSistema,
                 Nombre = "Sistema",
-                Correo = "sistema@sigebi.com",
+                Correo = (Email)"sistema@sigebi.com",
                 ContrasenaHash = Usuario.SistemaHashCentinela,
                 Rol = Domain.Enums.Seguridad.RolUsuario.Bibliotecario,
                 Estado = Domain.Enums.Seguridad.EstadoUsuario.Activo

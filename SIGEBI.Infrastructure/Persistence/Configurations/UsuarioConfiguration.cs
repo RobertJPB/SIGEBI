@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SIGEBI.Domain.Entities;
+using SIGEBI.Domain.ValueObjects;
 
 namespace SIGEBI.Infrastructure.Persistence.Configurations
 {
@@ -18,7 +19,10 @@ namespace SIGEBI.Infrastructure.Persistence.Configurations
 
             builder.Property(u => u.Correo)
                 .IsRequired()
-                .HasMaxLength(200);
+                .HasMaxLength(200)
+                .HasConversion(
+                    v => v.Value,
+                    v => new Email(v));
 
             builder.HasIndex(u => u.Correo)
                 .IsUnique();

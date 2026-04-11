@@ -83,7 +83,11 @@ namespace SIGEBI.Web.Controllers
                     };
                 }
             }
-            catch { /* silencioso */ }
+            catch (ApiException)
+            {
+                // Dejamos que el filtro global maneje errores de red,
+                // pero si es un error controlado de API (404, etc) mostramos el modelo vacío.
+            }
 
             return View(model);
         }
@@ -98,7 +102,12 @@ namespace SIGEBI.Web.Controllers
             {
                 try
                 {
-                    await _usuarioService.ActualizarFotoAsync(foto, token);
+                    // COMENTARIO PARA EXPLICACIÓN:
+                    // Sincronización Manual: Como los tokens son inmutables durante la sesión,
+                    // actualizamos manualmente el valor en HttpContext.Session para que la UI
+                    // refleje el cambio de imagen de inmediato en el Navbar.
+                    var newUrl = await _usuarioService.ActualizarFotoAsync(foto, token);
+                    HttpContext.Session.SetString("UsuarioImagen", newUrl);
                     TempData["Success"] = "Foto de perfil actualizada correctamente.";
                 }
                 catch (ApiException apiEx)
@@ -125,6 +134,9 @@ namespace SIGEBI.Web.Controllers
             {
                 await _usuarioService.ActualizarDatosAsync(nombre, correo, token);
                 
+                // COMENTARIO PARA EXPLICACIÓN:
+                // Sincronizamos también el nombre en la sesión para que el saludo en 
+                // el Navbar se actualice reactivamente sin requerir un nuevo login.
                 TempData["Success"] = "Perfil actualizado correctamente.";
                 HttpContext.Session.SetString("UsuarioNombre", nombre);
             }

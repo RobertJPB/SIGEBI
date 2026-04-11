@@ -44,6 +44,11 @@ namespace SIGEBI.Infrastructure.Persistence.Base
             }
         }
 
+        public void HardDelete(T entity) // Borrado fisico permanente
+        {
+            _dbSet.Remove(entity);
+        }
+
         public async Task<bool> ExistsAsync(TId id) // Verificar existencia por ID sin cargar entidad
             => await _dbSet.AnyAsync(e => EF.Property<TId>(e, "Id")!.Equals(id));
     }

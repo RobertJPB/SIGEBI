@@ -10,10 +10,12 @@ namespace SIGEBI.Infrastructure.Services
     public class ImagenService : IImagenService
     {
         private readonly IWebHostEnvironment _env;
+        private readonly string _imagesSubPath;
 
-        public ImagenService(IWebHostEnvironment env)
+        public ImagenService(IWebHostEnvironment env, Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
             _env = env;
+            _imagesSubPath = configuration["Storage:ImagesPath"] ?? "imagenes";
         }
 
         public async Task<string?> GuardarImagenAsync(Stream? stream, string nombreArchivoOriginal, string subCarpeta)
@@ -24,7 +26,7 @@ namespace SIGEBI.Infrastructure.Services
             if (!EsExtensionValida(nombreArchivoOriginal)) return null;
 
             // Definición de la ruta física
-            var carpetaBase = Path.Combine(_env.WebRootPath ?? _env.ContentRootPath, "imagenes", subCarpeta);
+            var carpetaBase = Path.Combine(_env.WebRootPath ?? _env.ContentRootPath, _imagesSubPath, subCarpeta);
             Directory.CreateDirectory(carpetaBase);
 
             // Generación de nombre único
@@ -36,7 +38,7 @@ namespace SIGEBI.Infrastructure.Services
             await stream.CopyToAsync(fileStream);
 
             // Retorno de la URL relativa para el cliente
-            return $"/imagenes/{subCarpeta}/{nombreArchivo}";
+            return $"/{_imagesSubPath}/{subCarpeta}/{nombreArchivo}";
         }
 
         public void EliminarImagen(string? urlRelativa)

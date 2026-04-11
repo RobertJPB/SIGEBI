@@ -126,7 +126,10 @@ namespace SIGEBI.Web.Controllers
             }
             catch (Exception ex)
             {
-                model.ErrorMessage = $"No se pudo conectar con el servidor. Detalle: {ex.Message}";
+                // Si es un error de red/conexión, dejamos que el filtro global redirija a Mantenimiento
+                if (ApiErrorHelper.EsErrorDeConexion(ex)) throw;
+
+                model.ErrorMessage = $"Error inesperado: {ex.Message}";
                 return View(model);
             }
         }

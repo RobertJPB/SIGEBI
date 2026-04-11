@@ -12,7 +12,8 @@ namespace SIGEBI.ViewModels
 {
     public partial class GestionUsuariosViewModel : BaseViewModel
     {
-        private readonly ISigebiApi _api;
+        private readonly IUsuariosApi _api;
+        private readonly IAuthApi _authApi;
         private List<UsuarioDTO> _allUsuarios = new();
 
         [ObservableProperty] private ObservableCollection<UsuarioDTO> _usuarios = new();
@@ -20,9 +21,10 @@ namespace SIGEBI.ViewModels
         [ObservableProperty] private string _busqueda = string.Empty;
         [ObservableProperty] private string _contador = "0 usuarios";
 
-        public GestionUsuariosViewModel(ISigebiApi api)
+        public GestionUsuariosViewModel(IUsuariosApi api, IAuthApi authApi)
         {
             _api = api;
+            _authApi = authApi;
             Title = "Gestión de Usuarios";
         }
 
@@ -185,7 +187,7 @@ namespace SIGEBI.ViewModels
             try
             {
                 IsBusy = true;
-                await _api.RegistrarUsuarioAsync(nuevo);
+                await _authApi.RegistrarUsuarioAsync(nuevo);
                 await CargarUsuariosAsync();
             }
             catch (Exception ex)

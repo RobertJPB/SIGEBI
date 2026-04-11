@@ -14,7 +14,34 @@ namespace SIGEBI.Web.Helpers
             if (string.IsNullOrWhiteSpace(apiEx.Content))
                 return Task.FromResult(apiEx.ReasonPhrase ?? "Error de red");
 
-            return Task.FromResult(ParseJsonError(apiEx.Content) ?? apiEx.ReasonPhrase ?? "Error en el servidor");
+            var parsedMessage = ParseJsonError(apiEx.Content);
+            if (parsedMessage != null) return Task.FromResult(parsedMessage);
+
+            // Fallback: Si no es JSON pero es un texto corto (mensaje directo), lo devolvemos.
+            // Evitamos devolver contenido largo que pueda ser HTML de error del servidor.
+            if (apiEx.Content.Length < 200 && !apiEx.Content.Trim().StartsWith("<"))
+                return Task.FromResult(apiEx.Content);
+
+            return Task.FromResult(apiEx.ReasonPhrase ?? "Error en el servidor");
+        }
+
+        public static bool EsErrorDeConexion(Exception? ex)
+        {
+            if (ex == null) return false;
+
+            // Errores comunes de red o timeouts
+            if (ex is System.Net.Http.HttpRequestException || 
+                ex is System.Net.Sockets.SocketException ||
+                ex is TaskCanceledException)
+            {
+                return true;
+            }
+
+            // Excepciones internas envueltas en Refit
+            if (ex.InnerException != null)
+                return EsErrorDeConexion(ex.InnerException);
+
+            return false;
         }
 
         public static async Task<string> GetErrorMessageAsync(HttpResponseMessage response)

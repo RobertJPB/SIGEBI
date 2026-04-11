@@ -48,7 +48,7 @@ namespace SIGEBI.API.Controllers
                 var usuario = await _loginUseCase.EjecutarAsync(dto.Correo, dto.Contrasena);
 
                 if (usuario == null)
-                    return Unauthorized("Correo o contraseña incorrectos.");
+                    return Unauthorized(new { message = "Correo o contraseña incorrectos." });
 
                 var token = _jwtService.GenerarToken(usuario);
 

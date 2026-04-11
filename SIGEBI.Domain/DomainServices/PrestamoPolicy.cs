@@ -7,19 +7,32 @@ using SIGEBI.Domain.Enums.Biblioteca;
 using SIGEBI.Domain.Enums.Seguridad;
 using SIGEBI.Domain.Enums.Operacion;
 
+using SIGEBI.Domain.Interfaces.Services;
+
 namespace SIGEBI.Domain.DomainServices
 {
-    public class PrestamoPolicy
+    public class PrestamoPolicy : IPrestamoPolicy
     {
         // Límites dinámicos por rol
         private const int MaxPrestamosEstudiante = 3;
-        private const int MaxPrestamosDocente = 10;
+        private const int MaxPrestamosPersonal = 10;
         private const int DiasPlazoEstudiante = 15;
-        private const int DiasPlazoDocente = 30;
+        private const int DiasPlazoPersonal = 30;
 
         public const int MaxDiasPrestamoTotal = 30;
 
-        public static bool PuedeRealizarPrestamo(Usuario usuario, IEnumerable<Prestamo> historialUsuario)
+        // COMENTARIO PARA EXPLICACIÓN:
+        // Centralizamos los roles de "Personal" (Docentes, Admins, Bibliotecarios) 
+        // para aplicarles los mismos beneficios de plazos y límites superiores,
+        // separándolos de la lógica base de los Estudiantes.
+        private bool EsRolPersonal(RolUsuario rol)
+        {
+            return rol == RolUsuario.Docente || 
+                   rol == RolUsuario.Administrador || 
+                   rol == RolUsuario.Bibliotecario;
+        }
+
+        public bool PuedeRealizarPrestamo(Usuario usuario, IEnumerable<Prestamo> historialUsuario)
         {
             if (usuario.Estado != EstadoUsuario.Activo)
                 return false;
@@ -28,7 +41,7 @@ namespace SIGEBI.Domain.DomainServices
             if (historialUsuario.Any(p => p.EstadoActual == EstadoPrestamo.Atrasado))
                 return false;
 
-            int limite = usuario.Rol == RolUsuario.Docente ? MaxPrestamosDocente : MaxPrestamosEstudiante;
+            int limite = EsRolPersonal(usuario.Rol) ? MaxPrestamosPersonal : MaxPrestamosEstudiante;
 
             var activos = historialUsuario.Count(p =>
                 p.EstadoActual == EstadoPrestamo.Activo ||
@@ -37,18 +50,18 @@ namespace SIGEBI.Domain.DomainServices
             return activos < limite;
         }
 
-        public static bool TienePenalizacionActiva(IEnumerable<Penalizacion> penalizaciones)
+        public bool TienePenalizacionActiva(IEnumerable<Penalizacion> penalizaciones)
         {
             return penalizaciones.Any(p =>
                 p.Estado == EstadoPenalizacion.Activa);
         }
 
-        public static int ObtenerDiasPlazo(RolUsuario rol)
+        public int ObtenerDiasPlazo(RolUsuario rol)
         {
-            return rol == RolUsuario.Docente ? DiasPlazoDocente : DiasPlazoEstudiante;
+            return EsRolPersonal(rol) ? DiasPlazoPersonal : DiasPlazoEstudiante;
         }
 
-        public static void ValidarPrestamo(Usuario usuario, RecursoBibliografico recurso,
+        public void ValidarPrestamo(Usuario usuario, RecursoBibliografico recurso,
             IEnumerable<Prestamo> historialUsuario, IEnumerable<Penalizacion> penalizaciones)
         {
             // 1. Estado activo del usuario
@@ -66,7 +79,7 @@ namespace SIGEBI.Domain.DomainServices
             // 4. Límite excedido según rol
             if (!PuedeRealizarPrestamo(usuario, historialUsuario))
             {
-                int limite = usuario.Rol == RolUsuario.Docente ? MaxPrestamosDocente : MaxPrestamosEstudiante;
+                int limite = EsRolPersonal(usuario.Rol) ? MaxPrestamosPersonal : MaxPrestamosEstudiante;
                 throw new InvalidOperationException($"El usuario ha alcanzado el límite máximo de {limite} préstamos permitidos para su rol.");
             }
 

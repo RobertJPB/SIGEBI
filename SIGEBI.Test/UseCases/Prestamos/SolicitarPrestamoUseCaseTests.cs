@@ -3,14 +3,16 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SIGEBI.Business.Interfaces;
+using SIGEBI.Business.Interfaces.Common;
 using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.Interfaces.Services;
 using SIGEBI.Business.UseCases.Prestamos;
+using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Entities.Recursos;
 using SIGEBI.Domain.Enums.Seguridad;
-using SIGEBI.Domain.DomainServices;
-using SIGEBI.Business.Interfaces.Common;
+using SIGEBI.Domain.Interfaces.Services;
+using SIGEBI.Domain.ValueObjects;
 using Xunit;
 
 namespace SIGEBI.Test.UseCases.Prestamos
@@ -25,6 +27,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
         private readonly Mock<ISolicitudAccesoRepository> _solicitudAccesoRepo;
         private readonly Mock<IEmailAdapter> _emailAdapter;
         private readonly Mock<IUnitOfWork> _unitOfWork;
+        private readonly Mock<IPrestamoPolicy> _prestamoPolicy;
         private readonly SolicitarPrestamoUseCase _useCase;
 
         public SolicitarPrestamoUseCaseTests()
@@ -37,6 +40,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
             _solicitudAccesoRepo = new Mock<ISolicitudAccesoRepository>();
             _emailAdapter = new Mock<IEmailAdapter>();
             _unitOfWork = new Mock<IUnitOfWork>();
+            _prestamoPolicy = new Mock<IPrestamoPolicy>();
 
             // Setup UnitOfWork
             _unitOfWork.Setup(u => u.SolicitudesAcceso).Returns(_solicitudAccesoRepo.Object);
@@ -52,18 +56,19 @@ namespace SIGEBI.Test.UseCases.Prestamos
                 new Mock<IMemoryCache>().Object,
                 new Mock<IGuidGenerator>().Object,
                 Microsoft.Extensions.Logging.Abstractions.NullLogger<SolicitarPrestamoUseCase>.Instance,
-                new Mock<IAuditService>().Object);
+                new Mock<IAuditService>().Object,
+                _prestamoPolicy.Object);
         }
 
-        // â”€â”€ HELPERS â”€â”€
+        // ── HELPERS ──
 
         private Usuario CrearUsuarioActivo(RolUsuario rol = RolUsuario.Estudiante)
-            => new Usuario(Guid.NewGuid(), "Juan Perez", "juan@test.com", "hash123", rol);
+            => new Usuario(Guid.NewGuid(), "Juan Perez", new Email("juan@test.com"), "hash123", rol);
 
         private Libro CrearLibroDisponible()
-            => new Libro(Guid.NewGuid(), "El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943);
+            => new Libro(Guid.NewGuid(), "El Principito", "Antoine", 1, 5, null, new ISBN("9781234567890"), "Editorial X", 1943);
 
-        // â”€â”€ PRUEBAS â”€â”€
+        // ── PRUEBAS ──
 
         [Fact]
         public async Task Ejecutar_UsuarioYRecursoValidos_DevuelveDTO()
@@ -78,6 +83,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
             _penalizacionRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Penalizacion>());
             _prestamoRepo.Setup(r => r.AddAsync(It.IsAny<Prestamo>())).Returns(Task.CompletedTask);
             _unitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
+            _prestamoPolicy.Setup(p => p.ObtenerDiasPlazo(It.IsAny<RolUsuario>())).Returns(15);
 
             // Act
             var resultado = await _useCase.EjecutarAsync(usuario.Id, libro.Id);
@@ -124,6 +130,8 @@ namespace SIGEBI.Test.UseCases.Prestamos
             _recursoRepo.Setup(r => r.GetByIdAsync(libro.Id)).ReturnsAsync(libro);
             _prestamoRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Prestamo>());
             _penalizacionRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Penalizacion> { penalizacion });
+            _prestamoPolicy.Setup(p => p.ValidarPrestamo(It.IsAny<Usuario>(), It.IsAny<RecursoBibliografico>(), It.IsAny<IEnumerable<Prestamo>>(), It.IsAny<IEnumerable<Penalizacion>>()))
+                .Throws(new InvalidOperationException("El usuario tiene una penalización activa"));
 
             // Act & Assert
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
@@ -135,12 +143,14 @@ namespace SIGEBI.Test.UseCases.Prestamos
         {
             // Arrange
             var usuario = CrearUsuarioActivo();
-            var libro = new Libro(Guid.NewGuid(), "El Principito", "Antoine", 1, 0, null, "978-84-261", "Editorial X", 1943);
+            var libro = new Libro(Guid.NewGuid(), "El Principito", "Antoine", 1, 0, null, new ISBN("9781234567890"), "Editorial X", 1943);
 
             _usuarioRepo.Setup(r => r.GetByIdAsync(usuario.Id)).ReturnsAsync(usuario);
             _recursoRepo.Setup(r => r.GetByIdAsync(libro.Id)).ReturnsAsync(libro);
             _prestamoRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Prestamo>());
             _penalizacionRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Penalizacion>());
+            _prestamoPolicy.Setup(p => p.ValidarPrestamo(It.IsAny<Usuario>(), It.IsAny<RecursoBibliografico>(), It.IsAny<IEnumerable<Prestamo>>(), It.IsAny<IEnumerable<Penalizacion>>()))
+                .Throws(new InvalidOperationException("No hay stock disponible"));
 
             // Act & Assert
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
@@ -161,6 +171,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
             _penalizacionRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Penalizacion>());
             _prestamoRepo.Setup(r => r.AddAsync(It.IsAny<Prestamo>())).Returns(Task.CompletedTask);
             _unitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
+            _prestamoPolicy.Setup(p => p.ObtenerDiasPlazo(It.IsAny<RolUsuario>())).Returns(15);
 
             // Act
             await _useCase.EjecutarAsync(usuario.Id, libro.Id);
@@ -201,6 +212,8 @@ namespace SIGEBI.Test.UseCases.Prestamos
             _recursoRepo.Setup(r => r.GetByIdAsync(libro.Id)).ReturnsAsync(libro);
             _prestamoRepo.Setup(r => r.GetActivosByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Prestamo>());
             _penalizacionRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Penalizacion>());
+            _prestamoPolicy.Setup(p => p.ValidarPrestamo(It.IsAny<Usuario>(), It.IsAny<RecursoBibliografico>(), It.IsAny<IEnumerable<Prestamo>>(), It.IsAny<IEnumerable<Penalizacion>>()))
+                .Throws(new ArgumentException("Fecha excede límite"));
 
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
@@ -222,6 +235,8 @@ namespace SIGEBI.Test.UseCases.Prestamos
             _recursoRepo.Setup(r => r.GetByIdAsync(libro.Id)).ReturnsAsync(libro);
             _prestamoRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Prestamo> { prestamoVencido });
             _penalizacionRepo.Setup(r => r.GetByUsuarioIdAsync(usuario.Id)).ReturnsAsync(new List<Penalizacion>());
+            _prestamoPolicy.Setup(p => p.ValidarPrestamo(It.IsAny<Usuario>(), It.IsAny<RecursoBibliografico>(), It.IsAny<IEnumerable<Prestamo>>(), It.IsAny<IEnumerable<Penalizacion>>()))
+                .Throws(new InvalidOperationException("El usuario tiene una devolución vencida"));
 
             // Act & Assert
             var action = () => _useCase.EjecutarAsync(usuario.Id, libro.Id);

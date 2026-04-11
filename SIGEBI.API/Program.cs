@@ -3,14 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using SIGEBI.API.Middleware;
-using SIGEBI.Business.Interfaces.Services;
 using SIGEBI.Infrastructure.Persistence;
 using SIGEBI.Infrastructure.Persistence.Interceptors;
 using SIGEBI.Business.IoC;
 using SIGEBI.Infrastructure.IoC;
 using SIGEBI.Infrastructure.Services;
 using System.Text;
-
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using SIGEBI.Business.Validators;
 
@@ -21,9 +20,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddBusiness();
 builder.Services.AddInfrastructure();
 
-// Registro de controladores con FluentValidation automático
+builder.Services.AddFluentValidationAutoValidation()
+    .AddFluentValidationClientsideAdapters()
+    .AddValidatorsFromAssemblyContaining<RegistrarUsuarioValidator>();
+
+// Registro de controladores
 builder.Services.AddControllers()
-    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<RegistrarUsuarioValidator>())
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler =

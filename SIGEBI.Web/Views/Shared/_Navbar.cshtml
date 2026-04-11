@@ -1,7 +1,17 @@
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@using Microsoft.AspNetCore.Http
 @{
     var activePage = ViewData["ActivePage"]?.ToString() ?? "";
-    var apiBase = ViewBag.ApiBaseUrl ?? "https://localhost:7047/";
-    var userImg = Context.User.FindFirst("UsuarioImagen")?.Value;
+    var apiBase = (ViewBag.ApiBaseUrl as string) ?? Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7047";
+    apiBase = apiBase.TrimEnd('/');
+    
+    // COMENTARIO PARA EXPLICACIÓN:
+    // Sincronización en Tiempo Real:
+    // Los Claims (Context.User) son inmutables durante la sesión. Para que la UI se actualice
+    // inmediatamente cuando el usuario cambia su foto o nombre, priorizamos los valores 
+    // almacenados en la Sesión (Context.Session), los cuales podemos mutar en el PerfilController.
+    var userImg = Context.Session.GetString("UsuarioImagen") ?? Context.User.FindFirst("UsuarioImagen")?.Value;
+    var userName = Context.Session.GetString("UsuarioNombre") ?? Context.User.Identity?.Name ?? "Perfil";
 }
 
 <nav class="navbar">
@@ -26,13 +36,14 @@
         <a class="nav-link @(activePage == "Perfil" ? "active" : "")" href="/Perfil/Index">
             @if (!string.IsNullOrEmpty(userImg))
             {
-                <img src="@(apiBase + userImg)" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.3);" />
+                var fullImgUrl = apiBase + "/" + userImg.TrimStart('/');
+                <img src="@fullImgUrl" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.3);" />
             }
             else
             {
                 <i class="bi bi-person-circle"></i>
             }
-            Perfil
+            @userName
         </a>
     </div>
 </nav>

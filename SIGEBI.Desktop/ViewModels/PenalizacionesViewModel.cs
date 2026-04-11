@@ -10,7 +10,8 @@ namespace SIGEBI.ViewModels
 {
     public partial class PenalizacionesViewModel : BaseViewModel
     {
-        private readonly ISigebiApi _api;
+        private readonly IPenalizacionesApi _api;
+        private readonly IUsuariosApi _usuariosApi;
 
         private IEnumerable<PenalizacionDTO> _todasLasPenalizaciones = Array.Empty<PenalizacionDTO>();
 
@@ -45,9 +46,10 @@ namespace SIGEBI.ViewModels
             Contador = $"{Penalizaciones.Count} penalizaciones visualizadas";
         }
 
-        public PenalizacionesViewModel(ISigebiApi api)
+        public PenalizacionesViewModel(IPenalizacionesApi api, IUsuariosApi usuariosApi)
         {
             _api = api;
+            _usuariosApi = usuariosApi;
             Title = "Penalizaciones";
         }
 
@@ -63,11 +65,11 @@ namespace SIGEBI.ViewModels
                 var data = await _api.GetPenalizacionesAsync();
                 _todasLasPenalizaciones = data;
                 FiltrarResultados();
-
+                
                 // Cargar usuarios para el combo manual (solo una vez o si es necesario)
                 if (Usuarios.Count == 0)
                 {
-                    var userList = await _api.GetUsuariosAsync();
+                    var userList = await _usuariosApi.GetUsuariosAsync();
                     Usuarios = new ObservableCollection<UsuarioDTO>(userList.OrderBy(u => u.Nombre));
                 }
             }

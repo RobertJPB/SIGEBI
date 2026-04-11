@@ -9,6 +9,7 @@ using SIGEBI.Domain.Entities.Recursos;
 using SIGEBI.Domain.Enums.Biblioteca;
 using SIGEBI.Domain.Enums.Seguridad;
 using SIGEBI.Business.Interfaces.Common;
+using SIGEBI.Domain.ValueObjects;
 using Xunit;
 
 namespace SIGEBI.Test.UseCases.Prestamos
@@ -44,10 +45,10 @@ namespace SIGEBI.Test.UseCases.Prestamos
                 new Mock<IGuidGenerator>().Object);
         }
 
-        // â”€â”€ HELPERS â”€â”€
+        // ── HELPERS ──
 
         private Libro CrearLibroDisponible()
-            => new Libro(Guid.NewGuid(), "El Principito", "Antoine", 1, 5, null, "978-84-261", "Editorial X", 1943);
+            => new Libro(Guid.NewGuid(), "El Principito", "Antoine", 1, 5, null, new ISBN("9781234567890"), "Editorial X", 1943);
 
         private Prestamo CrearPrestamoActivo(Guid? usuarioId = null, Guid? recursoId = null)
             => new Prestamo(Guid.NewGuid(), 

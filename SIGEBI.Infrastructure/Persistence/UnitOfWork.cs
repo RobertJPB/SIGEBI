@@ -1,8 +1,11 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using SIGEBI.Business.Interfaces;
+using SIGEBI.Business.Interfaces.Common;
 using SIGEBI.Business.Interfaces.Persistence;
+using SIGEBI.Domain.Common;
 using SIGEBI.Infrastructure.Persistence.Repositories;
 
 namespace SIGEBI.Infrastructure.Persistence
@@ -12,6 +15,7 @@ namespace SIGEBI.Infrastructure.Persistence
     public class UnitOfWork : IUnitOfWork
     {
         private readonly SIGEBIDbContext _context;
+        private readonly IDomainEventDispatcher? _dispatcher;
 
         private IUsuarioRepository? _usuarios;
         private IPrestamoRepository? _prestamos;
@@ -24,9 +28,10 @@ namespace SIGEBI.Infrastructure.Persistence
         private IListaDeseosRepository? _listasDeseos;
         private ISolicitudAccesoRepository? _solicitudesAcceso;
 
-        public UnitOfWork(SIGEBIDbContext context)
+        public UnitOfWork(SIGEBIDbContext context, IDomainEventDispatcher? dispatcher = null)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _dispatcher = dispatcher;
         }
 
         // Usamos Lazy loading para los repositorios
@@ -41,8 +46,40 @@ namespace SIGEBI.Infrastructure.Persistence
         public IListaDeseosRepository ListasDeseos => _listasDeseos ??= new ListaDeseosRepository(_context); 
         public ISolicitudAccesoRepository SolicitudesAcceso => _solicitudesAcceso ??= new SolicitudAccesoRepository(_context); 
 
-        public async Task<int> SaveChangesAsync() // Guardar cambios
-            => await _context.SaveChangesAsync();
+        public async Task<int> SaveChangesAsync()
+        {
+            // 1. Guardar cambios en la base de datos
+            var result = await _context.SaveChangesAsync();
+
+            // 2. Despachar eventos si existe un despachador
+            if (_dispatcher != null)
+            {
+                await DispatchDomainEventsAsync();
+            }
+
+            return result;
+        }
+
+        private async Task DispatchDomainEventsAsync()
+        {
+            // Obtener todas las entidades rastreadas que son BaseEntity y tienen eventos
+            var entitiesWithEvents = _context.ChangeTracker
+                .Entries<BaseEntity>()
+                .Select(e => e.Entity)
+                .Where(e => e.DomainEvents != null && e.DomainEvents.Any())
+                .ToList();
+
+            foreach (var entity in entitiesWithEvents)
+            {
+                var events = entity.DomainEvents.ToList();
+                entity.ClearDomainEvents();
+
+                foreach (var domainEvent in events)
+                {
+                    await _dispatcher!.DispatchAsync(domainEvent);
+                }
+            }
+        }
 
         public void Dispose()
         {

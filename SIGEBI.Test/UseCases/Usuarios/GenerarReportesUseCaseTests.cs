@@ -5,6 +5,7 @@ using SIGEBI.Business.UseCases.Usuarios;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Entities.Recursos;
 using SIGEBI.Domain.Enums.Seguridad;
+using SIGEBI.Domain.ValueObjects;
 using Xunit;
 
 namespace SIGEBI.Test.UseCases.Usuarios
@@ -31,16 +32,16 @@ namespace SIGEBI.Test.UseCases.Usuarios
                 _penalizacionRepo.Object);
         }
 
-        // â”€â”€ GENERAR REPORTE GENERAL â”€â”€
+        // ── GENERAR REPORTE GENERAL ──
 
-        // Caso de Uso: Generar Reportes - Proceso: Generar un resumen ejecutivo con mÃ©tricas de todas las entidades.
+        // Caso de Uso: Generar Reportes - Proceso: Generar un resumen ejecutivo con métricas de todas las entidades.
         [Fact]
         public async Task GenerarReporteGeneral_CalculaTotalesCorrectamente()
         {
             // Arrange
             _prestamoRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Prestamo> { new Prestamo(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 7, DateTime.UtcNow) });
-            _usuarioRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Usuario> { new Usuario(Guid.NewGuid(), "Test", "t@t.com", "h", RolUsuario.Estudiante) });
-            _recursoRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<RecursoBibliografico> { new Libro(Guid.NewGuid(), "T", "A", 1, 1, null, "I", "E", 2020) });
+            _usuarioRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Usuario> { new Usuario(Guid.NewGuid(), "Test", new Email("t@t.com"), "h", RolUsuario.Estudiante) });
+            _recursoRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<RecursoBibliografico> { new Libro(Guid.NewGuid(), "T", "A", 1, 1, null, new ISBN("1234567890"), "E", 2020) });
             _penalizacionRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Penalizacion> { new Penalizacion(Guid.NewGuid(), Guid.NewGuid(), "M", 3, DateTime.UtcNow, Guid.NewGuid()) });
 
             // Act

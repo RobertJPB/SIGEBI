@@ -10,7 +10,7 @@ namespace SIGEBI.ViewModels
 {
     public partial class NotificacionesViewModel : BaseViewModel
     {
-        private readonly ISigebiApi _api;
+        private readonly INotificacionesApi _api;
 
         [ObservableProperty]
         private ObservableCollection<NotificacionDTO> _notificaciones = new();
@@ -18,7 +18,7 @@ namespace SIGEBI.ViewModels
         [ObservableProperty]
         private string _contador = "0 notificaciones";
 
-        public NotificacionesViewModel(ISigebiApi api)
+        public NotificacionesViewModel(INotificacionesApi api)
         {
             _api = api;
             Title = "Notificaciones";

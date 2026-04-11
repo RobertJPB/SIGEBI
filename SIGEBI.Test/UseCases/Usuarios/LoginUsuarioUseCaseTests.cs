@@ -7,6 +7,7 @@ using SIGEBI.Business.UseCases.Usuarios;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Enums.Seguridad;
 using SIGEBI.Business.Interfaces.Common;
+using SIGEBI.Domain.ValueObjects;
 using Xunit;
 
 namespace SIGEBI.Test.UseCases.Usuarios
@@ -33,7 +34,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
         // -- HELPER --
 
         private Usuario CrearUsuario()
-            => new Usuario(Guid.NewGuid(), "Juan Perez", "juan@test.com", "hash123", RolUsuario.Estudiante);
+            => new Usuario(Guid.NewGuid(), "Juan Perez", new Email("juan@test.com"), "hash123", RolUsuario.Estudiante);
 
         // -- PRUEBAS --
 
@@ -51,7 +52,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
 
             // Assert
             resultado.Should().NotBeNull();
-            resultado!.Correo.Should().Be("juan@test.com");
+            resultado!.Correo.Value.Should().Be("juan@test.com");
         }
 
         [Fact]
