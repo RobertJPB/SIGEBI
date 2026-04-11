@@ -11,8 +11,8 @@ namespace SIGEBI.Views.GestionUsuarios
         public UsuarioDialog()
         {
             InitializeComponent();
-            // asegurar que empiece vacio (cero riesgos de hash)
-            TxtPass.Password = string.Empty;
+            // asegurar que empiece vacio
+            TxtPass.Text = string.Empty;
         }
 
         private void BtnCancelar_Click(object sender, RoutedEventArgs e)
@@ -33,7 +33,7 @@ namespace SIGEBI.Views.GestionUsuarios
             {
                 Nombre = TxtNombre.Text.Trim(),
                 Correo = TxtCorreo.Text.Trim(),
-                Contrasena = TxtPass.Password,
+                Contrasena = TxtPass.Text,
                 IdRol = rolId
             };
 
@@ -49,7 +49,7 @@ namespace SIGEBI.Views.GestionUsuarios
             if (string.IsNullOrWhiteSpace(TxtNombre.Text)) error = "El nombre es obligatorio.";
             else if (string.IsNullOrWhiteSpace(TxtCorreo.Text)) error = "El correo es obligatorio.";
             else if (!TxtCorreo.Text.Contains("@")) error = "El correo no es válido.";
-            else if (string.IsNullOrWhiteSpace(TxtPass.Password)) error = "La contraseña es obligatoria.";
+            else if (string.IsNullOrWhiteSpace(TxtPass.Text)) error = "La contraseña es obligatoria.";
             else if (CmbRol.SelectedIndex == -1) error = "Debe seleccionar un rol.";
 
             if (!string.IsNullOrEmpty(error))

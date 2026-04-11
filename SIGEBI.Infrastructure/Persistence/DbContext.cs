@@ -20,7 +20,6 @@ namespace SIGEBI.Infrastructure.Persistence
         public DbSet<Valoracion> Valoraciones { get; set; } 
         public DbSet<Notificacion> Notificaciones { get; set; } 
         public DbSet<ListaDeseos> ListasDeseos { get; set; } 
-        public DbSet<SolicitudAcceso> SolicitudesAcceso { get; private set; } 
         public DbSet<Auditoria> Auditorias { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

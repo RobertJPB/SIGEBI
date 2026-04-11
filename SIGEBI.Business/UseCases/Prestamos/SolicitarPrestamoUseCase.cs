@@ -82,9 +82,6 @@ namespace SIGEBI.Business.UseCases.Prestamos
                 // 2. Aplicación Centralizada de Reglas
                 _prestamoPolicy.ValidarPrestamo(usuario, recurso, historialUsuario, penalizaciones);
 
-                // 3. Registro de Solicitud Exitosa (Trazabilidad)
-                var solicitudExito = SolicitudAcceso.RegistrarExito(_guidGenerator.Create(), usuarioId, recursoId, fechaActual);
-                await _unitOfWork.SolicitudesAcceso.AddAsync(solicitudExito);
 
                 // 4. Creación del Préstamo
                 int diasPlazo = _prestamoPolicy.ObtenerDiasPlazo(usuario.Rol);
@@ -129,10 +126,10 @@ namespace SIGEBI.Business.UseCases.Prestamos
             }
             catch (InvalidOperationException ex)
             {
-                // REGLA: Toda solicitud de acceso debe quedar registrada, incluso si es rechazada.
-                var solicitudRechazo = SolicitudAcceso.RegistrarRechazo(_guidGenerator.Create(), usuarioId, recursoId, fechaActual, ex.Message);
-                await _unitOfWork.SolicitudesAcceso.AddAsync(solicitudRechazo);
-                await _unitOfWork.SaveChangesAsync();
+                // Auditoría de Rechazo
+                await _audit.LogActionAsync(TipoAccionAuditoria.AccesoDenegado, "Prestamo", 
+                    $"Solicitud de préstamo rechazada para el recurso '{recursoId}': {ex.Message}", 
+                    usuarioId);
 
                 _logger.LogInformation("Solicitud de préstamo rechazada: {Motivo}", ex.Message);
                 throw;

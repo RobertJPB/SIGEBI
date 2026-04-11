@@ -135,13 +135,22 @@
             <TextBlock x:Name="TxtRutaImagen" FontSize="10" Foreground="#7a9e84"
                        Margin="0,4,0,0" TextTrimming="CharacterEllipsis"/>
 
-            <TextBlock Text="Titulo *" Style="{StaticResource Etiqueta}"/>
+            <TextBlock Style="{StaticResource Etiqueta}">
+                <Run Text="Titulo "/>
+                <Run Text="*" Foreground="Red"/>
+            </TextBlock>
             <TextBox x:Name="TxtTitulo" Style="{StaticResource Campo}"/>
 
-            <TextBlock Text="Autor *" Style="{StaticResource Etiqueta}"/>
+            <TextBlock Style="{StaticResource Etiqueta}">
+                <Run Text="Autor "/>
+                <Run Text="*" Foreground="Red"/>
+            </TextBlock>
             <TextBox x:Name="TxtAutor" Style="{StaticResource Campo}"/>
 
-            <TextBlock Text="Categoria *" Style="{StaticResource Etiqueta}"/>
+            <TextBlock Style="{StaticResource Etiqueta}">
+                <Run Text="Categoria "/>
+                <Run Text="*" Foreground="Red"/>
+            </TextBlock>
             <ComboBox x:Name="CmbCategoria"
                       Style="{StaticResource CampoCombo}"
                       DisplayMemberPath="Nombre"
@@ -162,7 +171,10 @@
             <TextBlock Text="Genero" Style="{StaticResource Etiqueta}"/>
             <TextBox x:Name="TxtGenero" Style="{StaticResource Campo}"/>
 
-            <TextBlock Text="Stock *" Style="{StaticResource Etiqueta}"/>
+            <TextBlock Style="{StaticResource Etiqueta}">
+                <Run Text="Stock "/>
+                <Run Text="*" Foreground="Red"/>
+            </TextBlock>
             <TextBox x:Name="TxtStock" Style="{StaticResource Campo}"/>
 
             <Border x:Name="ErrorPanel" Background="#fdecea" CornerRadius="7"

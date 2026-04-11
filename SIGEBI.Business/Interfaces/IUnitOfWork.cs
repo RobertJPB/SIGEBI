@@ -19,7 +19,6 @@ namespace SIGEBI.Business.Interfaces
         INotificacionRepository Notificaciones { get; } // Repositorio de Notificaciones
         IAuditoriaRepository Auditorias { get; } // Repositorio de Auditoría
         IListaDeseosRepository ListasDeseos { get; } // Repositorio de Listas de Deseos
-        ISolicitudAccesoRepository SolicitudesAcceso { get; } // Repositorio de Solicitudes de Acceso
 
         Task<int> SaveChangesAsync(); // Confirmar transacción
     }

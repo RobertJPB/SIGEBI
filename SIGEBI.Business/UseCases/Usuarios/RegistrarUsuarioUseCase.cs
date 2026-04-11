@@ -17,17 +17,20 @@ namespace SIGEBI.Business.UseCases.Usuarios
         private readonly IHashService _hashService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IGuidGenerator _guidGenerator;
+        private readonly IEmailAdapter _emailAdapter;
 
         public RegistrarUsuarioUseCase(
             IUsuarioRepository usuarioRepository,
             IHashService hashService,
             IUnitOfWork unitOfWork,
-            IGuidGenerator guidGenerator)
+            IGuidGenerator guidGenerator,
+            IEmailAdapter emailAdapter)
         {
             _usuarioRepository = usuarioRepository;
             _hashService = hashService;
             _unitOfWork = unitOfWork;
             _guidGenerator = guidGenerator;
+            _emailAdapter = emailAdapter;
         }
 
         // Crea un nuevo usuario encriptando su clave.
@@ -58,6 +61,21 @@ namespace SIGEBI.Business.UseCases.Usuarios
 
             await _usuarioRepository.AddAsync(usuario);
             await _unitOfWork.SaveChangesAsync();
+
+            // Enviar correo de bienvenida en segundo plano
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await _emailAdapter.EnviarAsync(usuario.Correo.Value, "Bienvenido a SIGEBI",
+                        $"Hola {usuario.Nombre}, ¡bienvenido al Sistema de Gestión Bibliotecaria (SIGEBI)! " +
+                        "Ya puedes acceder al catálogo y solicitar préstamos.");
+                }
+                catch
+                {
+                    // No bloqueamos el registro si el email falla
+                }
+            });
 
             return usuario.Id;
         }

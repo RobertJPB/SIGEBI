@@ -24,7 +24,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
         private readonly Mock<IRecursoRepository> _recursoRepo;
         private readonly Mock<IPenalizacionRepository> _penalizacionRepo;
         private readonly Mock<INotificacionRepository> _notificacionRepo;
-        private readonly Mock<ISolicitudAccesoRepository> _solicitudAccesoRepo;
+        private readonly Mock<IAuditService> _audit;
         private readonly Mock<IEmailAdapter> _emailAdapter;
         private readonly Mock<IUnitOfWork> _unitOfWork;
         private readonly Mock<IPrestamoPolicy> _prestamoPolicy;
@@ -37,13 +37,12 @@ namespace SIGEBI.Test.UseCases.Prestamos
             _recursoRepo = new Mock<IRecursoRepository>();
             _penalizacionRepo = new Mock<IPenalizacionRepository>();
             _notificacionRepo = new Mock<INotificacionRepository>();
-            _solicitudAccesoRepo = new Mock<ISolicitudAccesoRepository>();
+            _audit = new Mock<IAuditService>();
             _emailAdapter = new Mock<IEmailAdapter>();
             _unitOfWork = new Mock<IUnitOfWork>();
             _prestamoPolicy = new Mock<IPrestamoPolicy>();
 
-            // Setup UnitOfWork
-            _unitOfWork.Setup(u => u.SolicitudesAcceso).Returns(_solicitudAccesoRepo.Object);
+            // Setup UnitOfWork (removed SolicitudesAcceso)
 
             _useCase = new SolicitarPrestamoUseCase(
                 _prestamoRepo.Object,
@@ -56,7 +55,7 @@ namespace SIGEBI.Test.UseCases.Prestamos
                 new Mock<IMemoryCache>().Object,
                 new Mock<IGuidGenerator>().Object,
                 Microsoft.Extensions.Logging.Abstractions.NullLogger<SolicitarPrestamoUseCase>.Instance,
-                new Mock<IAuditService>().Object,
+                _audit.Object,
                 _prestamoPolicy.Object);
         }
 
@@ -243,8 +242,8 @@ namespace SIGEBI.Test.UseCases.Prestamos
             await action.Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("*vencida*");
                 
-            // Verificar que se registró el rechazo en la trazabilidad
-            _solicitudAccesoRepo.Verify(r => r.AddAsync(It.Is<SolicitudAcceso>(s => !s.FueAprobada)), Times.Once);
+            // Verificar que se registró el rechazo en la auditoría general
+            _audit.Verify(a => a.LogActionAsync(It.Is<TipoAccionAuditoria>(t => t == TipoAccionAuditoria.AccesoDenegado), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Guid?>()), Times.Once);
         }
     }
 }

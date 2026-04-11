@@ -112,16 +112,28 @@
                    FontSize="11" Foreground="#7a9e84" Margin="0,0,0,16"/>
         <Rectangle Height="1" Fill="#dde8e2" Margin="0,0,0,10"/>
 
-        <TextBlock Text="Nombre Completo *" Style="{StaticResource Etiqueta}"/>
+        <TextBlock Style="{StaticResource Etiqueta}">
+            <Run Text="Nombre Completo "/>
+            <Run Text="*" Foreground="Red"/>
+        </TextBlock>
         <TextBox x:Name="TxtNombre" Style="{StaticResource Campo}"/>
 
-        <TextBlock Text="Correo Electrónico *" Style="{StaticResource Etiqueta}"/>
+        <TextBlock Style="{StaticResource Etiqueta}">
+            <Run Text="Correo Electrónico "/>
+            <Run Text="*" Foreground="Red"/>
+        </TextBlock>
         <TextBox x:Name="TxtCorreo" Style="{StaticResource Campo}"/>
 
-        <TextBlock Text="Contraseña *" Style="{StaticResource Etiqueta}"/>
-        <PasswordBox x:Name="TxtPass" Style="{StaticResource CampoPass}"/>
+        <TextBlock Style="{StaticResource Etiqueta}">
+            <Run Text="Contraseña "/>
+            <Run Text="*" Foreground="Red"/>
+        </TextBlock>
+        <TextBox x:Name="TxtPass" Style="{StaticResource Campo}"/>
 
-        <TextBlock Text="Rol de Usuario *" Style="{StaticResource Etiqueta}"/>
+        <TextBlock Style="{StaticResource Etiqueta}">
+            <Run Text="Rol de Usuario "/>
+            <Run Text="*" Foreground="Red"/>
+        </TextBlock>
         <ComboBox x:Name="CmbRol" Style="{StaticResource CampoCombo}">
             <ComboBoxItem Content="Estudiante" Tag="3"/>
             <ComboBoxItem Content="Bibliotecario" Tag="2"/>

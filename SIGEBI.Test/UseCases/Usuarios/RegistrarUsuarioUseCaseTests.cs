@@ -18,6 +18,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
         private readonly Mock<IUsuarioRepository> _usuarioRepo;
         private readonly Mock<IHashService> _hashService;
         private readonly Mock<IUnitOfWork> _unitOfWork;
+        private readonly Mock<IEmailAdapter> _emailAdapter;
         private readonly RegistrarUsuarioUseCase _useCase;
 
         public RegistrarUsuarioUseCaseTests()
@@ -25,12 +26,14 @@ namespace SIGEBI.Test.UseCases.Usuarios
             _usuarioRepo = new Mock<IUsuarioRepository>();
             _hashService = new Mock<IHashService>();
             _unitOfWork = new Mock<IUnitOfWork>();
+            _emailAdapter = new Mock<IEmailAdapter>();
 
             _useCase = new RegistrarUsuarioUseCase(
                 _usuarioRepo.Object,
                 _hashService.Object,
                 _unitOfWork.Object,
-                new Mock<IGuidGenerator>().Object);
+                new Mock<IGuidGenerator>().Object,
+                _emailAdapter.Object);
         }
 
         // ── HELPER ──
