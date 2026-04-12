@@ -68,15 +68,17 @@ namespace SIGEBI.Business.UseCases.Usuarios
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task SuspenderAsync(Guid id)
+        public async Task SuspenderAsync(Guid id, string motivo)
         {
             var usuario = await _usuarioRepository.GetByIdAsync(id)
                 ?? throw new InvalidOperationException("Usuario no encontrado.");
-            usuario.Suspender();
+            usuario.Suspender(motivo);
             _usuarioRepository.Update(usuario);
-            await _unitOfWork.SaveChangesAsync();
-            
             _cache.Remove($"{CachePrefix}{id}");
+
+            await _notificaciones.EnviarNotificacionAsync(id, $"Su cuenta ha sido suspendida. Motivo: {motivo}");
+
+            await _unitOfWork.SaveChangesAsync();
         }
 
         // Restringe permanentemente el acceso de un usuario al sistema.

@@ -68,6 +68,9 @@ namespace SIGEBI.ViewModels
         private string _tipoReporteSeleccionado = "Préstamos por Período";
 
         [ObservableProperty]
+        private bool _muestraTituloResultados;
+
+        [ObservableProperty]
         private bool _muestraFiltrosPrestamos = true;
 
         [ObservableProperty]
@@ -83,6 +86,7 @@ namespace SIGEBI.ViewModels
         {
             MuestraFiltrosPrestamos = value == "Préstamos por Período";
             HayResultados = false; // Reset results when switching
+            MuestraTituloResultados = false;
             
             MuestraGridPrestamos = value == "Préstamos por Período";
             MuestraGridMorosos = value == "Usuarios más penalizados";
@@ -188,20 +192,24 @@ namespace SIGEBI.ViewModels
                             FechaInicio, FechaFin, UsuarioSeleccionado?.Id, RecursoSeleccionado?.Id);
                         Prestamos = new ObservableCollection<PrestamoResponseDTO>(dataP);
                         HayResultados = Prestamos.Count > 0;
+                        MuestraTituloResultados = HayResultados;
                         break;
                     case "Usuarios más penalizados":
                         var dataM = await _api.GetUsuariosMasPenalizadosAsync(10);
                         UsuariosMorosos = new ObservableCollection<dynamic>(dataM);
                         HayResultados = UsuariosMorosos.Count > 0;
+                        MuestraTituloResultados = HayResultados;
                         break;
                     case "Penalizaciones Activas":
                         var dataA = await _api.GetPenalizacionesActivasAsync();
                         PenalizacionesActivas = new ObservableCollection<PenalizacionDTO>(dataA);
                         HayResultados = PenalizacionesActivas.Count > 0;
+                        MuestraTituloResultados = HayResultados;
                         break;
                     case "Reporte General":
                         Dashboard = await _api.GetReporteGeneralAsync();
                         HayResultados = true;
+                        MuestraTituloResultados = false;
                         break;
                 }
                 
@@ -230,29 +238,57 @@ namespace SIGEBI.ViewModels
         [RelayCommand]
         public async Task ExportarExcelAsync()
         {
-            if (Prestamos == null || Prestamos.Count == 0) return;
+            if (!HayResultados) return;
 
             try
             {
                 var saveFileDialog = new SaveFileDialog
                 {
                     Filter = "Archivo CSV (*.csv)|*.csv",
-                    FileName = $"Reporte_Prestamos_{DateTime.Now:yyyyMMdd_HHmm}.csv",
-                    Title = "Exportar Reporte de Préstamos"
+                    FileName = $"Reporte_{TipoReporteSeleccionado.Replace(" ", "_")}_{DateTime.Now:yyyyMMdd_HHmm}.csv",
+                    Title = $"Exportar {TipoReporteSeleccionado}"
                 };
 
                 if (saveFileDialog.ShowDialog() == true)
                 {
                     IsBusy = true;
                     var csv = new StringBuilder();
-                    
-                    // Encabezados
-                    csv.AppendLine("Fecha Inicio;Usuario;Recurso;Fecha Devolución Estimada;Estado");
 
-                    foreach (var p in Prestamos)
+                    if (TipoReporteSeleccionado == "Préstamos por Período" && Prestamos != null && Prestamos.Count > 0)
                     {
-                        var linea = $"{p.FechaInicio:dd/MM/yyyy HH:mm};{p.NombreUsuario};{p.TituloRecurso};{p.FechaDevolucionEstimada:dd/MM/yyyy};{p.Estado}";
-                        csv.AppendLine(linea);
+                        csv.AppendLine("Fecha Inicio;Usuario;Recurso;Fecha Devolución Estimada;Estado");
+                        foreach (var p in Prestamos)
+                        {
+                            csv.AppendLine($"{p.FechaInicio:dd/MM/yyyy HH:mm};{p.NombreUsuario};{p.TituloRecurso};{p.FechaDevolucionEstimada:dd/MM/yyyy};{p.Estado}");
+                        }
+                    }
+                    else if (TipoReporteSeleccionado == "Usuarios más penalizados" && UsuariosMorosos != null && UsuariosMorosos.Count > 0)
+                    {
+                        csv.AppendLine("Nombre;Sanciones Totales");
+                        foreach (var m in UsuariosMorosos)
+                        {
+                            csv.AppendLine($"{m.Nombre};{m.CantidadSanciones}");
+                        }
+                    }
+                    else if (TipoReporteSeleccionado == "Penalizaciones Activas" && PenalizacionesActivas != null && PenalizacionesActivas.Count > 0)
+                    {
+                        csv.AppendLine("Fecha Inicio;Usuario;Motivo;Fecha Fin");
+                        foreach (var p in PenalizacionesActivas)
+                        {
+                            csv.AppendLine($"{p.FechaDesde:dd/MM/yyyy HH:mm};{p.NombreUsuario};{p.Motivo};{p.FechaHasta:dd/MM/yyyy}");
+                        }
+                    }
+                    else if (TipoReporteSeleccionado == "Reporte General" && Dashboard != null)
+                    {
+                        csv.AppendLine("Métrica;Valor");
+                        csv.AppendLine($"Préstamos Totales;{Dashboard.TotalPrestamos}");
+                        csv.AppendLine($"Usuarios Registrados;{Dashboard.TotalUsuarios}");
+                        csv.AppendLine($"Recursos Bibliográficos;{Dashboard.TotalRecursos}");
+                        csv.AppendLine($"Penalizaciones Activas;{Dashboard.TotalPenalizaciones}");
+                    }
+                    else
+                    {
+                        return; // Sin datos
                     }
 
                     // Guardar con BOM para que Excel detecte UTF-8 correctamente

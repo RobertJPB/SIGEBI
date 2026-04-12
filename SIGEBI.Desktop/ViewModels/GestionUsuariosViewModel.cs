@@ -125,16 +125,24 @@ namespace SIGEBI.ViewModels
         [RelayCommand]
         public async Task SuspenderAsync(Guid id)
         {
-            try
+            var dialog = new SIGEBI.Views.GestionUsuarios.MotivoDialog("Suspender Cuenta")
             {
-                IsBusy = true;
-                await _api.SuspenderUsuarioAsync(id);
-                await CargarUsuariosAsync();
-            }
-            catch (Exception ex)
+                Owner = System.Windows.Application.Current.MainWindow
+            };
+
+            if (dialog.ShowDialog() == true)
             {
-                await ManejarErrorAsync(ex, "suspender usuario");
-                IsBusy = false;
+                try
+                {
+                    IsBusy = true;
+                    await _api.SuspenderUsuarioAsync(id, new MotivoRequest { Motivo = dialog.Motivo! });
+                    await CargarUsuariosAsync();
+                }
+                catch (Exception ex)
+                {
+                    await ManejarErrorAsync(ex, "suspender usuario");
+                    IsBusy = false;
+                }
             }
         }
 

@@ -345,6 +345,13 @@
                 </div>
             }
 
+            @if (TempData["ErrorValoracion"] != null)
+            {
+                <div class="alert alert-danger mb-4" style="border-radius: 12px; font-size: 0.85rem;">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorValoracion"]
+                </div>
+            }
+
             <div class="add-review-box">
                 <h5 style="font-weight: 700; margin-bottom: 1rem;">¿Qué te pareció este material? Califícalo:</h5>
                 <form action="/Catalogo/Valorar" method="post">

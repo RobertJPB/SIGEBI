@@ -8,7 +8,7 @@ namespace SIGEBI.Domain.DomainServices
     {
         public static Notificacion CrearNotificacionPrestamo(Guid id, Guid usuarioId, DateTime fechaDevolucion)
         {
-            var mensaje = $"Tu préstamo vence el {fechaDevolucion:dd/MM/yyyy}. Por favor devuelve el recurso a tiempo.";
+            var mensaje = $"Tu préstamo fue procesado correctamente. Tienes hasta el {fechaDevolucion:dd/MM/yyyy} para devolver el recurso.";
             return new Notificacion(id, usuarioId, TipoNotificacion.Recordatorio, mensaje, DateTime.UtcNow);
         }
 
@@ -34,6 +34,12 @@ namespace SIGEBI.Domain.DomainServices
         {
             var mensaje = $"¡Buenas noticias! El recurso '{tituloRecurso}' que tienes en tu lista de deseos ya está disponible.";
             return new Notificacion(id, usuarioId, TipoNotificacion.Recordatorio, mensaje, DateTime.UtcNow);
+        }
+
+        public static Notificacion CrearNotificacionListaDeseos(Guid id, Guid usuarioId, string tituloRecurso)
+        {
+            var mensaje = $"Has agregado '{tituloRecurso}' a tu lista de deseos.";
+            return new Notificacion(id, usuarioId, TipoNotificacion.Informativa, mensaje, DateTime.UtcNow);
         }
     }
 }

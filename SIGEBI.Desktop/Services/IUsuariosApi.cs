@@ -24,7 +24,7 @@ namespace SIGEBI.Services
         Task BloquearUsuarioAsync(Guid id, [Body] MotivoRequest request);
 
         [Put("/api/Usuarios/{id}/suspender")]
-        Task SuspenderUsuarioAsync(Guid id);
+        Task SuspenderUsuarioAsync(Guid id, [Body] MotivoRequest request);
 
         [Put("/api/Usuarios/{id}/rol")]
         Task CambiarRolUsuarioAsync(Guid id, [Body] int nuevoRol);

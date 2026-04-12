@@ -95,7 +95,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
                 var usuario = await _usuarioRepository.GetByIdAsync(prestamo.UsuarioId);
                 if (usuario != null)
                 {
-                    usuario.Suspender();
+                    usuario.Suspender($"Penalización automática por {diasPenalizacion} días. Motivo: {motivo}");
                     _usuarioRepository.Update(usuario);
                     _cache.Remove($"{CachePrefix}{usuario.Id}");
 
@@ -129,7 +129,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
             await _penalizacionRepository.AddAsync(penalizacion);
             
             // Sincronizar estado del usuario
-            usuario.Suspender();
+            usuario.Suspender($"Penalización manual por {dto.DiasPenalizacion} días. Motivo: {dto.Motivo}");
             _usuarioRepository.Update(usuario);
             _cache.Remove($"{CachePrefix}{usuario.Id}");
 

@@ -146,8 +146,9 @@ namespace SIGEBI.Web.Controllers
             }
             catch (Exception ex)
             {
-                // Mostramos el error para saber si es por el Índice Único (ya valoró) u otro motivo
-                return Content($"No se pudo registrar su valoración. Detalles: {ex.Message}. Importante: Solo se permite una valoración por recurso.");
+                // Mostramos el error mediante TempData en lugar de un plain Content para no romper la UI
+                TempData["ErrorValoracion"] = $"No se pudo registrar su valoración. Detalles: {ex.Message}. Importante: Solo se permite una valoración por recurso.";
+                return RedirectToAction("Detalle", new { id = recursoId });
             }
         }
 

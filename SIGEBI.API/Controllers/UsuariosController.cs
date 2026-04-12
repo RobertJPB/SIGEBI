@@ -141,12 +141,14 @@ namespace SIGEBI.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("{id}/suspender")]
-        public async Task<IActionResult> Suspender(Guid id)
+        public async Task<IActionResult> Suspender(Guid id, [FromBody] SIGEBI.Business.DTOs.MotivoRequest request)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarUsuarios(rol), "suspender usuario");
 
-            await _gestionarUsuario.SuspenderAsync(id);
+            if (string.IsNullOrWhiteSpace(request?.Motivo)) return BadRequest("El motivo de suspensión es obligatorio.");
+
+            await _gestionarUsuario.SuspenderAsync(id, request.Motivo);
             return NoContent();
         }
 

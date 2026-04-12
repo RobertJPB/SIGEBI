@@ -70,63 +70,50 @@
                                   Width="300" Height="32" VerticalContentAlignment="Center"/>
                     </StackPanel>
 
-                    <Grid Margin="0,0,0,16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="150"/>
-                            <ColumnDefinition Width="200"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
+                    <WrapPanel Margin="0,0,0,16" VerticalAlignment="Bottom">
+                        
                         <!-- Filtros (Visible solo para Préstamos por Período) -->
-                        <Grid Margin="0,0,12,0" Visibility="{Binding MuestraFiltrosPrestamos, Converter={StaticResource BoolToVis}}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="150" />
-                                <ColumnDefinition Width="200" />
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                        <WrapPanel Margin="0,0,12,0" Visibility="{Binding MuestraFiltrosPrestamos, Converter={StaticResource BoolToVis}}">
+                            <StackPanel Margin="0,0,12,8">
                                 <TextBlock Text="Fecha Inicio" FontSize="11" Margin="0,0,0,4" Foreground="#667f70"/>
                                 <DatePicker SelectedDate="{Binding FechaInicio}" Width="110" Height="32"/>
                             </StackPanel>
-                            <StackPanel Grid.Column="1" Margin="0,0,12,0">
+                            <StackPanel Margin="0,0,12,8">
                                 <TextBlock Text="Fecha Fin" FontSize="11" Margin="0,0,0,4" Foreground="#667f70"/>
                                 <DatePicker SelectedDate="{Binding FechaFin}" Width="110" Height="32"/>
                             </StackPanel>
-                            <StackPanel Grid.Column="2" Margin="0,0,12,0">
+                            <StackPanel Margin="0,0,12,8">
                                 <TextBlock Text="Usuario (Opcional)" FontSize="11" Margin="0,0,0,4" Foreground="#667f70"/>
                                 <ComboBox ItemsSource="{Binding UsuariosFiltro}" 
                                           SelectedItem="{Binding UsuarioSeleccionado}"
                                           DisplayMemberPath="Nombre"
-                                          Height="32" VerticalContentAlignment="Center"/>
+                                          Width="150" Height="32" VerticalContentAlignment="Center"/>
                             </StackPanel>
-                            <StackPanel Grid.Column="3" Margin="0,0,12,0">
+                            <StackPanel Margin="0,0,12,8">
                                 <TextBlock Text="Recurso (Opcional)" FontSize="11" Margin="0,0,0,4" Foreground="#667f70"/>
                                 <ComboBox ItemsSource="{Binding RecursosFiltro}" 
                                           SelectedItem="{Binding RecursoSeleccionado}"
                                           DisplayMemberPath="Titulo"
-                                          Height="32" VerticalContentAlignment="Center"/>
+                                          Width="200" Height="32" VerticalContentAlignment="Center"/>
                             </StackPanel>
-                        </Grid>
+                        </WrapPanel>
 
-                        <Button Grid.Column="4" Content="Generar Reporte" 
-                                Command="{Binding GenerarReporteDinamicoCommand}" 
-                                Width="130" Height="32" VerticalAlignment="Bottom"
-                                Background="#1a5c2e" Foreground="White" BorderThickness="0">
-                            <Button.Resources>
-                                <Style TargetType="Border">
-                                    <Setter Property="CornerRadius" Value="6"/>
-                                </Style>
-                            </Button.Resources>
-                        </Button>
+                        <!-- Botones de Acción -->
+                        <WrapPanel Margin="0,0,0,8" VerticalAlignment="Bottom">
+                            <Button Content="Generar Reporte" 
+                                    Command="{Binding GenerarReporteDinamicoCommand}" 
+                                    Width="130" Height="32" VerticalAlignment="Bottom"
+                                    Background="#1a5c2e" Foreground="White" BorderThickness="0">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="6"/>
+                                    </Style>
+                                </Button.Resources>
+                            </Button>
 
-                        <StackPanel Grid.Column="5" Orientation="Horizontal" VerticalAlignment="Bottom">
                             <Button Content="Limpiar" 
                                     Command="{Binding LimpiarFiltrosCommand}" 
-                                    Width="70" Height="32"
+                                    Width="70" Height="32" VerticalAlignment="Bottom"
                                     Margin="8,0,0,0"
                                     Visibility="{Binding MuestraFiltrosPrestamos, Converter={StaticResource BoolToVis}}"
                                     Background="#f5f5f5" Foreground="#667f70" BorderThickness="0">
@@ -139,7 +126,7 @@
 
                             <Button Content="Exportar a Excel" 
                                     Command="{Binding ExportarExcelCommand}" 
-                                    Width="120" Height="32"
+                                    Width="120" Height="32" VerticalAlignment="Bottom"
                                     Margin="8,0,0,0"
                                     Background="#f4f9f6" Foreground="#1a5c2e" 
                                     BorderBrush="#1a5c2e" BorderThickness="1"
@@ -150,13 +137,13 @@
                                     </Style>
                                 </Button.Resources>
                             </Button>
-                        </StackPanel>
-                    </Grid>
+                        </WrapPanel>
+                    </WrapPanel>
 
                     <Separator Height="1" Background="#f0f2f1" Margin="0,20"/>
 
                     <TextBlock Text="Resultados del Reporte" FontSize="14" FontWeight="SemiBold" Foreground="#0f3d20" Margin="0,0,0,12"
-                               Visibility="{Binding HayResultados, Converter={StaticResource BoolToVis}}"/>
+                               Visibility="{Binding MuestraTituloResultados, Converter={StaticResource BoolToVis}}"/>
 
                     <!-- DataGrid Préstamos -->
                     <Grid Visibility="{Binding MuestraGridPrestamos, Converter={StaticResource BoolToVis}}">
@@ -193,10 +180,10 @@
                                   HeadersVisibility="Column"
                                   Visibility="{Binding HayResultados, Converter={StaticResource BoolToVis}}">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Inicio" Binding="{Binding FechaInicio, StringFormat=dd/MM/yyyy HH:mm}" Width="150"/>
+                                <DataGridTextColumn Header="Inicio" Binding="{Binding FechaDesde, StringFormat=dd/MM/yyyy HH:mm}" Width="150"/>
                                 <DataGridTextColumn Header="Usuario" Binding="{Binding NombreUsuario}" Width="*"/>
                                 <DataGridTextColumn Header="Motivo" Binding="{Binding Motivo}" Width="*"/>
-                                <DataGridTextColumn Header="Vence" Binding="{Binding FechaFin, StringFormat=dd/MM/yyyy}" Width="120"/>
+                                <DataGridTextColumn Header="Vence" Binding="{Binding FechaHasta, StringFormat=dd/MM/yyyy}" Width="120"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>

@@ -55,7 +55,12 @@ namespace SIGEBI.Domain.Entities
             MotivoEstado = motivo;
         }
 
-        public void Suspender() => Estado = EstadoUsuario.Suspendido;
+        public void Suspender(string motivo)
+        {
+            if (string.IsNullOrWhiteSpace(motivo)) throw new ArgumentException("El motivo es obligatorio.");
+            Estado = EstadoUsuario.Suspendido;
+            MotivoEstado = motivo;
+        }
 
         public void Bloquear(string motivo)
         {

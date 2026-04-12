@@ -123,7 +123,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
         {
             // Arrange
             var usuario = CrearUsuario();
-            usuario.Suspender();
+            usuario.Suspender("Motivo de prueba");
 
             _usuarioRepo.Setup(r => r.GetByCorreoAsync("juan@test.com")).ReturnsAsync(usuario);
             _hashService.Setup(h => h.Verificar("password123", "hash123")).Returns(true);

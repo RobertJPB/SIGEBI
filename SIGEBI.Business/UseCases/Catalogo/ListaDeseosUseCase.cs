@@ -6,6 +6,7 @@ using SIGEBI.Business.Mappers;
 using SIGEBI.Business.Interfaces.Common;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Entities.Recursos;
+using SIGEBI.Domain.DomainServices;
 
 namespace SIGEBI.Business.UseCases.Catalogo
 {
@@ -17,19 +18,22 @@ namespace SIGEBI.Business.UseCases.Catalogo
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IGuidGenerator _guidGenerator;
+        private readonly INotificacionRepository _notificacionRepository;
 
         public ListaDeseosUseCase(
             IListaDeseosRepository listaDeseosRepository,
             IRecursoRepository recursoRepository,
             IUsuarioRepository usuarioRepository,
             IUnitOfWork unitOfWork,
-            IGuidGenerator guidGenerator)
+            IGuidGenerator guidGenerator,
+            INotificacionRepository notificacionRepository)
         {
             _listaDeseosRepository = listaDeseosRepository;
             _recursoRepository = recursoRepository;
             _usuarioRepository = usuarioRepository;
             _unitOfWork = unitOfWork;
             _guidGenerator = guidGenerator;
+            _notificacionRepository = notificacionRepository;
         }
 
         // Obtiene la lista del usuario o crea una nueva si aún no la tiene.
@@ -71,6 +75,14 @@ namespace SIGEBI.Business.UseCases.Catalogo
 
             lista.AgregarRecurso(recurso);
             
+            // Creamos notificación informativa del evento
+            var notificacion = NotificacionFactory.CrearNotificacionListaDeseos(
+                _guidGenerator.Create(),
+                usuarioId,
+                recurso.Titulo);
+            
+            await _notificacionRepository.AddAsync(notificacion);
+
             // No es necesario llamar a Update() si la entidad ya está siendo trackeada por EF.
             // Al llamar a SaveChangesAsync(), EF detectará el cambio en la colección Recursos.
             await _unitOfWork.SaveChangesAsync();

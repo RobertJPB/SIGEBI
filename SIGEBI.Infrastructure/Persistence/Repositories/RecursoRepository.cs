@@ -89,8 +89,9 @@ namespace SIGEBI.Infrastructure.Persistence.Repositories
                 .Distinct()
                 .ToListAsync();
 
-            return editorialesLibros.Union(editorialesRevistas!)
-                .OrderBy(e => e!)
+            return editorialesLibros.Union(editorialesRevistas)
+                .OrderBy(e => e)
+                .Select(e => e!)
                 .ToList();
         }
     }

@@ -17,6 +17,7 @@ namespace SIGEBI.Test.UseCases.Catalogo
         private readonly Mock<IRecursoRepository> _recursoRepo;
         private readonly Mock<IUsuarioRepository> _usuarioRepo;
         private readonly Mock<IUnitOfWork> _unitOfWork;
+        private readonly Mock<INotificacionRepository> _notificacionRepo;
         private readonly ListaDeseosUseCase _useCase;
 
         public ListaDeseosUseCaseTests()
@@ -25,13 +26,15 @@ namespace SIGEBI.Test.UseCases.Catalogo
             _recursoRepo = new Mock<IRecursoRepository>();
             _usuarioRepo = new Mock<IUsuarioRepository>();
             _unitOfWork = new Mock<IUnitOfWork>();
+            _notificacionRepo = new Mock<INotificacionRepository>();
 
             _useCase = new ListaDeseosUseCase(
                 _listaRepo.Object,
                 _recursoRepo.Object,
                 _usuarioRepo.Object,
                 _unitOfWork.Object,
-                new Mock<IGuidGenerator>().Object);
+                new Mock<IGuidGenerator>().Object,
+                _notificacionRepo.Object);
         }
 
         // â”€â”€ OBTENER POR USUARIO â”€â”€
