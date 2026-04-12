@@ -1,3 +1,5 @@
+using SIGEBI.Domain.Enums.Seguridad;
+
 namespace SIGEBI.Services
 {
     /// <summary>
@@ -15,12 +17,16 @@ namespace SIGEBI.Services
         /// <summary>Nombre del usuario para mostrarlo en la UI.</summary>
         public static string NombreUsuario { get; set; } = string.Empty;
 
+        /// <summary>El rol del usuario obtenido del token para validaciones de UI.</summary>
+        public static RolUsuario Rol { get; set; }
+
         /// <summary>Limpia todos los datos de sesión (logout).</summary>
         public static void Cerrar()
         {
             Token = null;
             UsuarioId = Guid.Empty;
             NombreUsuario = string.Empty;
+            Rol = 0;
         }
     }
 }

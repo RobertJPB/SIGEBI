@@ -45,7 +45,7 @@ namespace SIGEBI.Web.Services
 
         public async Task ValorarAsync(Guid usuarioId, Guid recursoId, int calificacion, string comentario, string token)
         {
-            var request = new
+            var request = new ValoracionDTO
             {
                 UsuarioId = usuarioId,
                 RecursoId = recursoId,
@@ -68,7 +68,7 @@ namespace SIGEBI.Web.Services
 
         public async Task SolicitarPrestamoAsync(Guid usuarioId, Guid recursoId, string token)
         {
-            var request = new { UsuarioId = usuarioId, RecursoId = recursoId };
+            var request = new PrestamoRequestDTO { UsuarioId = usuarioId, RecursoId = recursoId };
             await _prestamosApi.SolicitarPrestamoAsync(request, token);
         }
     }

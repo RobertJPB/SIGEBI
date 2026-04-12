@@ -12,6 +12,6 @@ namespace SIGEBI.Web.Services
         Task<List<PrestamoResponseDTO>> GetPrestamosByUsuarioAsync(Guid usuarioId, [Header("Authorization")] string token);
 
         [Post("/api/Prestamos")]
-        Task SolicitarPrestamoAsync([Body] object request, [Header("Authorization")] string token);
+        Task SolicitarPrestamoAsync([Body] PrestamoRequestDTO request, [Header("Authorization")] string token);
     }
 }

@@ -83,6 +83,14 @@ namespace SIGEBI.ViewModels
                 
                 if (!string.IsNullOrWhiteSpace(nombre))
                     SessionService.NombreUsuario = nombre;
+
+                // Buscamos el Rol (puede venir como 'role' o el URI de ClaimTypes.Role)
+                var rolString = jwt.Claims.FirstOrDefault(c => 
+                    c.Type == "role" || 
+                    c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role")?.Value;
+                
+                if (Enum.TryParse<SIGEBI.Domain.Enums.Seguridad.RolUsuario>(rolString, out var rol))
+                    SessionService.Rol = rol;
             }
             catch
             {

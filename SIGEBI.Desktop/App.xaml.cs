@@ -56,6 +56,7 @@ public partial class App : Application
         ConfigureClient<IAuditoriaApi>(services);
         ConfigureClient<IValoracionesApi>(services);
         ConfigureClient<IListaDeseosApi>(services);
+        ConfigureClient<IReportesApi>(services);
 
         // ── Facade ──
         services.AddTransient<ISigebiApiFacade, SigebiApiFacade>();
@@ -76,6 +77,7 @@ public partial class App : Application
         services.AddTransient<PenalizacionesViewModel>();
         services.AddTransient<NotificacionesViewModel>();
         services.AddTransient<AuditoriaViewModel>();
+        services.AddTransient<ReportesViewModel>();
 
         return services.BuildServiceProvider();
     }

@@ -32,8 +32,14 @@ namespace SIGEBI.ViewModels
                 IsBusy = true;
                 LimpiarError();
 
-                // El UsuarioId se obtiene de la sesión iniciada — no se necesita parámetro externo
-                var data = await _api.GetNotificacionesAsync(SessionService.UsuarioId);
+                // Si el usuario es admin/bibliotecario, mostramos todas las notificaciones del sistema
+                bool esAdmin = SessionService.Rol == SIGEBI.Domain.Enums.Seguridad.RolUsuario.Administrador || 
+                               SessionService.Rol == SIGEBI.Domain.Enums.Seguridad.RolUsuario.Bibliotecario;
+
+                var data = esAdmin 
+                    ? await _api.GetTodasNotificacionesAsync()
+                    : await _api.GetNotificacionesAsync(SessionService.UsuarioId);
+
                 Notificaciones = new ObservableCollection<NotificacionDTO>(data);
                 Contador = $"{Notificaciones.Count} notificaciones";
             }

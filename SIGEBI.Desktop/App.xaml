@@ -2,9 +2,11 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:SIGEBI"
+             xmlns:converters="clr-namespace:SIGEBI.Desktop.Converters"
              StartupUri="Views/Auth/LoginWindow.xaml">
     <Application.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <converters:InvertedBooleanToVisibilityConverter x:Key="InvertedBoolToVis"/>
     </Application.Resources>
     
 </Application>

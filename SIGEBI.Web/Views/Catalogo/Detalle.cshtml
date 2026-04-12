@@ -8,12 +8,11 @@
     var avgRating = Math.Round(Model.PromedioValoraciones, 1);
 
     // COMENTARIO PARA EXPLICACIÓN:
-    // Esta lógica determina el plazo de devolución directamente en la interfaz (UI).
-    // Si el rol es Docente/Admin/Bibliotecario, se otorgan 30 días; de lo contrario, 15 (Estudiantes).
+    // Se ha estandarizado el plazo de devolución a 15 días para todos los roles (Docentes y Estudiantes).
     // Esto asegura que el usuario vea la información correcta antes de confirmar su préstamo.
     var userRole = Context.Session.GetString("UsuarioRol");
-    var loanDays = (userRole == "Docente" || userRole == "Administrador" || userRole == "Bibliotecario") ? 30 : 15;
-    var roleText = (loanDays == 30) ? "Docente/Personal" : "Estudiante";
+    var loanDays = 15;
+    var roleText = userRole == "Docente" || userRole == "Administrador" || userRole == "Bibliotecario" ? "Docente/Personal" : "Estudiante";
 }
 
 <!DOCTYPE html>
@@ -312,7 +311,7 @@
                 </div>
 
                 <div style="font-size: 0.85rem; color: var(--muted); margin-bottom: 2rem;">
-                    <i class="bi bi-info-circle me-1"></i> Nota: Su plazo de devolución es de <strong>@loanDays días</strong> (Rol: @roleText).
+                    <i class="bi bi-info-circle me-1"></i> Nota: Su plazo de devolución es de <strong>@loanDays días</strong>.
                 </div>
 
                 @if (!string.IsNullOrEmpty(Model.UsuarioCreadorNombre))
@@ -432,7 +431,7 @@
                 </div>
                 <div class="modal-body">
                     <p class="text-muted">¿Estás seguro de solicitar el préstamo de <strong>@Model.Titulo</strong>?</p>
-                    <p class="mb-1">La fecha estimada de devolución es (@loanDays días para su rol):</p>
+                    <p class="mb-1">La fecha estimada de devolución es:</p>
                     <div class="confirm-date-badge">
                         <span class="local-time" data-utc="@DateTime.UtcNow.AddDays(loanDays).ToString("yyyy-MM-ddTHH:mm:ssZ")" data-format="short">@DateTime.Now.AddDays(loanDays).ToString("dd/MM/yyyy")</span>
                     </div>

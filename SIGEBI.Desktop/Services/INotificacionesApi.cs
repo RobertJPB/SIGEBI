@@ -11,10 +11,13 @@ namespace SIGEBI.Services
         [Get("/api/Notificaciones/usuario/{usuarioId}")]
         Task<List<NotificacionDTO>> GetNotificacionesAsync(Guid usuarioId);
 
+        [Get("/api/Notificaciones")]
+        Task<List<NotificacionDTO>> GetTodasNotificacionesAsync();
+
         [Delete("/api/Notificaciones/{id}")]
         Task EliminarNotificacionAsync(Guid id);
 
-        [Put("/api/Notificaciones/usuario/{id}/leida")]
+        [Put("/api/Notificaciones/{id}/leida")]
         Task MarcarNotificacionLeidaAsync(Guid id);
 
         [Put("/api/Notificaciones/usuario/{usuarioId}/leidas")]

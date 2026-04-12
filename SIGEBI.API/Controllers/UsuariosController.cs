@@ -123,14 +123,14 @@ namespace SIGEBI.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("{id}/desactivar")]
-        public async Task<IActionResult> Desactivar(Guid id, [FromBody] string motivo)
+        public async Task<IActionResult> Desactivar(Guid id, [FromBody] SIGEBI.Business.DTOs.MotivoRequest request)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarUsuarios(rol), "desactivar usuario");
 
-            if (string.IsNullOrWhiteSpace(motivo)) return BadRequest("El motivo de desactivación es obligatorio.");
+            if (string.IsNullOrWhiteSpace(request?.Motivo)) return BadRequest("El motivo de desactivación es obligatorio.");
 
-            await _gestionarUsuario.DesactivarAsync(id, motivo);
+            await _gestionarUsuario.DesactivarAsync(id, request.Motivo);
             return NoContent();
         }
 
@@ -157,14 +157,14 @@ namespace SIGEBI.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("{id}/bloquear")]
-        public async Task<IActionResult> Bloquear(Guid id, [FromBody] string motivo)
+        public async Task<IActionResult> Bloquear(Guid id, [FromBody] SIGEBI.Business.DTOs.MotivoRequest request)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGestionarUsuarios(rol), "bloquear usuario");
 
-            if (string.IsNullOrWhiteSpace(motivo)) return BadRequest("El motivo de bloqueo es obligatorio.");
+            if (string.IsNullOrWhiteSpace(request?.Motivo)) return BadRequest("El motivo de bloqueo es obligatorio.");
 
-            await _gestionarUsuario.BloquearAsync(id, motivo);
+            await _gestionarUsuario.BloquearAsync(id, request.Motivo);
             return NoContent();
         }
 

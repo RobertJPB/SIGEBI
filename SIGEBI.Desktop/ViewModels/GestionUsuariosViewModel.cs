@@ -111,7 +111,7 @@ namespace SIGEBI.ViewModels
                 try
                 {
                     IsBusy = true;
-                    await _api.DesactivarUsuarioAsync(id, dialog.Motivo!);
+                    await _api.DesactivarUsuarioAsync(id, new MotivoRequest { Motivo = dialog.Motivo! });
                     await CargarUsuariosAsync();
                 }
                 catch (Exception ex)
@@ -151,7 +151,7 @@ namespace SIGEBI.ViewModels
                 try
                 {
                     IsBusy = true;
-                    await _api.BloquearUsuarioAsync(id, dialog.Motivo!);
+                    await _api.BloquearUsuarioAsync(id, new MotivoRequest { Motivo = dialog.Motivo! });
                     await CargarUsuariosAsync();
                 }
                 catch (Exception ex)

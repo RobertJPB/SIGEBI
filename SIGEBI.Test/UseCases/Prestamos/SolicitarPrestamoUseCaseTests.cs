@@ -11,6 +11,7 @@ using SIGEBI.Domain.DomainServices;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Domain.Entities.Recursos;
 using SIGEBI.Domain.Enums.Seguridad;
+using SIGEBI.Domain.Enums.Auditoria;
 using SIGEBI.Domain.Interfaces.Services;
 using SIGEBI.Domain.ValueObjects;
 using Xunit;

@@ -18,15 +18,15 @@ namespace SIGEBI.Services
         Task ActivarUsuarioAsync(Guid id);
 
         [Put("/api/Usuarios/{id}/desactivar")]
-        Task DesactivarUsuarioAsync(Guid id, [Body] string motivo);
+        Task DesactivarUsuarioAsync(Guid id, [Body] MotivoRequest request);
 
         [Put("/api/Usuarios/{id}/bloquear")]
-        Task BloquearUsuarioAsync(Guid id, [Body] string motivo);
+        Task BloquearUsuarioAsync(Guid id, [Body] MotivoRequest request);
 
         [Put("/api/Usuarios/{id}/suspender")]
         Task SuspenderUsuarioAsync(Guid id);
 
-        [Post("/api/Usuarios/{id}/rol")]
+        [Put("/api/Usuarios/{id}/rol")]
         Task CambiarRolUsuarioAsync(Guid id, [Body] int nuevoRol);
     }
 }

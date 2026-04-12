@@ -41,7 +41,7 @@ namespace SIGEBI.Test.Domain
         {
             // Arrange
             var usuario = CrearUsuarioActivo(RolUsuario.Estudiante);
-            var prestamos = Enumerable.Range(0, 3)
+            var prestamos = Enumerable.Range(0, 5)
                 .Select(_ => new Prestamo(Guid.NewGuid(), usuario.Id, Guid.NewGuid(), 7, DateTime.UtcNow))
                 .ToList();
 
@@ -53,11 +53,11 @@ namespace SIGEBI.Test.Domain
         }
 
         [Fact]
-        public void PuedeRealizarPrestamo_DocenteConOchoPrestamos_DevuelveTrue()
+        public void PuedeRealizarPrestamo_DocenteConCuatroPrestamos_DevuelveTrue()
         {
             // Arrange
             var usuario = CrearUsuarioActivo(RolUsuario.Docente);
-            var prestamos = Enumerable.Range(0, 8)
+            var prestamos = Enumerable.Range(0, 4)
                 .Select(_ => new Prestamo(Guid.NewGuid(), usuario.Id, Guid.NewGuid(), 7, DateTime.UtcNow))
                 .ToList();
 
@@ -65,7 +65,7 @@ namespace SIGEBI.Test.Domain
             var resultado = _policy.PuedeRealizarPrestamo(usuario, prestamos);
 
             // Assert
-            resultado.Should().BeTrue(); // Límite es 10 para docentes
+            resultado.Should().BeTrue(); // Límite es 5 para docentes
         }
 
         [Fact]
@@ -132,17 +132,17 @@ namespace SIGEBI.Test.Domain
         }
 
         [Fact]
-        public void ObtenerDiasPlazo_Docente_DevuelveTreintaDias()
+        public void ObtenerDiasPlazo_Docente_DevuelveQuinceDias()
         {
             var dias = _policy.ObtenerDiasPlazo(RolUsuario.Docente);
-            dias.Should().Be(30);
+            dias.Should().Be(15);
         }
 
         [Fact]
-        public void ObtenerDiasPlazo_Administrador_DevuelveTreintaDias()
+        public void ObtenerDiasPlazo_Administrador_DevuelveQuinceDias()
         {
             var dias = _policy.ObtenerDiasPlazo(RolUsuario.Administrador);
-            dias.Should().Be(30);
+            dias.Should().Be(15);
         }
     }
 }

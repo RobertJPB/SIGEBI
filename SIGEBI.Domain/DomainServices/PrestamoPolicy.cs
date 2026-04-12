@@ -14,12 +14,12 @@ namespace SIGEBI.Domain.DomainServices
     public class PrestamoPolicy : IPrestamoPolicy
     {
         // Límites dinámicos por rol
-        private const int MaxPrestamosEstudiante = 3;
-        private const int MaxPrestamosPersonal = 10;
+        private const int MaxPrestamosEstudiante = 5;
+        private const int MaxPrestamosPersonal = 5;
         private const int DiasPlazoEstudiante = 15;
-        private const int DiasPlazoPersonal = 30;
+        private const int DiasPlazoPersonal = 15;
 
-        public const int MaxDiasPrestamoTotal = 30;
+        public const int MaxDiasPrestamoTotal = 15;
 
         
         private bool EsRolPersonal(RolUsuario rol)
@@ -55,7 +55,7 @@ namespace SIGEBI.Domain.DomainServices
 
         public int ObtenerDiasPlazo(RolUsuario rol)
         {
-            return EsRolPersonal(rol) ? DiasPlazoPersonal : DiasPlazoEstudiante;
+            return 15; // Plazo fijo de 15 días para todos los roles
         }
 
         public void ValidarPrestamo(Usuario usuario, RecursoBibliografico recurso,

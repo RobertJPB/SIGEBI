@@ -12,7 +12,7 @@ namespace SIGEBI.Services
         Task<List<ValoracionDTO>> GetValoracionesAsync(Guid recursoId);
 
         [Post("/api/Valoraciones")]
-        Task ValorarAsync([Body] object request);
+        Task ValorarAsync([Body] ValoracionDTO request);
 
         [Delete("/api/Valoraciones/{id}")]
         Task EliminarValoracionAsync(Guid id);

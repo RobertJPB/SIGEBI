@@ -14,5 +14,11 @@ namespace SIGEBI.Web.Services
 
         [Put("/api/Usuarios/perfil")]
         Task ActualizarDatosAsync([Body] object request, [Header("Authorization")] string token);
+
+        [Put("/api/Usuarios/{id}/desactivar")]
+        Task DesactivarUsuarioAsync(Guid id, [Body] MotivoRequest request, [Header("Authorization")] string token);
+
+        [Put("/api/Usuarios/{id}/bloquear")]
+        Task BloquearUsuarioAsync(Guid id, [Body] MotivoRequest request, [Header("Authorization")] string token);
     }
 }

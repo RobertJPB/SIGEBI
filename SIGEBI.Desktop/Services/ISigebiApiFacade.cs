@@ -17,5 +17,6 @@ namespace SIGEBI.Services
         IAuditoriaApi Auditoria { get; }
         IValoracionesApi Valoraciones { get; }
         IListaDeseosApi ListaDeseos { get; }
+        IReportesApi Reportes { get; }
     }
 }

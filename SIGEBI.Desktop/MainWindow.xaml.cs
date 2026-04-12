@@ -7,6 +7,7 @@ using SIGEBI.Views.Auditoria;
 using SIGEBI.Views.Notificaciones;
 using SIGEBI.Views.Penalizaciones;
 using SIGEBI.Views.GestionUsuarios;
+using SIGEBI.Views.Reportes;
 
 namespace SIGEBI
 {
@@ -45,6 +46,9 @@ namespace SIGEBI
 
         private void BtnAuditoria_Click(object sender, RoutedEventArgs e)
             => Navegar(new AuditoriaPage(), "Auditoría", BtnAuditoria, TxtNavAuditoria, BrdAuditoria);
+
+        private void BtnReportes_Click(object sender, RoutedEventArgs e)
+            => Navegar(new ReportesPage(), "Reportes y Estadísticas", BtnReportes, TxtNavReportes, BrdReportes);
 
         private void BtnCerrarSesion_Click(object sender, RoutedEventArgs e)
         {
@@ -101,6 +105,10 @@ namespace SIGEBI
             BtnAuditoria.Style = btnStyle;
             TxtNavAuditoria.Foreground = _inactiveFg;
             BrdAuditoria.Background = _inactiveIndicator;
+
+            BtnReportes.Style = btnStyle;
+            TxtNavReportes.Foreground = _inactiveFg;
+            BrdReportes.Background = _inactiveIndicator;
         }
     }
 }

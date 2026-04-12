@@ -12,6 +12,7 @@ namespace SIGEBI.Services
         public IAuditoriaApi Auditoria { get; }
         public IValoracionesApi Valoraciones { get; }
         public IListaDeseosApi ListaDeseos { get; }
+        public IReportesApi Reportes { get; }
 
         public SigebiApiFacade(
             IAuthApi auth,
@@ -23,7 +24,8 @@ namespace SIGEBI.Services
             INotificacionesApi notificaciones,
             IAuditoriaApi auditoria,
             IValoracionesApi valoraciones,
-            IListaDeseosApi listaDeseos)
+            IListaDeseosApi listaDeseos,
+            IReportesApi reportes)
         {
             Auth = auth;
             Usuarios = usuarios;
@@ -35,6 +37,7 @@ namespace SIGEBI.Services
             Auditoria = auditoria;
             Valoraciones = valoraciones;
             ListaDeseos = listaDeseos;
+            Reportes = reportes;
         }
     }
 }
