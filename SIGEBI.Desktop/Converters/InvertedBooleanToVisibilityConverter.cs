@@ -5,11 +5,6 @@ using System.Windows.Data;
 
 namespace SIGEBI.Desktop.Converters
 {
-    /// <summary>
-    /// Convierte un booleano a Visibilidad de forma invertida:
-    /// True -> Collapsed / Hidden
-    /// False -> Visible
-    /// </summary>
     public class InvertedBooleanToVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -25,3 +20,4 @@ namespace SIGEBI.Desktop.Converters
         }
     }
 }
+

@@ -3,10 +3,6 @@ using SIGEBI.Domain.Enums.Seguridad;
 
 namespace SIGEBI.Business.Exceptions
 {
-    /// <summary>
-    /// Excepción lanzada cuando un usuario intenta iniciar sesión pero su cuenta
-    /// no se encuentra en estado Activo.
-    /// </summary>
     public class UsuarioEstadoException : Exception
     {
         public EstadoUsuario Estado { get; }
@@ -44,3 +40,4 @@ namespace SIGEBI.Business.Exceptions
         }
     }
 }
+

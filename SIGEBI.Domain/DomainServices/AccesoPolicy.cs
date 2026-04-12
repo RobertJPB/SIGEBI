@@ -3,9 +3,6 @@ using SIGEBI.Domain.Enums.Seguridad;
 namespace SIGEBI.Domain.DomainServices
 {
 
-    /// Política de Acceso Centralizada 
-    /// Define las reglas de autorización basadas en roles en la capa de dominio,
-
     public class AccesoPolicy
     {
         // ── CATÁLOGO ──
@@ -51,10 +48,6 @@ namespace SIGEBI.Domain.DomainServices
             => rol == RolUsuario.Administrador;
 
         // ── HELPER ──
-
-       
-        /// Valida si el rol tiene el permiso requerido. Si no lo tiene, lanza una excepción de tipo UnauthorizedAccessException,
-        /// la cual será capturada por el ExceptionHandlingMiddleware para devolver un 403 Forbidden.
    
         public static void ValidarAcceso(RolUsuario rol, bool permiso, string mensaje)
         {
@@ -64,3 +57,4 @@ namespace SIGEBI.Domain.DomainServices
         }
     }
 }
+

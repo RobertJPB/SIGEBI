@@ -4,10 +4,6 @@ using System.Linq;
 
 namespace SIGEBI.Domain.Common
 {
-    /// <summary>
-    /// Base class for Value Objects in the domain.
-    /// Value Objects are defined by their attributes rather than a unique identity.
-    /// </summary>
     public abstract class BaseValueObject : IEquatable<BaseValueObject>
     {
         protected abstract IEnumerable<object?> GetEqualityComponents();
@@ -50,3 +46,4 @@ namespace SIGEBI.Domain.Common
         }
     }
 }
+

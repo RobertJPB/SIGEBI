@@ -4,10 +4,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SIGEBI.Infrastructure.Migrations
 {
-    /// <inheritdoc />
     public partial class AddDescripcionToRecursos : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
@@ -29,8 +27,6 @@ namespace SIGEBI.Infrastructure.Migrations
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
         }
-
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
@@ -50,3 +46,4 @@ namespace SIGEBI.Infrastructure.Migrations
         }
     }
 }
+

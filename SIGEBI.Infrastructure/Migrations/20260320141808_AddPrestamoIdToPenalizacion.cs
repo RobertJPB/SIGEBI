@@ -5,10 +5,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SIGEBI.Infrastructure.Migrations
 {
-    /// <inheritdoc />
     public partial class AddPrestamoIdToPenalizacion : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropIndex(
@@ -47,8 +45,6 @@ namespace SIGEBI.Infrastructure.Migrations
                 principalTable: "Prestamos",
                 principalColumn: "Id");
         }
-
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
@@ -84,3 +80,4 @@ namespace SIGEBI.Infrastructure.Migrations
         }
     }
 }
+

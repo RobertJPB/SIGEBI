@@ -236,11 +236,17 @@ namespace SIGEBI.Infrastructure.Migrations
                     b.Property<int>("Estado")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("IdCategoria")
                         .HasColumnType("int");
 
                     b.Property<string>("ImagenUrl")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("NumeroPaginas")
+                        .HasColumnType("int");
 
                     b.Property<int>("Stock")
                         .HasColumnType("int");
@@ -255,9 +261,14 @@ namespace SIGEBI.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<Guid?>("UsuarioCreadorId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("IdCategoria");
+
+                    b.HasIndex("UsuarioCreadorId");
 
                     b.ToTable("RecursosBibliograficos", (string)null);
 
@@ -266,35 +277,34 @@ namespace SIGEBI.Infrastructure.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("SIGEBI.Domain.Entities.SolicitudAcceso", b =>
+            modelBuilder.Entity("SIGEBI.Domain.Entities.Reporte", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("FechaSolicitud")
+                    b.Property<DateTime>("FechaGeneracion")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("FueAprobada")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("MotivoRechazo")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<Guid>("RecursoId")
+                    b.Property<Guid?>("GeneradoPorId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("UsuarioId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Parametros")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Resultado")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Tipo")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RecursoId");
+                    b.HasIndex("GeneradoPorId");
 
-                    b.HasIndex("UsuarioId");
-
-                    b.ToTable("SolicitudesAcceso", (string)null);
+                    b.ToTable("Reportes");
                 });
 
             modelBuilder.Entity("SIGEBI.Domain.Entities.Usuario", b =>
@@ -314,6 +324,9 @@ namespace SIGEBI.Infrastructure.Migrations
 
                     b.Property<int>("Estado")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("FechaRegistro")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("ImagenUrl")
                         .HasMaxLength(500)
@@ -340,10 +353,21 @@ namespace SIGEBI.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
+                            Id = new Guid("00000000-0000-0000-0000-000000000002"),
+                            ContrasenaHash = "JAvlGPu9JyTdtvBO6x2llnRI1+gxwIyPqCKAn3THIKk=",
+                            Correo = "admin@sigebi.com",
+                            Estado = 1,
+                            FechaRegistro = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Administrador",
+                            Rol = 2
+                        },
+                        new
+                        {
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             ContrasenaHash = "SYSTEM_ACCOUNT_NO_LOGIN",
                             Correo = "sistema@sigebi.com",
                             Estado = 1,
+                            FechaRegistro = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Nombre = "Sistema",
                             Rol = 2
                         });
@@ -424,6 +448,7 @@ namespace SIGEBI.Infrastructure.Migrations
                         .HasColumnName("Genero");
 
                     b.Property<string>("ISBN")
+                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)")
                         .HasColumnName("ISBN");
@@ -550,26 +575,23 @@ namespace SIGEBI.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("SIGEBI.Domain.Entities.Usuario", "UsuarioCreador")
+                        .WithMany()
+                        .HasForeignKey("UsuarioCreadorId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("Categoria");
+
+                    b.Navigation("UsuarioCreador");
                 });
 
-            modelBuilder.Entity("SIGEBI.Domain.Entities.SolicitudAcceso", b =>
+            modelBuilder.Entity("SIGEBI.Domain.Entities.Reporte", b =>
                 {
-                    b.HasOne("SIGEBI.Domain.Entities.Recursos.RecursoBibliografico", "Recurso")
+                    b.HasOne("SIGEBI.Domain.Entities.Usuario", "GeneradoPor")
                         .WithMany()
-                        .HasForeignKey("RecursoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("GeneradoPorId");
 
-                    b.HasOne("SIGEBI.Domain.Entities.Usuario", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Recurso");
-
-                    b.Navigation("Usuario");
+                    b.Navigation("GeneradoPor");
                 });
 
             modelBuilder.Entity("SIGEBI.Domain.Entities.Valoracion", b =>

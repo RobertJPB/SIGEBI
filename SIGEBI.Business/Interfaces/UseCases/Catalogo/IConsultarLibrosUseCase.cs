@@ -2,9 +2,6 @@ using SIGEBI.Business.DTOs;
 
 namespace SIGEBI.Business.Interfaces.UseCases.Catalogo
 {
-    /// <summary>
-    /// Contrato para la consulta y búsqueda de recursos bibliográficos disponibles.
-    /// </summary>
     public interface IConsultarLibrosUseCase
     {
         Task<IEnumerable<RecursoDetalleDTO>> EjecutarAsync();
@@ -13,3 +10,4 @@ namespace SIGEBI.Business.Interfaces.UseCases.Catalogo
         Task<RecursoDetalleDTO?> GetByIdAsync(Guid id);
     }
 }
+

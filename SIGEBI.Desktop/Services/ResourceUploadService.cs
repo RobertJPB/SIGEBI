@@ -6,13 +6,6 @@ using System.Threading.Tasks;
 
 namespace SIGEBI.Services
 {
-    /// <summary>
-    /// Servicio especializado para operaciones de subida de archivos (multipart/form-data).
-    /// Gestiona los recursos bibliográficos que requieren imágenes adjuntas.
-    /// 
-    /// Separado de los clientes Refit porque éstos no soportan constructores dinámicos
-    /// de MultipartFormDataContent con campos condicionales.
-    /// </summary>
     public class ResourceUploadService
     {
         private readonly HttpClient _httpClient;
@@ -144,3 +137,4 @@ namespace SIGEBI.Services
         }
     }
 }
+

@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SIGEBI.API.Middleware
 {
-    /// Middleware global para la captura de excepciones.
-    /// Centraliza el manejo de errores para devolver respuestas JSON consistentes al cliente.
     public class ExceptionHandlingMiddleware
     {
         private readonly RequestDelegate _next;
@@ -35,8 +33,6 @@ namespace SIGEBI.API.Middleware
                 await ManejarExcepcionAsync(context, ex);
             }
         }
-
-        /// Determina el código de estado HTTP adecuado basándose en el tipo de excepción capturada.
         private static Task ManejarExcepcionAsync(HttpContext context, Exception ex)
         {
             var statusCode = ex switch
@@ -78,3 +74,4 @@ namespace SIGEBI.API.Middleware
         };
     }
 }
+

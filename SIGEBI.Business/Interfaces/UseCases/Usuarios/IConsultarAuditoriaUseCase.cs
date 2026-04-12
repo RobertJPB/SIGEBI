@@ -2,9 +2,6 @@ using SIGEBI.Business.DTOs;
 
 namespace SIGEBI.Business.Interfaces.UseCases.Usuarios
 {
-    /// <summary>
-    /// Contrato para la consulta de registros de auditoría del sistema.
-    /// </summary>
     public interface IConsultarAuditoriaUseCase
     {
         Task<IEnumerable<AuditoriaDTO>> ObtenerTodasAsync();
@@ -12,3 +9,4 @@ namespace SIGEBI.Business.Interfaces.UseCases.Usuarios
         Task<IEnumerable<AuditoriaDTO>> ObtenerPorEntidadAsync(string entidad, string entidadId);
     }
 }
+

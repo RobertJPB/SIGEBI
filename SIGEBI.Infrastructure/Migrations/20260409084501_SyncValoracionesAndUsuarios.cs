@@ -5,10 +5,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SIGEBI.Infrastructure.Migrations
 {
-    /// <inheritdoc />
     public partial class SyncValoracionesAndUsuarios : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<DateTime>(
@@ -34,8 +32,6 @@ namespace SIGEBI.Infrastructure.Migrations
                 value: null);
             */
         }
-
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
@@ -48,3 +44,4 @@ namespace SIGEBI.Infrastructure.Migrations
         }
     }
 }
+

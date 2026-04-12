@@ -4,10 +4,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SIGEBI.Infrastructure.Migrations
 {
-    /// <inheritdoc />
     public partial class AgregarImagenUrl : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
@@ -16,8 +14,6 @@ namespace SIGEBI.Infrastructure.Migrations
                 type: "nvarchar(max)",
                 nullable: true);
         }
-
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
@@ -26,3 +22,4 @@ namespace SIGEBI.Infrastructure.Migrations
         }
     }
 }
+

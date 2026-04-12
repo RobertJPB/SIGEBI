@@ -15,7 +15,6 @@ namespace SIGEBI.Infrastructure.Migrations
     [Migration("20260309145422_AgregarImagenUrl")]
     partial class AgregarImagenUrl
     {
-        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
@@ -501,3 +500,4 @@ namespace SIGEBI.Infrastructure.Migrations
         }
     }
 }
+

@@ -2,9 +2,6 @@ using SIGEBI.Business.DTOs;
 
 namespace SIGEBI.Business.Interfaces.UseCases.Catalogo
 {
-    /// <summary>
-    /// Contrato para la administración del catálogo de categorías bibliográficas.
-    /// </summary>
     public interface ICategoriasUseCase
     {
         Task<IEnumerable<CategoriaDTO>> ObtenerTodasAsync();
@@ -15,3 +12,4 @@ namespace SIGEBI.Business.Interfaces.UseCases.Catalogo
         Task EliminarAsync(int id);
     }
 }
+

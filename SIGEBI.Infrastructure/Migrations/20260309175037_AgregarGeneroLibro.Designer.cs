@@ -15,7 +15,6 @@ namespace SIGEBI.Infrastructure.Migrations
     [Migration("20260309175037_AgregarGeneroLibro")]
     partial class AgregarGeneroLibro
     {
-        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
@@ -506,3 +505,4 @@ namespace SIGEBI.Infrastructure.Migrations
         }
     }
 }
+

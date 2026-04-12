@@ -1,10 +1,5 @@
 namespace SIGEBI.Services
 {
-    /// <summary>
-    /// Fachada que centraliza el acceso a todos los servicios de la API de SIGEBI.
-    /// Sigue la recomendación arquitectónica de proveer un punto de entrada único 
-    /// mientras se mantienen contratos granulares internamente.
-    /// </summary>
     public interface ISigebiApiFacade
     {
         IAuthApi Auth { get; }
@@ -20,3 +15,4 @@ namespace SIGEBI.Services
         IReportesApi Reportes { get; }
     }
 }
+

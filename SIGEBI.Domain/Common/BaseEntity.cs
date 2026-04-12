@@ -3,10 +3,6 @@ using System.Collections.Generic;
 
 namespace SIGEBI.Domain.Common
 {
-    /// <summary>
-    /// Base class for all domain entities.
-    /// Provides identity and domain event management.
-    /// </summary>
     public abstract class BaseEntity
     {
         public Guid Id { get; protected set; }
@@ -26,3 +22,4 @@ namespace SIGEBI.Domain.Common
         }
     }
 }
+

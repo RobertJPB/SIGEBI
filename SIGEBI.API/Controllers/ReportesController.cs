@@ -52,13 +52,25 @@ namespace SIGEBI.API.Controllers
         [HttpGet("prestamos")]
         public async Task<IActionResult> ObtenerPrestamosPorPeriodo(
             [FromQuery] DateTime fechaInicio,
-            [FromQuery] DateTime fechaFin)
+            [FromQuery] DateTime fechaFin,
+            [FromQuery] Guid? usuarioId = null,
+            [FromQuery] Guid? recursoId = null)
         {
             var rol = User.ObtenerRolActual();
             AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGenerarReportes(rol), "generar reporte de préstamos");
 
-            var prestamos = await _reportesService.ObtenerPrestamosPorPeriodoAsync(fechaInicio, fechaFin);
+            var prestamos = await _reportesService.ObtenerPrestamosPorPeriodoAsync(fechaInicio, fechaFin, usuarioId, recursoId);
             return Ok(prestamos);
+        }
+
+        [HttpGet("historial")]
+        public async Task<IActionResult> ObtenerHistorialReportes([FromQuery] int top = 10)
+        {
+            var rol = User.ObtenerRolActual();
+            AccesoPolicy.ValidarAcceso(rol, AccesoPolicy.PuedeGenerarReportes(rol), "ver historial de reportes");
+
+            var historial = await _reportesService.ObtenerHistorialReportesAsync(top);
+            return Ok(historial);
         }
 
         // Identifica usuarios con historial recurrente de incumplimiento.

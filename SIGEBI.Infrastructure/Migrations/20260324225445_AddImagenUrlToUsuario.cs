@@ -5,10 +5,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SIGEBI.Infrastructure.Migrations
 {
-    /// <inheritdoc />
     public partial class AddImagenUrlToUsuario : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
@@ -25,8 +23,6 @@ namespace SIGEBI.Infrastructure.Migrations
                 column: "ImagenUrl",
                 value: null);
         }
-
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
@@ -35,3 +31,4 @@ namespace SIGEBI.Infrastructure.Migrations
         }
     }
 }
+

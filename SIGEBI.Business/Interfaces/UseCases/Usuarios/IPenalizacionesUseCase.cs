@@ -2,9 +2,6 @@ using SIGEBI.Business.DTOs;
 
 namespace SIGEBI.Business.Interfaces.UseCases.Usuarios
 {
-    /// <summary>
-    /// Contrato para la gestión de penalizaciones automáticas y manuales por devoluciones tardías.
-    /// </summary>
     public interface IPenalizacionesUseCase
     {
         Task AplicarPenalizacionesAsync();
@@ -15,3 +12,4 @@ namespace SIGEBI.Business.Interfaces.UseCases.Usuarios
         Task FinalizarPenalizacionAsync(Guid id);
     }
 }
+

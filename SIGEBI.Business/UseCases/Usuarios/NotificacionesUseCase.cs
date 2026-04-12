@@ -107,10 +107,6 @@ namespace SIGEBI.Business.UseCases.Usuarios
             var notificaciones = await _notificacionRepository.GetAllAsync();
             return notificaciones.Select(NotificacionMapper.ToDTO);
         }
-
-        /// <summary>
-        /// Método de conveniencia para enviar notificaciones genéricas (pueden ser sanciones, bloqueos, etc.)
-        /// </summary>
         public async Task EnviarNotificacionAsync(Guid usuarioId, string mensaje)
         {
             var notificacion = new Notificacion(
@@ -126,3 +122,4 @@ namespace SIGEBI.Business.UseCases.Usuarios
         }
     }
 }
+

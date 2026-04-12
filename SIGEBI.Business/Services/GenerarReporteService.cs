@@ -17,13 +17,16 @@ namespace SIGEBI.Business.Services
             => await _generarReportesUseCase.GenerarReporteGeneralAsync();
 
         public async Task<IEnumerable<PrestamoResponseDTO>> ObtenerPrestamosPorPeriodoAsync(
-            DateTime fechaInicio, DateTime fechaFin)
-            => await _generarReportesUseCase.ObtenerPrestamosPorPeriodoAsync(fechaInicio, fechaFin);
+            DateTime fechaInicio, DateTime fechaFin, Guid? usuarioId = null, Guid? recursoId = null)
+            => await _generarReportesUseCase.ObtenerPrestamosPorPeriodoAsync(fechaInicio, fechaFin, usuarioId, recursoId);
 
         public async Task<IEnumerable<object>> ObtenerUsuariosMasPenalizadosAsync(int top)
             => await _generarReportesUseCase.ObtenerUsuariosMasPenalizadosAsync(top);
 
         public async Task<IEnumerable<PenalizacionDTO>> ObtenerPenalizacionesActivasAsync()
             => await _generarReportesUseCase.ObtenerPenalizacionesActivasAsync();
+
+        public async Task<IEnumerable<HistorialReporteDTO>> ObtenerHistorialReportesAsync(int count = 10)
+            => await _generarReportesUseCase.ObtenerHistorialReportesAsync(count);
     }
 }

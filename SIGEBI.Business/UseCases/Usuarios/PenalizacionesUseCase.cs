@@ -57,6 +57,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
         {
             // Este metodo deberia correrse todos los dias con un cronjob o algo asi
             var prestamosAtrasados = await _prestamoRepository.GetAtrasadosAsync();
+            var usuariosPenalizadosEnLote = new HashSet<Guid>();
 
             foreach (var prestamo in prestamosAtrasados)
             {
@@ -69,6 +70,18 @@ namespace SIGEBI.Business.UseCases.Usuarios
                     continue;
                 }
 
+                // Asegurar que no se apliquen múltiples penalizaciones activas al mismo tiempo
+                if (usuariosPenalizadosEnLote.Contains(prestamo.UsuarioId))
+                {
+                    continue;
+                }
+
+                var penalizacionesPrevias = await _penalizacionRepository.GetByUsuarioIdAsync(prestamo.UsuarioId);
+                if (penalizacionesPrevias.Any(p => p.Estado == SIGEBI.Domain.Enums.Operacion.EstadoPenalizacion.Activa))
+                {
+                    continue;
+                }
+
                 int diasAtraso = (int)(DateTime.UtcNow - prestamo.FechaDevolucionEstimada).TotalDays;
                 int diasPenalizacion = PenalizacionCalculator.CalcularDiasPenalizacion(
                     prestamo.FechaDevolucionEstimada, DateTime.UtcNow);
@@ -76,6 +89,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
 
                 var penalizacion = new Penalizacion(_guidGenerator.Create(), prestamo.UsuarioId, motivo, diasPenalizacion, DateTime.UtcNow, prestamo.Id);
                 await _penalizacionRepository.AddAsync(penalizacion);
+                usuariosPenalizadosEnLote.Add(prestamo.UsuarioId);
                 
                 // Sincronizar estado del usuario
                 var usuario = await _usuarioRepository.GetByIdAsync(prestamo.UsuarioId);
@@ -104,6 +118,12 @@ namespace SIGEBI.Business.UseCases.Usuarios
         {
             var usuario = await _usuarioRepository.GetByIdAsync(dto.UsuarioId)
                 ?? throw new KeyNotFoundException("Usuario no encontrado.");
+
+            var penalizacionesExistentes = await _penalizacionRepository.GetByUsuarioIdAsync(usuario.Id);
+            if (penalizacionesExistentes.Any(p => p.Estado == SIGEBI.Domain.Enums.Operacion.EstadoPenalizacion.Activa))
+            {
+                throw new InvalidOperationException("El usuario ya tiene una penalización activa. No se pueden superponer sanciones.");
+            }
 
             var penalizacion = new Penalizacion(_guidGenerator.Create(), dto.UsuarioId, dto.Motivo, dto.DiasPenalizacion, DateTime.UtcNow, dto.PrestamoId);
             await _penalizacionRepository.AddAsync(penalizacion);

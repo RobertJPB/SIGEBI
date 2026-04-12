@@ -5,10 +5,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SIGEBI.Infrastructure.Migrations
 {
-    /// <inheritdoc />
     public partial class InitialCreate : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -302,8 +300,6 @@ namespace SIGEBI.Infrastructure.Migrations
                 table: "Valoraciones",
                 column: "UsuarioId");
         }
-
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
@@ -338,3 +334,4 @@ namespace SIGEBI.Infrastructure.Migrations
         }
     }
 }
+

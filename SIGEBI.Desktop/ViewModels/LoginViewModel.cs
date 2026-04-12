@@ -54,11 +54,6 @@ namespace SIGEBI.ViewModels
                 IsBusy = false;
             }
         }
-
-        /// <summary>
-        /// Decodifica el JWT para extraer UsuarioId y Nombre del usuario
-        /// sin requerir un endpoint adicional de perfil.
-        /// </summary>
         private static void ExtraerDatosSesion(string token)
         {
             try
@@ -99,4 +94,5 @@ namespace SIGEBI.ViewModels
         }
     }
 }
+
 

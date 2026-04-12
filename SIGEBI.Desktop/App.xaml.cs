@@ -6,14 +6,6 @@ using Refit;
 using System.Text.Json;
 
 namespace SIGEBI;
-
-/// <summary>
-/// Punto de entrada de SIGEBI.Desktop.
-/// Configura el contenedor de inversión de control (IoC) con:
-/// - Clientes API por dominio vía Refit (IAuthApi, IRecursosApi, etc.)
-/// - ResourceUploadService (operaciones multipart/form-data)
-/// - Todos los ViewModels bajo patrón IsBusy / ManejarErrorAsync
-/// </summary>
 public partial class App : Application
 {
     public new static App Current => (App)Application.Current;
@@ -82,4 +74,5 @@ public partial class App : Application
         return services.BuildServiceProvider();
     }
 }
+
 

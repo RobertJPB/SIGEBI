@@ -3,10 +3,6 @@ using SIGEBI.Business.Interfaces.Common;
 
 namespace SIGEBI.Infrastructure.Common
 {
-    /// <summary>
-    /// Generador de IDs secuenciales optimizado para SQL Server.
-    /// Reduce la fragmentación de índices al insertar registros.
-    /// </summary>
     public class SequentialGuidGenerator : IGuidGenerator
     {
         public Guid Create()
@@ -32,3 +28,4 @@ namespace SIGEBI.Infrastructure.Common
         }
     }
 }
+

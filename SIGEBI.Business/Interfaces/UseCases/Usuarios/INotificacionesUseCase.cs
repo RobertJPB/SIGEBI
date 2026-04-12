@@ -2,9 +2,6 @@ using SIGEBI.Business.DTOs;
 
 namespace SIGEBI.Business.Interfaces.UseCases.Usuarios
 {
-    /// <summary>
-    /// Contrato para la gestión de notificaciones persistentes de los usuarios.
-    /// </summary>
     public interface INotificacionesUseCase
     {
         Task<IEnumerable<NotificacionDTO>> ObtenerPorUsuarioAsync(Guid usuarioId);
@@ -18,3 +15,4 @@ namespace SIGEBI.Business.Interfaces.UseCases.Usuarios
         Task EnviarNotificacionAsync(Guid usuarioId, string mensaje);
     }
 }
+

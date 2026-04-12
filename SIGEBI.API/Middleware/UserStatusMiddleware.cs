@@ -5,10 +5,6 @@ using System.Security.Claims;
 
 namespace SIGEBI.API.Middleware
 {
-    /// <summary>
-    /// Middleware encargado de verificar en tiempo real si la cuenta del usuario sigue activa.
-    /// Si un administrador suspende al usuario, este middleware rechazará cualquier petición posterior.
-    /// </summary>
     public class UserStatusMiddleware
     {
         private readonly RequestDelegate _next;
@@ -98,3 +94,4 @@ namespace SIGEBI.API.Middleware
         }
     }
 }
+

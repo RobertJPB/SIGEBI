@@ -2,9 +2,6 @@ using System.IO;
 
 namespace SIGEBI.Business.DTOs
 {
-    /// <summary>
-    /// Base para las solicitudes de creación/edición de recursos.
-    /// </summary>
     public abstract class RecursoBaseRequest
     {
         public string Titulo { get; set; } = string.Empty;
@@ -40,3 +37,4 @@ namespace SIGEBI.Business.DTOs
         public int Anio { get; set; }
     }
 }
+

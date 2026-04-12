@@ -15,7 +15,6 @@ namespace SIGEBI.Infrastructure.Migrations
     [Migration("20260324220445_AddDescripcionToRecursos")]
     partial class AddDescripcionToRecursos
     {
-        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
@@ -533,3 +532,4 @@ namespace SIGEBI.Infrastructure.Migrations
         }
     }
 }
+

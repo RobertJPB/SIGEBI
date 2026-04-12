@@ -27,6 +27,7 @@ namespace SIGEBI.Infrastructure.IoC
             services.AddScoped<INotificacionRepository, NotificacionRepository>();
             services.AddScoped<IAuditoriaRepository, AuditoriaRepository>();
             services.AddScoped<IListaDeseosRepository, ListaDeseosRepository>();
+            services.AddScoped<IReporteRepository, ReporteRepository>();
 
             // Unidad de trabajo: coordina todos los repositorios en una sola transacción.
             services.AddScoped<IUnitOfWork, UnitOfWork>();

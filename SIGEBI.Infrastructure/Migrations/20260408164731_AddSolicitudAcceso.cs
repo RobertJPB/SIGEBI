@@ -1,14 +1,12 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace SIGEBI.Infrastructure.Migrations
 {
-    /// <inheritdoc />
     public partial class AddSolicitudAcceso : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
@@ -63,8 +61,6 @@ namespace SIGEBI.Infrastructure.Migrations
                 table: "SolicitudesAcceso",
                 column: "UsuarioId");
         }
-
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
@@ -88,3 +84,4 @@ namespace SIGEBI.Infrastructure.Migrations
         }
     }
 }
+

@@ -12,7 +12,14 @@ namespace SIGEBI.Services
         Task<ReporteDTO> GetReporteGeneralAsync();
 
         [Get("/api/Reportes/prestamos")]
-        Task<List<PrestamoResponseDTO>> GetPrestamosPorPeriodoAsync([Query] DateTime fechaInicio, [Query] DateTime fechaFin);
+        Task<List<PrestamoResponseDTO>> GetPrestamosPorPeriodoAsync(
+            [Query] DateTime fechaInicio, 
+            [Query] DateTime fechaFin, 
+            [Query] Guid? usuarioId = null, 
+            [Query] Guid? recursoId = null);
+
+        [Get("/api/Reportes/historial")]
+        Task<List<HistorialReporteDTO>> GetHistorialReportesAsync([Query] int top = 10);
 
         [Get("/api/Reportes/usuarios-morosos")]
         Task<List<dynamic>> GetUsuariosMasPenalizadosAsync([Query] int top = 5);

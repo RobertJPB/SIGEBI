@@ -9,12 +9,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Microsoft.Win32;
+using System.Linq;
 
 namespace SIGEBI.ViewModels
 {
     public partial class ReportesViewModel : BaseViewModel
     {
         private readonly IReportesApi _api;
+        private readonly IUsuariosApi _usuariosApi;
+        private readonly IRecursosApi _recursosApi;
 
         [ObservableProperty]
         private ReporteDTO? _dashboard;
@@ -29,6 +32,21 @@ namespace SIGEBI.ViewModels
         private ObservableCollection<PenalizacionDTO> _penalizacionesActivas = new();
 
         [ObservableProperty]
+        private ObservableCollection<UsuarioDTO> _usuariosFiltro = new();
+
+        [ObservableProperty]
+        private ObservableCollection<RecursoDetalleDTO> _recursosFiltro = new();
+
+        [ObservableProperty]
+        private ObservableCollection<HistorialReporteDTO> _historialReportes = new();
+
+        [ObservableProperty]
+        private UsuarioDTO? _usuarioSeleccionado;
+
+        [ObservableProperty]
+        private RecursoDetalleDTO? _recursoSeleccionado;
+
+        [ObservableProperty]
         private DateTime _fechaInicio = DateTime.Now.AddMonths(-1);
 
         [ObservableProperty]
@@ -37,18 +55,58 @@ namespace SIGEBI.ViewModels
         [ObservableProperty]
         private bool _hayResultados;
 
-        public ReportesViewModel(IReportesApi api)
+        [ObservableProperty]
+        private ObservableCollection<string> _tiposDeReporte = new() 
+        { 
+            "Préstamos por Período", 
+            "Usuarios más penalizados", 
+            "Penalizaciones Activas",
+            "Reporte General"
+        };
+
+        [ObservableProperty]
+        private string _tipoReporteSeleccionado = "Préstamos por Período";
+
+        [ObservableProperty]
+        private bool _muestraFiltrosPrestamos = true;
+
+        [ObservableProperty]
+        private bool _muestraGridPrestamos = true;
+
+        [ObservableProperty]
+        private bool _muestraGridMorosos;
+
+        [ObservableProperty]
+        private bool _muestraGridPenalizaciones;
+
+        partial void OnTipoReporteSeleccionadoChanged(string value)
+        {
+            MuestraFiltrosPrestamos = value == "Préstamos por Período";
+            HayResultados = false; // Reset results when switching
+            
+            MuestraGridPrestamos = value == "Préstamos por Período";
+            MuestraGridMorosos = value == "Usuarios más penalizados";
+            MuestraGridPenalizaciones = value == "Penalizaciones Activas";
+        }
+
+        public ReportesViewModel(IReportesApi api, IUsuariosApi usuariosApi, IRecursosApi recursosApi)
         {
             _api = api;
+            _usuariosApi = usuariosApi;
+            _recursosApi = recursosApi;
             Title = "Reportes y Estadísticas";
             _ = InicializarAsync();
         }
 
         private async Task InicializarAsync()
         {
-            await CargarDashboardAsync();
-            await CargarMorososAsync();
-            await CargarPenalizacionesActivasAsync();
+            await Task.WhenAll(
+                CargarDashboardAsync(),
+                CargarMorososAsync(),
+                CargarPenalizacionesActivasAsync(),
+                CargarCombosFiltroAsync(),
+                CargarHistorialAsync()
+            );
         }
 
         [RelayCommand]
@@ -91,31 +149,82 @@ namespace SIGEBI.ViewModels
             catch { /* Silencioso */ }
         }
 
+        public async Task CargarCombosFiltroAsync()
+        {
+            try
+            {
+                var usuarios = await _usuariosApi.GetUsuariosAsync();
+                UsuariosFiltro = new ObservableCollection<UsuarioDTO>(usuarios.OrderBy(u => u.Nombre));
+
+                var recursos = await _recursosApi.GetRecursosAsync();
+                RecursosFiltro = new ObservableCollection<RecursoDetalleDTO>(recursos.OrderBy(r => r.Titulo));
+            }
+            catch { /* Silencioso */ }
+        }
+
         [RelayCommand]
-        public async Task GenerarReportePrestamosAsync()
+        public async Task CargarHistorialAsync()
+        {
+            try
+            {
+                var data = await _api.GetHistorialReportesAsync(10);
+                HistorialReportes = new ObservableCollection<HistorialReporteDTO>(data);
+            }
+            catch { /* Silencioso */ }
+        }
+
+        [RelayCommand]
+        public async Task GenerarReporteDinamicoAsync()
         {
             try
             {
                 IsBusy = true;
                 LimpiarError();
-                
-                var data = await _api.GetPrestamosPorPeriodoAsync(FechaInicio, FechaFin);
-                Prestamos = new ObservableCollection<PrestamoResponseDTO>(data);
-                HayResultados = Prestamos.Count > 0;
-                
-                if (!HayResultados)
+
+                switch (TipoReporteSeleccionado)
                 {
-                    // Podemos mostrar un aviso opcional
+                    case "Préstamos por Período":
+                        var dataP = await _api.GetPrestamosPorPeriodoAsync(
+                            FechaInicio, FechaFin, UsuarioSeleccionado?.Id, RecursoSeleccionado?.Id);
+                        Prestamos = new ObservableCollection<PrestamoResponseDTO>(dataP);
+                        HayResultados = Prestamos.Count > 0;
+                        break;
+                    case "Usuarios más penalizados":
+                        var dataM = await _api.GetUsuariosMasPenalizadosAsync(10);
+                        UsuariosMorosos = new ObservableCollection<dynamic>(dataM);
+                        HayResultados = UsuariosMorosos.Count > 0;
+                        break;
+                    case "Penalizaciones Activas":
+                        var dataA = await _api.GetPenalizacionesActivasAsync();
+                        PenalizacionesActivas = new ObservableCollection<PenalizacionDTO>(dataA);
+                        HayResultados = PenalizacionesActivas.Count > 0;
+                        break;
+                    case "Reporte General":
+                        Dashboard = await _api.GetReporteGeneralAsync();
+                        HayResultados = true;
+                        break;
                 }
+                
+                // Recargar historial después de generar uno nuevo
+                _ = CargarHistorialAsync();
             }
             catch (Exception ex)
             {
-                await ManejarErrorAsync(ex, "generar reporte de préstamos");
+                await ManejarErrorAsync(ex, "generar reporte");
             }
             finally
             {
                 IsBusy = false;
             }
+        }
+
+        [RelayCommand]
+        public void LimpiarFiltros()
+        {
+            UsuarioSeleccionado = null;
+            RecursoSeleccionado = null;
+            FechaInicio = DateTime.Now.AddMonths(-1);
+            FechaFin = DateTime.Now;
         }
 
         [RelayCommand]
@@ -148,8 +257,6 @@ namespace SIGEBI.ViewModels
 
                     // Guardar con BOM para que Excel detecte UTF-8 correctamente
                     await File.WriteAllTextAsync(saveFileDialog.FileName, csv.ToString(), Encoding.UTF8);
-                    
-                    // Opcional: Notificar éxito
                 }
             }
             catch (Exception ex)

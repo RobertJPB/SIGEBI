@@ -4,10 +4,15 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:SIGEBI.Views.Reportes"
+      xmlns:converters="clr-namespace:SIGEBI.Desktop.Converters"
       mc:Ignorable="d" 
       d:DesignHeight="700" d:DesignWidth="1000"
       Title="Reportes y Estadísticas"
       Background="Transparent">
+
+    <Page.Resources>
+        <converters:JsonParametersConverter x:Key="JsonParametersConverter"/>
+    </Page.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="24">
@@ -56,20 +61,60 @@
             <!-- ── REPORT GENERATOR ── -->
             <Border Background="White" CornerRadius="12" Padding="20" BorderBrush="#dde8e2" BorderThickness="1" Margin="0,0,0,24">
                 <StackPanel>
-                    <TextBlock Text="Consulta de Préstamos por Período" FontSize="14" FontWeight="Bold" Foreground="#0f3d20" Margin="0,0,0,16"/>
+                    <TextBlock Text="Generador de Reportes" FontSize="16" FontWeight="Bold" Foreground="#0f3d20" Margin="0,0,0,16"/>
                     
-                    <StackPanel Orientation="Horizontal">
-                        <StackPanel Margin="0,0,16,0">
-                            <TextBlock Text="Fecha Inicio" FontSize="11" Margin="0,0,0,4" Foreground="#667f70"/>
-                            <DatePicker SelectedDate="{Binding FechaInicio}" Width="150" Height="32"/>
-                        </StackPanel>
-                        <StackPanel Margin="0,0,16,0">
-                            <TextBlock Text="Fecha Fin" FontSize="11" Margin="0,0,0,4" Foreground="#667f70"/>
-                            <DatePicker SelectedDate="{Binding FechaFin}" Width="150" Height="32"/>
-                        </StackPanel>
-                        <Button Content="Generar Reporte" 
-                                Command="{Binding GenerarReportePrestamosCommand}" 
-                                Width="140" Height="32" VerticalAlignment="Bottom"
+                    <StackPanel Margin="0,0,0,16" HorizontalAlignment="Left">
+                        <TextBlock Text="Tipo de Reporte" FontSize="11" Margin="0,0,0,4" Foreground="#667f70"/>
+                        <ComboBox ItemsSource="{Binding TiposDeReporte}" 
+                                  SelectedItem="{Binding TipoReporteSeleccionado}"
+                                  Width="300" Height="32" VerticalContentAlignment="Center"/>
+                    </StackPanel>
+
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Filtros (Visible solo para Préstamos por Período) -->
+                        <Grid Margin="0,0,12,0" Visibility="{Binding MuestraFiltrosPrestamos, Converter={StaticResource BoolToVis}}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="150" />
+                                <ColumnDefinition Width="200" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                                <TextBlock Text="Fecha Inicio" FontSize="11" Margin="0,0,0,4" Foreground="#667f70"/>
+                                <DatePicker SelectedDate="{Binding FechaInicio}" Width="110" Height="32"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Margin="0,0,12,0">
+                                <TextBlock Text="Fecha Fin" FontSize="11" Margin="0,0,0,4" Foreground="#667f70"/>
+                                <DatePicker SelectedDate="{Binding FechaFin}" Width="110" Height="32"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Margin="0,0,12,0">
+                                <TextBlock Text="Usuario (Opcional)" FontSize="11" Margin="0,0,0,4" Foreground="#667f70"/>
+                                <ComboBox ItemsSource="{Binding UsuariosFiltro}" 
+                                          SelectedItem="{Binding UsuarioSeleccionado}"
+                                          DisplayMemberPath="Nombre"
+                                          Height="32" VerticalContentAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="3" Margin="0,0,12,0">
+                                <TextBlock Text="Recurso (Opcional)" FontSize="11" Margin="0,0,0,4" Foreground="#667f70"/>
+                                <ComboBox ItemsSource="{Binding RecursosFiltro}" 
+                                          SelectedItem="{Binding RecursoSeleccionado}"
+                                          DisplayMemberPath="Titulo"
+                                          Height="32" VerticalContentAlignment="Center"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Button Grid.Column="4" Content="Generar Reporte" 
+                                Command="{Binding GenerarReporteDinamicoCommand}" 
+                                Width="130" Height="32" VerticalAlignment="Bottom"
                                 Background="#1a5c2e" Foreground="White" BorderThickness="0">
                             <Button.Resources>
                                 <Style TargetType="Border">
@@ -78,103 +123,149 @@
                             </Button.Resources>
                         </Button>
 
-                        <Button Content="Exportar a Excel" 
-                                Command="{Binding ExportarExcelCommand}" 
-                                Width="140" Height="32" VerticalAlignment="Bottom"
-                                Margin="8,0,0,0"
-                                Background="#f4f9f6" Foreground="#1a5c2e" 
-                                BorderBrush="#1a5c2e" BorderThickness="1"
-                                Visibility="{Binding HayResultados, Converter={StaticResource BoolToVis}}">
-                            <Button.Resources>
-                                <Style TargetType="Border">
-                                    <Setter Property="CornerRadius" Value="6"/>
-                                </Style>
-                            </Button.Resources>
-                        </Button>
-                    </StackPanel>
+                        <StackPanel Grid.Column="5" Orientation="Horizontal" VerticalAlignment="Bottom">
+                            <Button Content="Limpiar" 
+                                    Command="{Binding LimpiarFiltrosCommand}" 
+                                    Width="70" Height="32"
+                                    Margin="8,0,0,0"
+                                    Visibility="{Binding MuestraFiltrosPrestamos, Converter={StaticResource BoolToVis}}"
+                                    Background="#f5f5f5" Foreground="#667f70" BorderThickness="0">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="6"/>
+                                    </Style>
+                                </Button.Resources>
+                            </Button>
+
+                            <Button Content="Exportar a Excel" 
+                                    Command="{Binding ExportarExcelCommand}" 
+                                    Width="120" Height="32"
+                                    Margin="8,0,0,0"
+                                    Background="#f4f9f6" Foreground="#1a5c2e" 
+                                    BorderBrush="#1a5c2e" BorderThickness="1"
+                                    Visibility="{Binding HayResultados, Converter={StaticResource BoolToVis}}">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="6"/>
+                                    </Style>
+                                </Button.Resources>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
 
                     <Separator Height="1" Background="#f0f2f1" Margin="0,20"/>
 
-                    <!-- DataGrid Results -->
-                    <DataGrid ItemsSource="{Binding Prestamos}" 
-                              AutoGenerateColumns="False" 
-                              IsReadOnly="True" 
-                              Height="300"
-                              Background="Transparent"
-                              BorderThickness="0"
-                              GridLinesVisibility="Horizontal"
-                              HorizontalGridLinesBrush="#f0f2f1"
-                              HeadersVisibility="Column"
-                              Visibility="{Binding HayResultados, Converter={StaticResource BoolToVis}}">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Fecha" Binding="{Binding FechaInicio, StringFormat=dd/MM/yyyy HH:mm}" Width="150"/>
-                            <DataGridTextColumn Header="Usuario" Binding="{Binding NombreUsuario}" Width="*"/>
-                            <DataGridTextColumn Header="Recurso" Binding="{Binding TituloRecurso}" Width="*"/>
-                            <DataGridTextColumn Header="Vence" Binding="{Binding FechaDevolucionEstimada, StringFormat=dd/MM/yyyy}" Width="120"/>
-                            <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" Width="100"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                    <TextBlock Text="Resultados del Reporte" FontSize="14" FontWeight="SemiBold" Foreground="#0f3d20" Margin="0,0,0,12"
+                               Visibility="{Binding HayResultados, Converter={StaticResource BoolToVis}}"/>
 
-                    <TextBlock Text="No se encontraron registros para el período seleccionado." 
+                    <!-- DataGrid Préstamos -->
+                    <Grid Visibility="{Binding MuestraGridPrestamos, Converter={StaticResource BoolToVis}}">
+                        <DataGrid ItemsSource="{Binding Prestamos}" 
+                                  AutoGenerateColumns="False" 
+                                  IsReadOnly="True" 
+                                  Height="300"
+                                  Background="Transparent"
+                                  BorderThickness="0"
+                                  GridLinesVisibility="Horizontal"
+                                  HorizontalGridLinesBrush="#f0f2f1"
+                                  HeadersVisibility="Column"
+                                  Visibility="{Binding HayResultados, Converter={StaticResource BoolToVis}}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Fecha" Binding="{Binding FechaInicio, StringFormat=dd/MM/yyyy HH:mm}" Width="150"/>
+                                <DataGridTextColumn Header="Usuario" Binding="{Binding NombreUsuario}" Width="*"/>
+                                <DataGridTextColumn Header="Recurso" Binding="{Binding TituloRecurso}" Width="*"/>
+                                <DataGridTextColumn Header="Vence" Binding="{Binding FechaDevolucionEstimada, StringFormat=dd/MM/yyyy}" Width="120"/>
+                                <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" Width="100"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+
+                    <!-- DataGrid Penalizaciones -->
+                    <Grid Visibility="{Binding MuestraGridPenalizaciones, Converter={StaticResource BoolToVis}}">
+                        <DataGrid ItemsSource="{Binding PenalizacionesActivas}" 
+                                  AutoGenerateColumns="False" 
+                                  IsReadOnly="True" 
+                                  Height="300"
+                                  Background="Transparent"
+                                  BorderThickness="0"
+                                  GridLinesVisibility="Horizontal"
+                                  HorizontalGridLinesBrush="#f0f2f1"
+                                  HeadersVisibility="Column"
+                                  Visibility="{Binding HayResultados, Converter={StaticResource BoolToVis}}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Inicio" Binding="{Binding FechaInicio, StringFormat=dd/MM/yyyy HH:mm}" Width="150"/>
+                                <DataGridTextColumn Header="Usuario" Binding="{Binding NombreUsuario}" Width="*"/>
+                                <DataGridTextColumn Header="Motivo" Binding="{Binding Motivo}" Width="*"/>
+                                <DataGridTextColumn Header="Vence" Binding="{Binding FechaFin, StringFormat=dd/MM/yyyy}" Width="120"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+
+                    <!-- DataGrid Morosos -->
+                    <Grid Visibility="{Binding MuestraGridMorosos, Converter={StaticResource BoolToVis}}">
+                        <DataGrid ItemsSource="{Binding UsuariosMorosos}" 
+                                  AutoGenerateColumns="False" 
+                                  IsReadOnly="True" 
+                                  Height="300"
+                                  Background="Transparent"
+                                  BorderThickness="0"
+                                  GridLinesVisibility="Horizontal"
+                                  HorizontalGridLinesBrush="#f0f2f1"
+                                  HeadersVisibility="Column"
+                                  Visibility="{Binding HayResultados, Converter={StaticResource BoolToVis}}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="*"/>
+                                <DataGridTextColumn Header="Sanciones Totales" Binding="{Binding CantidadSanciones}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+
+                    <TextBlock Text="No se encontraron registros." 
                                HorizontalAlignment="Center" Margin="0,40" Foreground="#a0c4ac"
                                Visibility="{Binding HayResultados, Converter={StaticResource InvertedBoolToVis}}"/>
 
                 </StackPanel>
             </Border>
 
-            <!-- ── BOTTOM LISTS ── -->
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <!-- Penalizaciones Activas -->
-                <Border Grid.Column="0" Background="White" CornerRadius="12" Padding="20" BorderBrush="#dde8e2" BorderThickness="1" Margin="0,0,12,0">
-                    <StackPanel>
-                        <TextBlock Text="Penalizaciones Activas" FontSize="13" FontWeight="Bold" Foreground="#d32f2f" Margin="0,0,0,12"/>
-                        <ListBox ItemsSource="{Binding PenalizacionesActivas}" BorderThickness="0" Background="Transparent" MaxHeight="200">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <Border BorderBrush="#f5f5f5" BorderThickness="0,0,0,1" Padding="4">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            <StackPanel>
-                                                <TextBlock Text="{Binding Motivo}" FontSize="12" FontWeight="SemiBold"/>
-                                                <TextBlock Text="{Binding NombreUsuario}" FontSize="10" Foreground="#667f70"/>
-                                            </StackPanel>
-                                            <TextBlock Grid.Column="1" Text="{Binding FechaFin, StringFormat=dd/MM/yy}" Foreground="#d32f2f" FontSize="10" VerticalAlignment="Center"/>
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                    </StackPanel>
-                </Border>
-
-                <!-- Ranking Morosos (Simulado con Dynamic) -->
-                <Border Grid.Column="1" Background="White" CornerRadius="12" Padding="20" BorderBrush="#dde8e2" BorderThickness="1">
-                    <StackPanel>
-                        <TextBlock Text="Usuarios más penalizados" FontSize="13" FontWeight="Bold" Foreground="#0f3d20" Margin="0,0,0,12"/>
-                        <ItemsControl ItemsSource="{Binding UsuariosMorosos}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border BorderBrush="#f5f5f5" BorderThickness="0,0,0,1" Padding="4">
-                                        <DockPanel>
-                                            <TextBlock Text="{Binding Nombre}" FontSize="12"/>
-                                            <TextBlock Text="{Binding CantidadSanciones, StringFormat='{} ({0} sanciones)'}" 
-                                                       FontSize="11" Foreground="#667f70" DockPanel.Dock="Right" HorizontalAlignment="Right"/>
-                                        </DockPanel>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
-                </Border>
-            </Grid>
+            <!-- ── HISTORIAL DE REPORTES ── -->
+            <Border Background="White" CornerRadius="12" Padding="20" BorderBrush="#dde8e2" BorderThickness="1" Margin="0,24,0,0">
+                <StackPanel>
+                    <TextBlock Text="Historial de Reportes Generados" FontSize="14" FontWeight="Bold" Foreground="#0f3d20" Margin="0,0,0,12"/>
+                    <DataGrid ItemsSource="{Binding HistorialReportes}" 
+                              AutoGenerateColumns="False" 
+                              IsReadOnly="True" 
+                              MaxHeight="300"
+                              Background="Transparent"
+                              BorderThickness="1"
+                              BorderBrush="#eef2f0"
+                              RowBackground="White"
+                              AlternatingRowBackground="#fafcfa"
+                              GridLinesVisibility="Horizontal"
+                              HorizontalGridLinesBrush="#e0e8e4"
+                              HeadersVisibility="Column"
+                              ColumnHeaderHeight="35">
+                        <DataGrid.Resources>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="#f4f9f6" />
+                                <Setter Property="Foreground" Value="#1a5c2e" />
+                                <Setter Property="FontWeight" Value="SemiBold" />
+                                <Setter Property="Padding" Value="10,0" />
+                                <Setter Property="BorderThickness" Value="0,0,0,1" />
+                                <Setter Property="BorderBrush" Value="#dde8e2" />
+                            </Style>
+                        </DataGrid.Resources>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Fecha y Hora" Binding="{Binding FechaGeneracion, StringFormat=dd/MM/yyyy HH:mm}" Width="150" ElementStyle="{StaticResource {x:Type TextBlock}}"/>
+                            <DataGridTextColumn Header="Tipo de Reporte" Binding="{Binding Tipo}" Width="180"/>
+                            <DataGridTextColumn Header="Filtros Aplicados / Parámetros" Binding="{Binding Parametros, Converter={StaticResource JsonParametersConverter}}" Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    
+                    <TextBlock Text="Los reportes generados recientemente se registran temporalmente." 
+                               FontSize="11" Foreground="#a0c4ac" Margin="0,12,0,0"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
 
         </StackPanel>
     </ScrollViewer>

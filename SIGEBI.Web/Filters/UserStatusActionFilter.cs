@@ -5,11 +5,6 @@ using System.Net;
 
 namespace SIGEBI.Web.Filters
 {
-    /// <summary>
-    /// Filtro global que captura errores de la API (específicamente 403 Forbidden).
-    /// Si la API rechaza una petición porque el usuario fue suspendido, este filtro
-    /// redirige automáticamente a la página de Logout para cerrar la sesión web.
-    /// </summary>
     public class UserStatusActionFilter : IAsyncActionFilter
     {
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -54,3 +49,4 @@ namespace SIGEBI.Web.Filters
         }
     }
 }
+

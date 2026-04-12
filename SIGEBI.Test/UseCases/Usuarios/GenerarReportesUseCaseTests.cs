@@ -1,5 +1,7 @@
 using FluentAssertions;
 using Moq;
+using SIGEBI.Business.Interfaces;
+using SIGEBI.Business.Interfaces.Common;
 using SIGEBI.Business.Interfaces.Persistence;
 using SIGEBI.Business.UseCases.Usuarios;
 using SIGEBI.Domain.Entities;
@@ -16,6 +18,9 @@ namespace SIGEBI.Test.UseCases.Usuarios
         private readonly Mock<IUsuarioRepository> _usuarioRepo;
         private readonly Mock<IRecursoRepository> _recursoRepo;
         private readonly Mock<IPenalizacionRepository> _penalizacionRepo;
+        private readonly Mock<IReporteRepository> _reporteRepo;
+        private readonly Mock<IUnitOfWork> _unitOfWork;
+        private readonly Mock<IGuidGenerator> _guidGenerator;
         private readonly GenerarReportesUseCase _useCase;
 
         public GenerarReportesUseCaseTests()
@@ -24,12 +29,18 @@ namespace SIGEBI.Test.UseCases.Usuarios
             _usuarioRepo = new Mock<IUsuarioRepository>();
             _recursoRepo = new Mock<IRecursoRepository>();
             _penalizacionRepo = new Mock<IPenalizacionRepository>();
+            _reporteRepo = new Mock<IReporteRepository>();
+            _unitOfWork = new Mock<IUnitOfWork>();
+            _guidGenerator = new Mock<IGuidGenerator>();
 
             _useCase = new GenerarReportesUseCase(
                 _prestamoRepo.Object,
                 _usuarioRepo.Object,
                 _recursoRepo.Object,
-                _penalizacionRepo.Object);
+                _penalizacionRepo.Object,
+                _reporteRepo.Object,
+                _unitOfWork.Object,
+                _guidGenerator.Object);
         }
 
         // ── GENERAR REPORTE GENERAL ──

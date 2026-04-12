@@ -15,7 +15,6 @@ namespace SIGEBI.Infrastructure.Migrations
     [Migration("20260320141808_AddPrestamoIdToPenalizacion")]
     partial class AddPrestamoIdToPenalizacion
     {
-        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
@@ -528,3 +527,4 @@ namespace SIGEBI.Infrastructure.Migrations
         }
     }
 }
+

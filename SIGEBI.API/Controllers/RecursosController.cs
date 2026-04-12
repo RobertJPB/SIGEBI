@@ -7,9 +7,6 @@ using SIGEBI.API.Extensions;
 
 namespace SIGEBI.API.Controllers
 {
-    /// <summary>
-    /// Controlador para la gestión de recursos bibliográficos (Libros, Revistas, Documentos).
-    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
@@ -198,3 +195,4 @@ namespace SIGEBI.API.Controllers
         }
     }
 }
+

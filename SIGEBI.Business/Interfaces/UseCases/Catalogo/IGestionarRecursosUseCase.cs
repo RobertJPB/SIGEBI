@@ -2,10 +2,6 @@ using SIGEBI.Business.DTOs;
 
 namespace SIGEBI.Business.Interfaces.UseCases.Catalogo
 {
-    /// <summary>
-    /// Contrato para la creación, edición y eliminación de recursos bibliográficos
-    /// (libros, revistas y documentos).
-    /// </summary>
     public interface IGestionarRecursosUseCase
     {
         // ── AGREGAR ──
@@ -26,4 +22,5 @@ namespace SIGEBI.Business.Interfaces.UseCases.Catalogo
         Task<IEnumerable<string>> ObtenerEditorialesAsync();
     }
 }
+
 
