@@ -1,6 +1,8 @@
-using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using SIGEBI.Services;
 using SIGEBI.Business.DTOs;
 
@@ -50,7 +52,6 @@ namespace SIGEBI.Views.GestionBibliografica
                 TxtISBN.Text = recurso.ISBN ?? "";
                 TxtEditorial.Text = recurso.Editorial ?? "";
                 TxtAnio.Text = recurso.Anio?.ToString() ?? "";
-                TxtGenero.Text = recurso.Genero ?? "";
                 TxtStock.Text = recurso.Stock.ToString();
 
                 if (!string.IsNullOrEmpty(recurso.ImagenUrl))
@@ -62,6 +63,28 @@ namespace SIGEBI.Views.GestionBibliografica
                             new Uri($"https://localhost:7047{recurso.ImagenUrl}"));
                     }
                     catch { }
+                }
+
+                try
+                {
+                    var generosDb = await _recursosApi.GetGenerosAsync();
+                    var sugerenciasGeneros = new List<string> { 
+                        "Novela", "Cuento", "Fantasía", "Terror", "Aventura", 
+                        "Ciencia Ficción", "Poesía", "Historia", "Biografía",
+                        "Ensayo", "Suspenso", "Infantil", "Juvenil"
+                    };
+
+                    foreach (var gen in generosDb)
+                    {
+                        if (!sugerenciasGeneros.Contains(gen)) sugerenciasGeneros.Add(gen);
+                    }
+                    CmbGenero.ItemsSource = sugerenciasGeneros.OrderBy(g => g);
+                    CmbGenero.Text = _recurso.Genero ?? "";
+                }
+                catch
+                {
+                    CmbGenero.ItemsSource = new[] { "Novela", "Fantasía", "Terror", "Historia" };
+                    CmbGenero.Text = _recurso.Genero ?? "";
                 }
             };
         }
@@ -114,7 +137,7 @@ namespace SIGEBI.Views.GestionBibliografica
                     ISBN = TxtISBN.Text.Trim(),
                     Editorial = TxtEditorial.Text.Trim(),
                     Anio = int.TryParse(TxtAnio.Text, out int anio) ? anio : null,
-                    Genero = string.IsNullOrWhiteSpace(TxtGenero.Text) ? null : TxtGenero.Text.Trim(),
+                    Genero = string.IsNullOrWhiteSpace(CmbGenero.Text) ? null : CmbGenero.Text.Trim(),
                     Stock = stock,
                     ImagenBytes = _imagenBytes,
                     ImagenNombre = _imagenNombre
@@ -130,5 +153,13 @@ namespace SIGEBI.Views.GestionBibliografica
 
         private void BtnCancelar_Click(object sender, RoutedEventArgs e)
             => DialogResult = false;
+
+        private void CmbGenero_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                BtnGuardar_Click(this, new RoutedEventArgs());
+            }
+        }
     }
 }

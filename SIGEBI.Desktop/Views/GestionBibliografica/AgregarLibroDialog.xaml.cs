@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using SIGEBI.Business.DTOs;
@@ -79,6 +80,26 @@ namespace SIGEBI.Views.GestionBibliografica
                     ErrorText.Text = "No se pudieron cargar las categorias.";
                     ErrorPanel.Visibility = Visibility.Visible;
                 }
+
+                try
+                {
+                    var generosDb = await _recursosApi.GetGenerosAsync();
+                    var sugerenciasGeneros = new List<string> { 
+                        "Novela", "Cuento", "Fantasía", "Terror", "Aventura", 
+                        "Ciencia Ficción", "Poesía", "Historia", "Biografía",
+                        "Ensayo", "Suspenso", "Infantil", "Juvenil"
+                    };
+
+                    foreach (var gen in generosDb)
+                    {
+                        if (!sugerenciasGeneros.Contains(gen)) sugerenciasGeneros.Add(gen);
+                    }
+                    CmbGenero.ItemsSource = sugerenciasGeneros.OrderBy(g => g);
+                }
+                catch
+                {
+                    CmbGenero.ItemsSource = new[] { "Novela", "Fantasía", "Terror", "Historia" };
+                }
             };
         }
 
@@ -134,7 +155,7 @@ namespace SIGEBI.Views.GestionBibliografica
                     Editorial = CmbEditorial.Text.Trim(),
                     Anio = int.TryParse(TxtAnio.Text, out int anio) ? anio : null,
                     NumeroPaginas = int.TryParse(TxtPaginas.Text, out int paginas) ? paginas : null,
-                    Genero = string.IsNullOrWhiteSpace(TxtGenero.Text) ? null : TxtGenero.Text.Trim(),
+                    Genero = string.IsNullOrWhiteSpace(CmbGenero.Text) ? null : CmbGenero.Text.Trim(),
                     Stock = stock,
                     ImagenBytes = _imagenBytes,
                     ImagenNombre = _imagenNombre
@@ -151,6 +172,14 @@ namespace SIGEBI.Views.GestionBibliografica
         private void BtnCancelar_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
+        }
+
+        private void CmbGenero_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                BtnGuardar_Click(this, new RoutedEventArgs());
+            }
         }
     }
 }

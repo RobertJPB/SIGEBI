@@ -14,6 +14,7 @@ namespace SIGEBI.Business.UseCases.Usuarios
     {
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly INotificacionesUseCase _notificaciones;
+        private readonly IPenalizacionesUseCase _penalizaciones;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMemoryCache _cache;
         private const string CachePrefix = "UserStatus_";
@@ -21,11 +22,13 @@ namespace SIGEBI.Business.UseCases.Usuarios
         public GestionarUsuarioUseCase(
             IUsuarioRepository usuarioRepository,
             INotificacionesUseCase notificaciones,
+            IPenalizacionesUseCase penalizaciones,
             IUnitOfWork unitOfWork,
             IMemoryCache cache)
         {
             _usuarioRepository = usuarioRepository;
             _notificaciones = notificaciones;
+            _penalizaciones = penalizaciones;
             _unitOfWork = unitOfWork;
             _cache = cache;
         }
@@ -68,8 +71,19 @@ namespace SIGEBI.Business.UseCases.Usuarios
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task SuspenderAsync(Guid id, string motivo)
+        public async Task SuspenderAsync(Guid id, string motivo, int? tiempoDias)
         {
+            if (tiempoDias.HasValue && tiempoDias.Value > 0)
+            {
+                await _penalizaciones.AplicarPenalizacionManualAsync(new AplicarPenalizacionManualDTO
+                {
+                    UsuarioId = id,
+                    Motivo = motivo,
+                    DiasPenalizacion = tiempoDias.Value
+                });
+                return;
+            }
+
             var usuario = await _usuarioRepository.GetByIdAsync(id)
                 ?? throw new InvalidOperationException("Usuario no encontrado.");
             usuario.Suspender(motivo);

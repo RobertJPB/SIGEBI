@@ -94,6 +94,16 @@ namespace SIGEBI.Infrastructure.Persistence.Repositories
                 .Select(e => e!)
                 .ToList();
         }
+        public async Task<IEnumerable<string>> GetGenerosUnicosAsync()
+        {
+            return await _context.Set<Libro>().AsNoTracking()
+                .Select(l => l.Genero)
+                .Where(g => !string.IsNullOrWhiteSpace(g))
+                .Distinct()
+                .OrderBy(g => g)
+                .Select(g => g!)
+                .ToListAsync();
+        }
     }
 }
 

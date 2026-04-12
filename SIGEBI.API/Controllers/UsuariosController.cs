@@ -148,7 +148,7 @@ namespace SIGEBI.API.Controllers
 
             if (string.IsNullOrWhiteSpace(request?.Motivo)) return BadRequest("El motivo de suspensión es obligatorio.");
 
-            await _gestionarUsuario.SuspenderAsync(id, request.Motivo);
+            await _gestionarUsuario.SuspenderAsync(id, request.Motivo, request.TiempoDias);
             return NoContent();
         }
 

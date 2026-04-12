@@ -234,5 +234,10 @@ namespace SIGEBI.Business.UseCases.Catalogo
         {
             return await _recursoRepository.GetEditorialesUnicasAsync();
         }
+        
+        public async Task<IEnumerable<string>> ObtenerGenerosAsync()
+        {
+            return await _recursoRepository.GetGenerosUnicosAsync();
+        }
     }
 }

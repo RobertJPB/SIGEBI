@@ -20,6 +20,7 @@ namespace SIGEBI.Business.Interfaces.UseCases.Catalogo
         // ── UTILIDADES ──
         Task<IEnumerable<string>> ObtenerAutoresAsync();
         Task<IEnumerable<string>> ObtenerEditorialesAsync();
+        Task<IEnumerable<string>> ObtenerGenerosAsync();
     }
 }
 

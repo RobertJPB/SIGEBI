@@ -15,6 +15,7 @@ namespace SIGEBI.Test.UseCases.Usuarios
     {
         private readonly Mock<IUsuarioRepository> _usuarioRepo;
         private readonly Mock<INotificacionesUseCase> _notificaciones;
+        private readonly Mock<IPenalizacionesUseCase> _penalizaciones;
         private readonly Mock<IUnitOfWork> _unitOfWork;
         private readonly Mock<Microsoft.Extensions.Caching.Memory.IMemoryCache> _cache;
         private readonly GestionarUsuarioUseCase _useCase;
@@ -23,12 +24,14 @@ namespace SIGEBI.Test.UseCases.Usuarios
         {
             _usuarioRepo = new Mock<IUsuarioRepository>();
             _notificaciones = new Mock<INotificacionesUseCase>();
+            _penalizaciones = new Mock<IPenalizacionesUseCase>();
             _unitOfWork = new Mock<IUnitOfWork>();
             _cache = new Mock<Microsoft.Extensions.Caching.Memory.IMemoryCache>();
 
             _useCase = new GestionarUsuarioUseCase(
                 _usuarioRepo.Object,
                 _notificaciones.Object,
+                _penalizaciones.Object,
                 _unitOfWork.Object,
                 _cache.Object);
         }

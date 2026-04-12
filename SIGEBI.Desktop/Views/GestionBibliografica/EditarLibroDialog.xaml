@@ -169,7 +169,7 @@
             <TextBox x:Name="TxtAnio" Style="{StaticResource Campo}"/>
 
             <TextBlock Text="Genero" Style="{StaticResource Etiqueta}"/>
-            <TextBox x:Name="TxtGenero" Style="{StaticResource Campo}"/>
+            <ComboBox x:Name="CmbGenero" Style="{StaticResource CampoCombo}" IsEditable="True" KeyDown="CmbGenero_KeyDown"/>
 
             <TextBlock Style="{StaticResource Etiqueta}">
                 <Run Text="Stock "/>
@@ -185,8 +185,8 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,28">
                 <Button Content="Cancelar" Style="{StaticResource BtnOutline}"
                         Margin="0,0,10,0" Click="BtnCancelar_Click"/>
-                <Button Content="Guardar Cambios" Style="{StaticResource BtnPrimario}"
-                        Click="BtnGuardar_Click"/>
+                <Button x:Name="BtnGuardar" Content="Guardar Cambios" Style="{StaticResource BtnPrimario}"
+                        Click="BtnGuardar_Click" IsDefault="True"/>
             </StackPanel>
         </StackPanel>
     </ScrollViewer>

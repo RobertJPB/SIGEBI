@@ -8,6 +8,9 @@ using SIGEBI.Views.Notificaciones;
 using SIGEBI.Views.Penalizaciones;
 using SIGEBI.Views.GestionUsuarios;
 using SIGEBI.Views.Reportes;
+using SIGEBI.Services;
+using SIGEBI.Domain.DomainServices;
+
 
 namespace SIGEBI
 {
@@ -26,7 +29,23 @@ namespace SIGEBI
             InitializeComponent();
             DataContext = SIGEBI.App.Current.Services.GetService(typeof(SIGEBI.ViewModels.MainViewModel));
             _activeBtn = BtnBibliografica;
+            AplicarPermisos();
             Navegar(new GestionBibliograficaPage(), "Gestión Bibliográfica", BtnBibliografica, TxtNavBibliografica, BrdBibliografica);
+        }
+
+        private void AplicarPermisos()
+        {
+            var rol = SessionService.Rol;
+            
+            if (!AccesoPolicy.PuedeVerAuditoria(rol))
+            {
+                BtnAuditoria.Visibility = Visibility.Collapsed;
+            }
+
+            if (!AccesoPolicy.PuedeGenerarReportes(rol))
+            {
+                BtnReportes.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void BtnBibliografica_Click(object sender, RoutedEventArgs e)

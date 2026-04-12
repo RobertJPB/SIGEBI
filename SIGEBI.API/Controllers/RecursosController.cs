@@ -80,6 +80,13 @@ namespace SIGEBI.API.Controllers
             return Ok(editoriales);
         }
 
+        [HttpGet("generos")]
+        public async Task<ActionResult<IEnumerable<string>>> ObtenerGeneros()
+        {
+            var generos = await _gestionarUseCase.ObtenerGenerosAsync();
+            return Ok(generos);
+        }
+
         // ── POST ──
         [HttpPost("libro")]
         [Consumes("multipart/form-data")]

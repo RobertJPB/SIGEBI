@@ -12,5 +12,6 @@ namespace SIGEBI.Business.Interfaces.Persistence
         Task<IEnumerable<Documento>> GetDocumentosAsync();
         Task<IEnumerable<string>> GetAutoresUnicosAsync();
         Task<IEnumerable<string>> GetEditorialesUnicasAsync();
+        Task<IEnumerable<string>> GetGenerosUnicosAsync();
     }
 }

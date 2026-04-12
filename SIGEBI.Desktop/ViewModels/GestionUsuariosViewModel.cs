@@ -135,7 +135,11 @@ namespace SIGEBI.ViewModels
                 try
                 {
                     IsBusy = true;
-                    await _api.SuspenderUsuarioAsync(id, new MotivoRequest { Motivo = dialog.Motivo! });
+                    await _api.SuspenderUsuarioAsync(id, new MotivoRequest 
+                    { 
+                        Motivo = dialog.Motivo!,
+                        TiempoDias = dialog.Dias
+                    });
                     await CargarUsuariosAsync();
                 }
                 catch (Exception ex)

@@ -25,6 +25,9 @@ namespace SIGEBI.Services
 
         [Get("/api/Recursos/editoriales")]
         Task<List<string>> GetEditorialesAsync();
+
+        [Get("/api/Recursos/generos")]
+        Task<List<string>> GetGenerosAsync();
     }
 
     public interface ICategoriasApi
