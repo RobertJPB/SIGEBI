@@ -5,6 +5,7 @@ using System.Windows.Data;
 
 namespace SIGEBI.Desktop.Converters
 {
+  
     public class InvertedBooleanToVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -20,4 +21,3 @@ namespace SIGEBI.Desktop.Converters
         }
     }
 }
-
